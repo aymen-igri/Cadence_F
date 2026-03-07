@@ -10,10 +10,11 @@ import {
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmIcon } from '@spartan-ng/helm/icon';
 import { LogoComponent } from "../../components/logo/Logo";
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [HlmSidebarImports, NgIcon, HlmIcon, LogoComponent],
+  imports: [HlmSidebarImports, NgIcon, HlmIcon, LogoComponent,RouterLink],
   template: `
     <div hlmSidebarWrapper>
       <hlm-sidebar>
@@ -26,7 +27,7 @@ import { LogoComponent } from "../../components/logo/Logo";
               <ul hlmSidebarMenu>
                 @for (item of _items; track item.title) {
                   <li hlmSidebarMenuItem>
-                    <a hlmSidebarMenuButton>
+                    <a hlmSidebarMenuButton [routerLink]="item.url">
                       <ng-icon hlm [name]="item.icon" />
                       <span>{{ item.title }}</span>
                     </a>

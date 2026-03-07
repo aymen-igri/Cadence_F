@@ -18,25 +18,29 @@ export const routes: Routes = [
   },
   {
     path: 'sign-in',
-    loadComponent: () => import('./pages/sign-in/sign-in').then((m) => m.SignIn),
+    loadComponent: () => import('./pages/auth/sign-in/sign-in').then((m) => m.SignIn),
   },
   {
     path: 'sign-up',
-    loadComponent: () => import('./pages/sign-up/sign-up').then((m) => m.SignUp),
+    loadComponent: () => import('./pages/auth/sign-up/sign-up').then((m) => m.SignUp),
   },
   {
-    path: '',
+    path: 'user',
     loadComponent: () =>
       import('./layouts/side-bar-layout/side-bar-layout').then((m) => m.SideBarLayout),
     children: [
       {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'user/dashboard',
         pathMatch: 'full',
       },
       {
         path: 'dashboard',
-        loadComponent: () => import('./pages/dashboard/dashboard').then((m) => m.Dashboard),
+        loadComponent: () => import('./pages/user/dashboard/dashboard').then((m) => m.Dashboard),
+      },
+      {
+        path: 'inbox',
+        loadComponent: () => import('./pages/user/inbox/inbox').then((m) => m.Inbox),
       },
     ],
   },
