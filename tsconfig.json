@@ -22,7 +22,8 @@
       "@spartan-ng/helm/dialog": ["./src/components/ui/dialog/src/index.ts"],
       "@spartan-ng/helm/label": ["./src/components/ui/label/src/index.ts"],
       "@spartan-ng/helm/sonner": ["./src/components/ui/sonner/src/index.ts"],
-      "@spartan-ng/helm/select": ["./src/components/ui/select/src/index.ts"]
+      "@spartan-ng/helm/select": ["./src/components/ui/select/src/index.ts"],
+      "@spartan-ng/helm/separator": ["./src/components/ui/separator/src/index.ts"]
     }
   },
   "angularCompilerOptions": {
