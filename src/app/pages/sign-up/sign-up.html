@@ -1,0 +1,67 @@
+<div class="min-h-screen bg-background flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <!-- Card -->
+    <div hlmCard class="border border-border shadow-none rounded-xl">
+      <div hlmCardContent class="pt-4 pb-4 px-4">
+        <!-- Logo / Brand -->
+        <div class="flex flex-col items-center mb-4">
+          <app-logo size="md" />
+          <p class="text-sm text-muted-foreground mt-2">Create your account</p>
+        </div>
+
+        <!-- Form -->
+        <form class="flex flex-col gap-4">
+          <!-- First Name + Last Name -->
+          <div class="flex gap-3">
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label hlmLabel for="firstName">First Name</label>
+              <input hlmInput id="firstName" type="text" placeholder="John" class="w-full" />
+            </div>
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label hlmLabel for="lastName">Last Name</label>
+              <input hlmInput id="lastName" type="text" placeholder="Doe" class="w-full" />
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="flex flex-col gap-1.5">
+            <label hlmLabel for="email">Email</label>
+            <input hlmInput id="email" type="email" placeholder="you@example.com" class="w-full" />
+          </div>
+
+          <!-- Password -->
+          <div class="flex flex-col gap-1.5">
+            <label hlmLabel for="password">Password</label>
+            <div class="relative">
+              <input
+                hlmInput
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                placeholder="••••••••"
+                class="w-full pr-10"
+              />
+              <button
+                type="button"
+                (click)="togglePassword()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <lucide-angular [img]="showPassword ? EyeOff : Eye" class="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button hlmBtn class="w-full mt-1">Create account</button>
+        </form>
+
+        <!-- Footer -->
+        <p class="text-center text-sm text-muted-foreground mt-6">
+          Already have an account?
+          <a routerLink="/sign-in" class="font-medium hover:underline underline-offset-4">
+            Sign in
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

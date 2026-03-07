@@ -1,9 +1,32 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { LucideAngularModule, Eye, EyeOff } from 'lucide-angular';
+import { HlmButtonImports } from '../../../components/ui/button/src';
+import { HlmInputImports } from '../../../components/ui/input/src';
+import { HlmLabelImports } from '../../../components/ui/label/src';
+import { HlmCardImports } from '../../../components/ui/card/src';
+import { LogoComponent } from '../../components/logo/Logo';
 
 @Component({
   selector: 'app-sign-up',
-  template: `<div class="min-h-screen bg-background flex items-center justify-center px-4">
-    <p class="text-muted-foreground text-sm">Sign up — coming soon.</p>
-  </div>`,
+  imports: [
+    RouterLink,
+    LucideAngularModule,
+    ...HlmButtonImports,
+    ...HlmInputImports,
+    ...HlmLabelImports,
+    ...HlmCardImports,
+    LogoComponent,
+  ],
+  templateUrl: './sign-up.html',
 })
-export class SignUp {}
+export class SignUp {
+  readonly Eye = Eye;
+  readonly EyeOff = EyeOff;
+
+  showPassword = false;
+
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+}
