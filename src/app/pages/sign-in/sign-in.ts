@@ -21,7 +21,6 @@ import { RouterLink } from "@angular/router";
     RouterLink
 ],
   templateUrl: './sign-in.html',
-  styleUrl: './sign-in.css',
 })
 export class SignIn {
   readonly Eye = Eye;
