@@ -42,6 +42,10 @@ export const routes: Routes = [
         path: 'inbox',
         loadComponent: () => import('./pages/user/inbox/inbox').then((m) => m.Inbox),
       },
+      {
+        path: 'subjects',
+        loadComponent: () => import('./pages/user/subjects/subjects').then((m) => m.Subjects),
+      }
     ],
   },
   {

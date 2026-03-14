@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
 import {
+  lucideBookOpen,
   lucideCalendar,
   lucideHouse,
   lucideInbox,
@@ -14,7 +15,7 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [HlmSidebarImports, NgIcon, HlmIcon, LogoComponent,RouterLink],
+  imports: [HlmSidebarImports, NgIcon, HlmIcon, LogoComponent, RouterLink],
   template: `
     <div hlmSidebarWrapper>
       <hlm-sidebar>
@@ -48,6 +49,7 @@ import { RouterLink } from '@angular/router';
       lucideCalendar,
       lucideSearch,
       lucideSettings,
+      lucideBookOpen,
     }),
   ],
 })
@@ -64,9 +66,9 @@ export class AppSidebar {
       icon: 'lucideInbox',
     },
     {
-      title: 'Calendar',
-      url: 'calendar',
-      icon: 'lucideCalendar',
+      title: 'Subjects',
+      url: 'subjects',
+      icon: 'lucideBookOpen',
     },
     {
       title: 'Search',
