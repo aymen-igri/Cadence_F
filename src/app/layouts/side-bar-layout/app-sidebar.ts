@@ -9,6 +9,7 @@ import {
   lucideSearch,
   lucideSettings,
   lucideLogOut,
+  lucideUsers,
 } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmIcon } from '@spartan-ng/helm/icon';
@@ -81,12 +82,27 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       lucideBookOpen,
       lucideGoal,
       lucideLogOut,
+      lucideUsers,
     }),
   ],
 })
 export class AppSidebar {
-  // Config: Main navigation items (Settings removed)
-  protected readonly _navItems = [
+  readonly role = localStorage.getItem('role');
+
+  protected readonly _adminNavItems = [
+    {
+      title: 'Dashboard',
+      url: 'dashboard',
+      icon: 'lucideHouse',
+    },
+    {
+      title: 'User Management',
+      url: 'users',
+      icon: 'lucideUsers',
+    },
+  ];
+
+  protected readonly _userNavItems = [
     {
       title: 'Home',
       url: 'dashboard',
@@ -126,4 +142,6 @@ export class AppSidebar {
       icon: 'lucideLogOut',
     },
   ];
+
+  readonly _navItems = this.role === 'admin' ? this._adminNavItems : this._userNavItems;
 }

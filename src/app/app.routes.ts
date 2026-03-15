@@ -58,6 +58,25 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'admin',
+    loadComponent: () =>
+      import('./layouts/side-bar-layout/side-bar-layout').then((m) => m.SideBarLayout),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./pages/admin/dashboard/dashboard').then((m) => m.AdminDashboard),
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./pages/admin/users/users').then((m) => m.AdminUsers),
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('./pages/admin/settings/settings').then((m) => m.AdminSettings),
+      },
+    ],
+  },
+  {
     path: '**',
     loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),
   },
