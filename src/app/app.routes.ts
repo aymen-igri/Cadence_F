@@ -25,6 +25,14 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/auth/sign-up/sign-up').then((m) => m.SignUp),
   },
   {
+    path: 'forbidden',
+    loadComponent: () => import('./pages/forbidden/forbidden').then((m) => m.Forbidden),
+  },
+  {
+    path: 'not-found',
+    loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),
+  },
+  {
     path: 'user',
     loadComponent: () =>
       import('./layouts/side-bar-layout/side-bar-layout').then((m) => m.SideBarLayout),
@@ -78,6 +86,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),
+    redirectTo: 'not-found',
   },
 ];
