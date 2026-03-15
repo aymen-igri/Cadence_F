@@ -3,6 +3,7 @@ import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
 import {
   lucideBookOpen,
   lucideCalendar,
+  lucideGoal,
   lucideHouse,
   lucideInbox,
   lucideSearch,
@@ -29,8 +30,8 @@ import { RouterLink } from '@angular/router';
                 @for (item of _items; track item.title) {
                   <li hlmSidebarMenuItem>
                     <a hlmSidebarMenuButton [routerLink]="item.url">
-                      <ng-icon hlm [name]="item.icon" />
-                      <span>{{ item.title }}</span>
+                      <ng-icon hlm [name]="item.icon" class="text-white" />
+                      <span class="text-white">{{ item.title }}</span>
                     </a>
                   </li>
                 }
@@ -50,6 +51,7 @@ import { RouterLink } from '@angular/router';
       lucideSearch,
       lucideSettings,
       lucideBookOpen,
+      lucideGoal,
     }),
   ],
 })
@@ -71,9 +73,9 @@ export class AppSidebar {
       icon: 'lucideBookOpen',
     },
     {
-      title: 'Search',
-      url: 'search',
-      icon: 'lucideSearch',
+      title: 'Goals',
+      url: 'goals',
+      icon: 'lucideGoal',
     },
     {
       title: 'Settings',

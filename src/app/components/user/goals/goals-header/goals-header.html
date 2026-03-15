@@ -1,0 +1,60 @@
+<hlm-sheet>
+  <div
+    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-border"
+  >
+    <div class="space-y-1">
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">Goals</h1>
+      <p class="text-sm text-muted-foreground">Set and track your learning objectives.</p>
+    </div>
+    <button hlmBtn size="sm" class="gap-2 shadow-sm" hlmSheetTrigger side="right">
+      <lucide-angular [img]="Plus" class="h-4 w-4" />
+      New goal
+    </button>
+  </div>
+
+  <hlm-sheet-content *hlmSheetPortal="let ctx" class="flex flex-col gap-6 p-6">
+    <div hlmSheetHeader side="right">
+      <h2 hlmSheetTitle class="text-lg">Create goal</h2>
+      <p hlmSheetDescription class="text-sm">Set a new learning goal and define your target.</p>
+    </div>
+
+    <div class="grid gap-6">
+      <div class="grid gap-2.5">
+        <label hlmLabel for="goal-title">Goal title</label>
+        <input hlmInput id="goal-title" placeholder="e.g. Master linear algebra" />
+      </div>
+
+      <div class="grid gap-2.5">
+        <label hlmLabel for="goal-subject">Subject</label>
+        <select
+          id="goal-subject"
+          class="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm text-foreground"
+        >
+          <option value="">Select a subject</option>
+          <option>Mathematics</option>
+          <option>Physics</option>
+          <option>Chemistry</option>
+        </select>
+      </div>
+
+      <div class="grid gap-2.5">
+        <label hlmLabel for="goal-deadline">Target date</label>
+        <input hlmInput id="goal-deadline" type="date" />
+      </div>
+
+      <div class="grid gap-2.5">
+        <label hlmLabel for="goal-description">Description</label>
+        <textarea
+          id="goal-description"
+          placeholder="Describe your goal and what you want to achieve"
+          class="h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+        ></textarea>
+      </div>
+    </div>
+
+    <div hlmSheetFooter class="mt-2 flex flex-row items-center justify-end gap-3">
+      <button hlmBtn variant="outline" size="sm" hlmSheetClose>Cancel</button>
+      <button hlmBtn size="sm">Create goal</button>
+    </div>
+  </hlm-sheet-content>
+</hlm-sheet>

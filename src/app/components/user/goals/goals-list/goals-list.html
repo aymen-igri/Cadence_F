@@ -1,0 +1,9 @@
+@if (hasGoals()) {
+  <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    @for (goal of goals; track goal.id) {
+      <app-goal-card [goal]="goal" />
+    }
+  </div>
+} @else {
+  <app-goals-empty-state />
+}
