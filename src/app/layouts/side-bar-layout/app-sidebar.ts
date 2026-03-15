@@ -8,36 +8,64 @@ import {
   lucideInbox,
   lucideSearch,
   lucideSettings,
+  lucideLogOut,
 } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmIcon } from '@spartan-ng/helm/icon';
-import { LogoComponent } from "../../components/logo/Logo";
-import { RouterLink } from '@angular/router';
+import { LogoComponent } from '../../components/logo/Logo';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [HlmSidebarImports, NgIcon, HlmIcon, LogoComponent, RouterLink],
+  imports: [HlmSidebarImports, NgIcon, HlmIcon, LogoComponent, RouterLink, RouterLinkActive],
   template: `
     <div hlmSidebarWrapper>
       <hlm-sidebar>
+        <!-- Header: Logo -->
+        <div hlmSidebarHeader class="p-4">
+          <app-logo />
+        </div>
+
+        <!-- Scrollable Content: Main Nav -->
         <div hlmSidebarContent>
           <div hlmSidebarGroup>
-            <div hlmSidebarGroupLabel>
-              <app-logo class="mt-2" />
-            </div>
-            <div hlmSidebarGroupContent class="mt-6">
+            <div hlmSidebarGroupContent>
               <ul hlmSidebarMenu>
-                @for (item of _items; track item.title) {
+                @for (item of _navItems; track item.title) {
                   <li hlmSidebarMenuItem>
-                    <a hlmSidebarMenuButton [routerLink]="item.url">
-                      <ng-icon hlm [name]="item.icon" class="text-white" />
-                      <span class="text-white">{{ item.title }}</span>
+                    <a
+                      hlmSidebarMenuButton
+                      [routerLink]="item.url"
+                      class="text-muted-foreground hover:text-foreground no-underline"
+                      routerLinkActive="!text-primary !bg-primary/10 !font-medium"
+                    >
+                      <ng-icon hlm [name]="item.icon" />
+                      <span>{{ item.title }}</span>
                     </a>
                   </li>
                 }
               </ul>
             </div>
           </div>
+        </div>
+
+        <!-- Footer: Settings (Pinned to bottom) -->
+        <div hlmSidebarFooter class="mb-6">
+          <ul hlmSidebarMenu>
+            @for (item of _footerItems; track item.title) {
+              <li hlmSidebarMenuItem>
+                <a
+                  hlmSidebarMenuButton
+                  [routerLink]="item.url"
+                  class="text-muted-foreground hover:text-foreground no-underline"
+                  routerLinkActive="!text-primary !bg-primary/10 !font-medium"
+                >
+                  <ng-icon hlm [name]="item.icon" />
+                  <span>{{ item.title }}</span>
+                </a>
+              </li>
+            }
+          </ul>
         </div>
       </hlm-sidebar>
       <ng-content />
@@ -52,11 +80,13 @@ import { RouterLink } from '@angular/router';
       lucideSettings,
       lucideBookOpen,
       lucideGoal,
+      lucideLogOut,
     }),
   ],
 })
 export class AppSidebar {
-  protected readonly _items = [
+  // Config: Main navigation items (Settings removed)
+  protected readonly _navItems = [
     {
       title: 'Home',
       url: 'dashboard',
@@ -80,12 +110,20 @@ export class AppSidebar {
     {
       title: 'Availability',
       url: 'availability',
-      icon: 'lucideGoal',
+      icon: 'lucideCalendar',
     },
+  ];
+
+  protected readonly _footerItems = [
     {
       title: 'Settings',
       url: 'settings',
       icon: 'lucideSettings',
+    },
+    {
+      title: 'Logout',
+      url: 'logout',
+      icon: 'lucideLogOut',
     },
   ];
 }
