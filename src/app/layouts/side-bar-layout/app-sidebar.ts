@@ -11,6 +11,7 @@ import {
   lucideLogOut,
   lucideUsers,
   lucideMap,
+  lucideClock,
 } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmIcon } from '@spartan-ng/helm/icon';
@@ -85,6 +86,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       lucideLogOut,
       lucideUsers,
       lucideMap,
+      lucideClock,
     }),
   ],
 })
@@ -119,6 +121,11 @@ export class AppSidebar {
       title: 'Study Map',
       url: 'study-map',
       icon: 'lucideMap',
+    },
+    {
+      title: 'Sessions',
+      url: 'sessions',
+      icon: 'lucideClock',
     },
     {
       title: 'Availability',

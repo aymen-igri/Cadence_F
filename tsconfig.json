@@ -36,7 +36,10 @@
       "@spartan-ng/helm/navigation-menu": ["./src/components/ui/navigation-menu/src/index.ts"],
       "@spartan-ng/helm/menubar": ["./src/components/ui/menubar/src/index.ts"],
       "@spartan-ng/helm/dropdown-menu": ["./src/components/ui/dropdown-menu/src/index.ts"],
-      "@spartan-ng/helm/badge": ["./src/components/ui/badge/src/index.ts"]
+      "@spartan-ng/helm/badge": ["./src/components/ui/badge/src/index.ts"],
+      "@spartan-ng/helm/date-picker": ["./src/components/ui/date-picker/src/index.ts"],
+      "@spartan-ng/helm/calendar": ["./src/components/ui/calendar/src/index.ts"],
+      "@spartan-ng/helm/popover": ["./src/components/ui/popover/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

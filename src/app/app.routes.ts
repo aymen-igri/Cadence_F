@@ -64,10 +64,15 @@ export const routes: Routes = [
           import('./pages/user/availability/availability').then((m) => m.AvailabilityComponent),
       },
       {
+        path: 'sessions',
+        loadComponent: () =>
+          import('./pages/user/sessions/sessions').then((m) => m.SessionsComponent),
+      },
+      {
         path: 'study-map',
         loadComponent: () =>
           import('./pages/user/study-map/study-map').then((m) => m.StudyMapComponent),
-      }
+      },
     ],
   },
   {
@@ -77,7 +82,8 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./pages/admin/dashboard/dashboard').then((m) => m.AdminDashboard),
+        loadComponent: () =>
+          import('./pages/admin/dashboard/dashboard').then((m) => m.AdminDashboard),
       },
       {
         path: 'users',

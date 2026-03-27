@@ -1,0 +1,76 @@
+<hlm-sheet side="right" [state]="state" (stateChanged)="onStateChange($event)">
+  <hlm-sheet-content *hlmSheetPortal="let ctx" class="w-full sm:max-w-md overflow-y-auto">
+    <hlm-sheet-header>
+      <h3 hlmSheetTitle>Schedule Session</h3>
+      <p hlmSheetDescription>Plan your study time carefully.</p>
+    </hlm-sheet-header>
+
+    <form [formGroup]="sessionForm" (ngSubmit)="onSubmit()" class="space-y-6 py-6 px-4">
+      <div class="space-y-2">
+        <label hlmLabel for="title">Session Title</label>
+        <input
+          hlmInput
+          id="title"
+          formControlName="title"
+          placeholder="e.g. Chapter 3 Review"
+          class="w-full"
+        />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label hlmLabel for="date">Date</label>
+          <input hlmInput type="date" id="date" formControlName="date" class="w-full" />
+        </div>
+        <div class="space-y-2">
+          <label hlmLabel for="type">Session Type</label>
+          <select
+            formControlName="type"
+            class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="FOCUS">Focus (Deep Work)</option>
+            <option value="REVIEW">Review</option>
+            <option value="PRACTICE">Practice</option>
+            <option value="BREAK">Break</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-2">
+          <label hlmLabel for="startTime">Start Time</label>
+          <input hlmInput type="time" id="startTime" formControlName="startTime" class="w-full" />
+        </div>
+        <div class="space-y-2">
+          <label hlmLabel for="endTime">End Time</label>
+          <input hlmInput type="time" id="endTime" formControlName="endTime" class="w-full" />
+        </div>
+      </div>
+
+      <div class="space-y-2 mt-4">
+        <label hlmLabel>Related Subject (Optional)</label>
+        <input hlmInput formControlName="subjectId" placeholder="e.g. subject-123" class="w-full" />
+        <p class="text-[10px] text-muted-foreground mt-1">
+          Select logic implementation pending real data.
+        </p>
+      </div>
+
+      <div class="space-y-2 mt-4">
+        <label hlmLabel>Related Goal (Optional)</label>
+        <input hlmInput formControlName="goalId" placeholder="e.g. goal-456" class="w-full" />
+      </div>
+
+      <div class="space-y-2 mt-4">
+        <label hlmLabel>Related Task (Optional)</label>
+        <input hlmInput formControlName="taskId" placeholder="e.g. task-789" class="w-full" />
+      </div>
+    </form>
+
+    <hlm-sheet-footer class="flex justify-end gap-2 mt-6">
+      <button hlmBtn variant="outline" type="button" (click)="close()">Cancel</button>
+      <button hlmBtn type="button" (click)="onSubmit()" [disabled]="sessionForm.invalid">
+        Save Session
+      </button>
+    </hlm-sheet-footer>
+  </hlm-sheet-content>
+</hlm-sheet>
