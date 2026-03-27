@@ -1,0 +1,112 @@
+<div class="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+  <!-- Goal Header (clickable to expand) -->
+  <div
+    class="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer hover:bg-muted/30 transition-colors"
+    (click)="toggleExpand.emit()"
+  >
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 mb-1.5">
+        <h4 class="font-medium text-sm text-foreground truncate">{{ goal.title }}</h4>
+      </div>
+
+      <!-- Progress row -->
+      <div class="flex items-center gap-3">
+        <hlm-progress [value]="goal.progress" class="h-2 w-full max-w-50"></hlm-progress>
+        <span class="text-xs text-muted-foreground whitespace-nowrap">{{ goal.progress }}%</span>
+      </div>
+    </div>
+
+    <div
+      class="flex items-center gap-4 text-xs text-muted-foreground shrink-0 flex-wrap sm:flex-nowrap"
+    >
+      <div class="flex items-center gap-1.5" title="Target hours per week">
+        <lucide-angular [img]="Clock" class="h-3.5 w-3.5" />
+        {{ goal.targetHoursPerWeek }}h/wk
+      </div>
+      <div class="flex items-center gap-1.5" title="Deadline">
+        <lucide-angular [img]="Calendar" class="h-3.5 w-3.5" />
+        {{ goal.deadline | date: 'shortDate' }}
+      </div>
+
+      <div class="flex items-center gap-1 ml-2" (click)="$event.stopPropagation()">
+        <button
+          [hlmDropdownMenuTrigger]="goalMenu"
+          hlmBtn
+          variant="ghost"
+          size="icon"
+          class="h-7 w-7 text-muted-foreground"
+        >
+          <lucide-angular [img]="MoreVertical" class="h-4 w-4" />
+        </button>
+        <button
+          hlmBtn
+          variant="ghost"
+          size="icon"
+          class="h-7 w-7 text-muted-foreground"
+          (click)="toggleExpand.emit()"
+        >
+          <lucide-angular [img]="isExpanded ? ChevronDown : ChevronRight" class="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expanded Content (Tasks) -->
+  @if (isExpanded) {
+    <div class="px-4 pb-4 bg-muted/10 border-t border-border/50">
+      <div class="flex items-center justify-between py-3">
+        <h5 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tasks</h5>
+      </div>
+
+      <!-- Tasks List -->
+      @if (goal.tasks.length > 0) {
+        <div class="flex flex-col gap-1">
+          @for (task of goal.tasks; track task.id) {
+            <app-task-item [task]="task" />
+          }
+        </div>
+      } @else {
+        <!-- Empty Tasks State -->
+        <div class="py-4 text-center border-y border-dashed border-border mb-3 rounded-sm">
+          <p class="text-xs text-muted-foreground">No tasks yet.</p>
+        </div>
+      }
+
+      <!-- Add Task bottom trigger -->
+      <div class="mt-3">
+        <hlm-sheet>
+          <button
+            hlmBtn
+            variant="ghost"
+            size="sm"
+            class="h-8 w-full border border-dashed border-border bg-background/50 hover:bg-muted text-muted-foreground gap-2"
+            hlmSheetTrigger
+            side="right"
+          >
+            <lucide-angular [img]="Plus" class="h-3.5 w-3.5" />
+            Add task
+          </button>
+
+          <hlm-sheet-content *hlmSheetPortal="let ctx" class="flex flex-col gap-6 p-6">
+            <div hlmSheetHeader side="right">
+              <h2 hlmSheetTitle class="text-lg">Create task</h2>
+              <p hlmSheetDescription class="text-sm">Add a task to "{{ goal.title }}".</p>
+            </div>
+            <app-task-form />
+            <div hlmSheetFooter class="mt-2 flex flex-row items-center justify-end gap-3">
+              <button hlmBtn variant="outline" size="sm" hlmSheetClose>Cancel</button>
+              <button hlmBtn size="sm">Create task</button>
+            </div>
+          </hlm-sheet-content>
+        </hlm-sheet>
+      </div>
+    </div>
+  }
+</div>
+
+<ng-template #goalMenu>
+  <hlm-dropdown-menu>
+    <button hlmMenuItem>Edit goal</button>
+    <button hlmMenuItem class="text-destructive">Delete goal</button>
+  </hlm-dropdown-menu>
+</ng-template>

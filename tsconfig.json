@@ -28,7 +28,15 @@
       "@spartan-ng/helm/sheet": ["./src/components/ui/sheet/src/index.ts"],
       "@spartan-ng/helm/skeleton": ["./src/components/ui/skeleton/src/index.ts"],
       "@spartan-ng/helm/tooltip": ["./src/components/ui/tooltip/src/index.ts"],
-      "@spartan-ng/helm/switch": ["./src/components/ui/switch/src/index.ts"]
+      "@spartan-ng/helm/switch": ["./src/components/ui/switch/src/index.ts"],
+      "@spartan-ng/helm/table": ["./src/components/ui/table/src/index.ts"],
+      "@spartan-ng/helm/accordion": ["./src/components/ui/accordion/src/index.ts"],
+      "@spartan-ng/helm/progress": ["./src/components/ui/progress/src/index.ts"],
+      "@spartan-ng/helm/checkbox": ["./src/components/ui/checkbox/src/index.ts"],
+      "@spartan-ng/helm/navigation-menu": ["./src/components/ui/navigation-menu/src/index.ts"],
+      "@spartan-ng/helm/menubar": ["./src/components/ui/menubar/src/index.ts"],
+      "@spartan-ng/helm/dropdown-menu": ["./src/components/ui/dropdown-menu/src/index.ts"],
+      "@spartan-ng/helm/badge": ["./src/components/ui/badge/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

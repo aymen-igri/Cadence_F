@@ -1,0 +1,80 @@
+<div class="flex flex-1 flex-col gap-6 p-6 sm:p-8">
+  <!-- Header -->
+  <hlm-sheet>
+    <div
+      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-border"
+    >
+      <div class="space-y-1">
+        <h1 class="text-3xl font-bold tracking-tight text-foreground">Study Map</h1>
+        <p class="text-sm text-muted-foreground">
+          Manage your subjects, goals, and tasks in one place.
+        </p>
+      </div>
+      <button hlmBtn size="sm" class="gap-2 shadow-sm" hlmSheetTrigger side="right">
+        <lucide-angular [img]="Plus" class="h-4 w-4" />
+        Add subject
+      </button>
+    </div>
+
+    <!-- Subject Sheet -->
+    <hlm-sheet-content *hlmSheetPortal="let ctx" class="flex flex-col gap-6 p-6">
+      <div hlmSheetHeader side="right">
+        <h2 hlmSheetTitle class="text-lg">Create subject</h2>
+        <p hlmSheetDescription class="text-sm">
+          Add a new subject to organize your goals and tasks.
+        </p>
+      </div>
+      <app-subject-form />
+      <div hlmSheetFooter class="mt-2 flex flex-row items-center justify-end gap-3">
+        <button hlmBtn variant="outline" size="sm" hlmSheetClose>Cancel</button>
+        <button hlmBtn size="sm">Create subject</button>
+      </div>
+    </hlm-sheet-content>
+  </hlm-sheet>
+
+  <!-- Content -->
+  @if (subjects.length > 0) {
+    <div class="flex flex-col gap-4">
+      @for (subject of subjects; track subject.id) {
+        <app-subject-card
+          [subject]="subject"
+          [isExpanded]="expandedSubjectId === subject.id"
+          (toggleExpand)="toggleSubject(subject.id)"
+        />
+      }
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <hlm-card
+      class="flex flex-col items-center justify-center gap-3 py-16 text-center border-dashed"
+    >
+      <div class="text-muted-foreground mb-2">
+        <lucide-angular [img]="Plus" class="h-10 w-10 opacity-50" />
+      </div>
+      <div>
+        <h3 class="font-semibold text-foreground">No subjects yet</h3>
+        <p class="text-sm text-muted-foreground mt-1 max-w-sm">
+          Create your first subject to start building your study map and organizing your goals.
+        </p>
+      </div>
+      <hlm-sheet>
+        <button hlmBtn size="sm" class="mt-4" hlmSheetTrigger side="right">
+          Add your first subject
+        </button>
+        <hlm-sheet-content *hlmSheetPortal="let ctx" class="flex flex-col gap-6 p-6">
+          <div hlmSheetHeader side="right">
+            <h2 hlmSheetTitle class="text-lg">Create subject</h2>
+            <p hlmSheetDescription class="text-sm">
+              Add a new subject to organize your goals and tasks.
+            </p>
+          </div>
+          <app-subject-form />
+          <div hlmSheetFooter class="mt-2 flex flex-row items-center justify-end gap-3">
+            <button hlmBtn variant="outline" size="sm" hlmSheetClose>Cancel</button>
+            <button hlmBtn size="sm">Create subject</button>
+          </div>
+        </hlm-sheet-content>
+      </hlm-sheet>
+    </hlm-card>
+  }
+</div>
