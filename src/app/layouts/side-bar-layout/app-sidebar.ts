@@ -132,11 +132,6 @@ export class AppSidebar {
       url: 'weekly-plan',
       icon: 'lucideCalendar',
     },
-    {
-      title: 'Availability',
-      url: 'availability',
-      icon: 'lucideCalendar',
-    },
   ];
 
   protected readonly _footerItems = [

@@ -51,11 +51,6 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/user/inbox/inbox').then((m) => m.Inbox),
       },
       {
-        path: 'availability',
-        loadComponent: () =>
-          import('./pages/user/availability/availability').then((m) => m.AvailabilityComponent),
-      },
-      {
         path: 'sessions',
         loadComponent: () =>
           import('./pages/user/sessions/sessions').then((m) => m.SessionsComponent),
