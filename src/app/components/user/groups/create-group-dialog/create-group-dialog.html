@@ -1,0 +1,40 @@
+<hlm-dialog [state]="state()" (stateChanged)="onStateChange($event)">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" style="width: 500px; max-width: 500px;">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle>Create Group</h3>
+      <p hlmDialogDescription>Set up a new study group.</p>
+    </hlm-dialog-header>
+
+    <div class="py-4 space-y-4">
+      <div class="space-y-2">
+        <label hlmLabel>Group Name</label>
+        <input hlmInput [(ngModel)]="groupName" placeholder="E.g. Angular Masters" class="w-full" />
+      </div>
+
+      <div class="space-y-2">
+        <label hlmLabel>Description</label>
+        <textarea
+          hlmInput
+          class="w-full min-h-25"
+          [(ngModel)]="description"
+          placeholder="What is this group about?"
+        ></textarea>
+      </div>
+
+      <div class="space-y-2">
+        <label hlmLabel>Type</label>
+        <select hlmInput [(ngModel)]="type" class="w-full">
+          <option value="OPEN">Open (Anyone can join)</option>
+          <option value="LOCKED">Locked (Requires approval)</option>
+        </select>
+      </div>
+    </div>
+
+    <hlm-dialog-footer>
+      <button hlmBtn variant="outline" (click)="closeDialog(ctx)">Cancel</button>
+      <button hlmBtn (click)="confirm(ctx)" [disabled]="!groupName() || !description()">
+        Create
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

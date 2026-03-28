@@ -61,6 +61,10 @@ export const routes: Routes = [
           import('./pages/user/weekly-plan/weekly-plan').then((m) => m.WeeklyPlanComponent),
       },
       {
+        path: 'groups',
+        loadComponent: () => import('./pages/user/groups/groups').then((m) => m.GroupsComponent),
+      },
+      {
         path: 'study-map',
         loadComponent: () =>
           import('./pages/user/study-map/study-map').then((m) => m.StudyMapComponent),

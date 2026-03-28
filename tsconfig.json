@@ -40,7 +40,8 @@
       "@spartan-ng/helm/date-picker": ["./src/components/ui/date-picker/src/index.ts"],
       "@spartan-ng/helm/calendar": ["./src/components/ui/calendar/src/index.ts"],
       "@spartan-ng/helm/popover": ["./src/components/ui/popover/src/index.ts"],
-      "@spartan-ng/helm/tabs": ["./src/components/ui/tabs/src/index.ts"]
+      "@spartan-ng/helm/tabs": ["./src/components/ui/tabs/src/index.ts"],
+      "@spartan-ng/helm/radio-group": ["./src/components/ui/radio-group/src/index.ts"]
     }
   },
   "angularCompilerOptions": {
