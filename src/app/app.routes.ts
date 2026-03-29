@@ -1,9 +1,15 @@
 import { Routes } from '@angular/router';
+import { Home } from './pages/home/home';
+import { SignIn } from './pages/auth/sign-in/sign-in';
+import { SignUp } from './pages/auth/sign-up/sign-up';
+import { Forbidden } from './pages/forbidden/forbidden';
+import { NotFound } from './pages/not-found/not-found';
+import { MainLayout } from './layouts/main-layout/main-layout';
 
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
+    component: MainLayout,
     children: [
       {
         path: '',
@@ -12,38 +18,35 @@ export const routes: Routes = [
       },
       {
         path: 'home',
-        loadComponent: () => import('./pages/home/home').then((m) => m.Home),
+        component: Home,
       },
     ],
   },
   {
     path: 'sign-in',
-    loadComponent: () => import('./pages/auth/sign-in/sign-in').then((m) => m.SignIn),
+    component: SignIn,
   },
   {
     path: 'sign-up',
-    loadComponent: () => import('./pages/auth/sign-up/sign-up').then((m) => m.SignUp),
+    component: SignUp,
   },
   {
     path: 'forbidden',
-    loadComponent: () => import('./pages/forbidden/forbidden').then((m) => m.Forbidden),
+    component: Forbidden,
   },
   {
     path: 'not-found',
-    loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),
+    component: NotFound,
   },
   {
     path: 'user',
     loadComponent: () =>
       import('./layouts/side-bar-layout/side-bar-layout').then((m) => m.SideBarLayout),
     children: [
-      {
-        path: '',
-        redirectTo: 'user/dashboard',
-        pathMatch: 'full',
-      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
         path: 'dashboard',
+        data: { preload: true },
         loadComponent: () => import('./pages/user/dashboard/dashboard').then((m) => m.Dashboard),
       },
       {
