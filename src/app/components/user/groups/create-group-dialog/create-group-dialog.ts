@@ -6,6 +6,8 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { BrnDialogImports } from '@spartan-ng/brain/dialog';
+import { GroupData } from '@app/core/models/group.model';
+import { form, required, FormRoot, FormField } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-create-group-dialog',
@@ -18,18 +20,33 @@ import { BrnDialogImports } from '@spartan-ng/brain/dialog';
     HlmInputImports,
     HlmLabelImports,
     BrnDialogImports,
+    FormRoot,
+    FormField,
   ],
   templateUrl: './create-group-dialog.html',
 })
 export class CreateGroupDialogComponent {
   state = input.required<'closed' | 'open'>();
   dialogStateChange = output<'closed' | 'open'>();
-  confirmClick = output<{ name: string; description: string; type: 'OPEN' | 'LOCKED' }>();
+  groupModel = signal<GroupData>({ name: '', description: '', type: 'OPEN' });
 
-  groupName = signal('');
-  description = signal('');
-  type = signal<'OPEN' | 'LOCKED'>('OPEN');
-
+  groupForm = form(
+    this.groupModel,
+    (schema) => {
+      required(schema.name, { message: 'Group name is required' });
+      required(schema.description, { message: 'Group description is required' });
+      required(schema.type, { message: 'Group type is required' });
+    },
+    {
+      submission: {
+        action: async () => {
+          const data = this.groupModel();
+          console.log('Submitted Group Data', data);
+          this.dialogStateChange.emit('closed');
+        },
+      },
+    },
+  );
   onStateChange(event: 'closed' | 'open') {
     this.dialogStateChange.emit(event);
   }
@@ -37,18 +54,5 @@ export class CreateGroupDialogComponent {
   closeDialog(ctx: any) {
     this.dialogStateChange.emit('closed');
     ctx.close();
-  }
-
-  confirm(ctx: any) {
-    if (!this.groupName() || !this.description()) return;
-    this.confirmClick.emit({
-      name: this.groupName(),
-      description: this.description(),
-      type: this.type(),
-    });
-    this.groupName.set('');
-    this.description.set('');
-    this.type.set('OPEN');
-    this.closeDialog(ctx);
   }
 }

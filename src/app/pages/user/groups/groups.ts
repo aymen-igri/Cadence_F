@@ -46,9 +46,4 @@ export class GroupsComponent {
     this.groupService.requestToJoin(groupId);
     // Show a toast ideally
   }
-
-  handleCreateGroup(data: { name: string; description: string; type: 'OPEN' | 'LOCKED' }) {
-    this.groupService.createGroup(data.name, data.description, data.type);
-    this.activeTab.set('my-groups');
-  }
 }
