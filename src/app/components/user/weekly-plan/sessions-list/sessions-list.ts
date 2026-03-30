@@ -1,6 +1,6 @@
 import { Component, input, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AppSession } from '../../../../core/models/session.model';
+import { AppSession } from '@app/core/models/session.model';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';

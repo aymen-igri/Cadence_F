@@ -6,8 +6,8 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
-import { AvailabilityService } from '../../../../core/services/availability.service';
-import { GoalProgressInfo } from '../../../../core/models/weekly-plan.model';
+import { AvailabilityService } from '@app/core/services/availability.service';
+import { GoalProgressInfo } from '@app/core/models/weekly-plan.model';
 
 @Component({
   selector: 'app-generate-week-dialog',

@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmProgressImports } from '@spartan-ng/helm/progress';
-import { GoalProgressInfo } from '../../../../core/models/weekly-plan.model';
+import { GoalProgressInfo } from '@app/core/models/weekly-plan.model';
 
 @Component({
   selector: 'app-weekly-summary',
