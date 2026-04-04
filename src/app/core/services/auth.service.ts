@@ -10,7 +10,7 @@ import { User } from '../models/user.model';
 export class AuthService {
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
-  private readonly url = `${environment.apiUrl}/auth`;
+  private readonly url = `${environment.apiUrl}`;
 
   currentUser = signal<User | null>(null);
 
@@ -31,7 +31,7 @@ export class AuthService {
   }
 
   register(payload: RegisterRequest) {
-    return this.http.post<AuthResponse>(`${this.url}/register`, payload).pipe(
+    return this.http.post<AuthResponse>(`${this.url}/auth/signUp`, payload).pipe(
       tap((response) => {
         this.setTokens(response.tokens);
         this.currentUser.set(response.user);
@@ -42,7 +42,7 @@ export class AuthService {
   refresh() {
     const refreshToken = this.getRefreshToken();
     return this.http
-      .post<AuthTokens>(`${this.url}/refresh`, { refreshToken })
+      .post<AuthTokens>(`${this.url}/refreshToken`, { refreshToken })
       .pipe(tap((tokens) => this.setTokens(tokens)));
   }
 

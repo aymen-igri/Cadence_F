@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-background flex items-center justify-center px-4">
-  <div class="w-full max-w-sm">
+  <div class="w-full max-w-md">
     <!-- Card -->
     <div hlmCard class="border border-border shadow-none rounded-xl">
       <div hlmCardContent class="pt-4 pb-4 px-4">
@@ -15,41 +15,116 @@
           <div class="flex gap-3">
             <div class="flex flex-col gap-1.5 flex-1">
               <label hlmLabel for="firstName">First Name</label>
-              <input hlmInput id="firstName" type="text" placeholder="John" class="w-full" [formField]="SignUpForm.firstName" />
-              @if (SignUpForm.firstName().touched() && SignUpForm.firstName().invalid()){
+              <input
+                hlmInput
+                id="firstName"
+                type="text"
+                placeholder="John"
+                class="w-full"
+                [formField]="SignUpForm.firstName"
+              />
+              @if (SignUpForm.firstName().touched() && SignUpForm.firstName().invalid()) {
                 <p class="text-xs text-destructive">
-                @for (error of SignUpForm.firstName().errors(); track error) {
-                  <p>{{ error.message }}</p>
-                }
-              </p>
+                  @for (error of SignUpForm.firstName().errors(); track error) {
+                    <p>{{ error.message }}</p>
+                  }
+                </p>
               }
             </div>
             <div class="flex flex-col gap-1.5 flex-1">
               <label hlmLabel for="lastName">Last Name</label>
-              <input hlmInput id="lastName" type="text" placeholder="Doe" class="w-full" [formField]="SignUpForm.lastName"/>
-              @if (SignUpForm.lastName().touched() && SignUpForm.lastName().invalid()){
+              <input
+                hlmInput
+                id="lastName"
+                type="text"
+                placeholder="Doe"
+                class="w-full"
+                [formField]="SignUpForm.lastName"
+              />
+              @if (SignUpForm.lastName().touched() && SignUpForm.lastName().invalid()) {
                 <p class="text-xs text-destructive">
-                @for (error of SignUpForm.lastName().errors(); track error) {
-                  <p>{{ error.message }}</p>
-                }
-              </p>
+                  @for (error of SignUpForm.lastName().errors(); track error) {
+                    <p>{{ error.message }}</p>
+                  }
+                </p>
               }
             </div>
           </div>
 
           <!-- Email -->
-          <div class="flex flex-col gap-1.5">
-            <label hlmLabel for="email">Email</label>
-            <input hlmInput id="email" type="email" placeholder="you@example.com" class="w-full" [formField]="SignUpForm.email"/>
-            @if (SignUpForm.email().touched() && SignUpForm.email().invalid()){
+          <div class="flex gap-3">
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label hlmLabel for="email">Email</label>
+              <input
+                hlmInput
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                class="w-full"
+                [formField]="SignUpForm.email"
+              />
+              @if (SignUpForm.email().touched() && SignUpForm.email().invalid()) {
                 <p class="text-xs text-destructive">
-                @for (error of SignUpForm.email().errors(); track error) {
-                  <p>{{ error.message }}</p>
-                }
-              </p>
+                  @for (error of SignUpForm.email().errors(); track error) {
+                    <p>{{ error.message }}</p>
+                  }
+                </p>
               }
+            </div>
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label hlmLabel for="username">Username</label>
+              <input
+                hlmInput
+                id="username"
+                type="text"
+                placeholder="johndoe"
+                class="w-full"
+                [formField]="SignUpForm.username"
+              />
+              @if (SignUpForm.username().touched() && SignUpForm.username().invalid()) {
+                <p class="text-xs text-destructive">
+                  @for (error of SignUpForm.username().errors(); track error) {
+                    <p>{{ error.message }}</p>
+                  }
+                </p>
+              }
+            </div>
           </div>
-
+          <!-- Phone and Gender -->
+          <div class="flex gap-3">
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label hlmLabel for="phone">Phone</label>
+              <input
+                hlmInput
+                id="phone"
+                type="tel"
+                placeholder="+123456789"
+                class="w-full"
+                [formField]="SignUpForm.phone"
+              />
+              @if (SignUpForm.phone().touched() && SignUpForm.phone().invalid()) {
+                <p class="text-xs text-destructive">
+                  @for (error of SignUpForm.phone().errors(); track error) {
+                    <p>{{ error.message }}</p>
+                  }
+                </p>
+              }
+            </div>
+            <div class="flex flex-col gap-1.5 flex-1">
+              <label hlmLabel for="gender">Gender</label>
+              <select hlmInput id="gender" class="w-full" [formField]="SignUpForm.gender">
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+              </select>
+              @if (SignUpForm.gender().touched() && SignUpForm.gender().invalid()) {
+                <p class="text-xs text-destructive">
+                  @for (error of SignUpForm.gender().errors(); track error) {
+                    <p>{{ error.message }}</p>
+                  }
+                </p>
+              }
+            </div>
+          </div>
           <!-- Password -->
           <div class="flex flex-col gap-1.5">
             <label hlmLabel for="password">Password</label>
@@ -70,17 +145,24 @@
                 <lucide-angular [img]="showPassword ? EyeOff : Eye" class="w-4 h-4" />
               </button>
             </div>
-            @if (SignUpForm.password().touched() && SignUpForm.password().invalid()){
-                <p class="text-xs text-destructive">
+            @if (SignUpForm.password().touched() && SignUpForm.password().invalid()) {
+              <p class="text-xs text-destructive">
                 @for (error of SignUpForm.password().errors(); track error) {
                   <p>{{ error.message }}</p>
                 }
               </p>
-              }
+            }
           </div>
 
           <!-- Submit -->
-          <button hlmBtn class="w-full mt-1" type="submit" [disabled]="SignUpForm().submitting() || SignUpForm().invalid()">Create account</button>
+          <button
+            hlmBtn
+            class="w-full mt-1"
+            type="submit"
+            [disabled]="SignUpForm().submitting() || SignUpForm().invalid()"
+          >
+            Create account
+          </button>
         </form>
 
         <!-- Footer -->
