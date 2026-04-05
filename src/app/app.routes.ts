@@ -7,6 +7,7 @@ import { NotFound } from '@app/pages/not-found/not-found';
 import { MainLayout } from '@app/layouts/main-layout/main-layout';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { ServerErrorPage } from './pages/server-error/server-error';
 
 export const routes: Routes = [
   {
@@ -41,6 +42,10 @@ export const routes: Routes = [
   {
     path: 'not-found',
     component: NotFound,
+  },
+  {
+    path: 'server-error',
+    component: ServerErrorPage,
   },
   {
     path: 'user',
