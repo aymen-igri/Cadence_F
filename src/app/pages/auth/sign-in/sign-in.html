@@ -12,18 +12,18 @@
         <form class="flex flex-col gap-4" [formRoot]="loginForm" novalidate>
           <!-- Email -->
           <div class="flex flex-col gap-1.5">
-            <label hlmLabel for="email">Email</label>
+            <label hlmLabel for="email">Username or Email</label>
             <input
               hlmInput
-              id="email"
-              type="email"
-              [formField]="loginForm.email"
-              placeholder="you@example.com"
+              id="identifier"
+              type="text"
+              [formField]="loginForm.identifier"
+              placeholder="Enter your username or email"
               class="w-full"
             />
-            @if (loginForm.email().touched() && loginForm.email().invalid()) {
+            @if (loginForm.identifier().touched() && loginForm.identifier().invalid()) {
               <p class="text-xs text-destructive">
-                @for (error of loginForm.email().errors(); track error) {
+                @for (error of loginForm.identifier().errors(); track error) {
                   <p>{{ error.message }}</p>
                 }
               </p>
