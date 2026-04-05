@@ -2,14 +2,14 @@
   <div class="w-full max-w-sm">
     <!-- Card -->
     <div hlmCard class="border border-border shadow-none rounded-xl">
-      <div hlmCardContent class="pt-4 pb-4 px-4">
+      <div hlmCardContent class="pt-2 pb-4 px-4">
         <!-- Logo / Brand -->
-        <div class="flex flex-col items-center mb-4">
+        <div class="flex flex-col items-center mb-6">
           <app-logo size="md" />
           <p class="text-sm text-muted-foreground mt-2">Sign in to your account</p>
         </div>
         <!-- Form -->
-        <form class="flex flex-col gap-4" [formRoot]="loginForm" novalidate>
+        <form class="flex flex-col gap-6" [formRoot]="loginForm" novalidate>
           <!-- Email -->
           <div class="flex flex-col gap-1.5">
             <label hlmLabel for="email">Username or Email</label>
