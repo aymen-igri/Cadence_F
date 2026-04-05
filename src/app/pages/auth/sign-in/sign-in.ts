@@ -12,6 +12,7 @@ import { LoginRequest } from '@app/core/models/auth.model';
 import { AuthService } from '@app/core/services/auth.service';
 import { firstValueFrom } from 'rxjs';
 import { toast } from 'ngx-sonner';
+import { extractErrorMessage } from '@app/core/utils/error.util';
 @Component({
   selector: 'app-sign-in',
   imports: [
@@ -55,7 +56,7 @@ export class SignIn {
             });
             this.router.navigate(['/user/dashboard']);
           } catch (err: any) {
-            const message = err?.error?.message ?? 'Something went wrong. Please try again.';
+            const message = extractErrorMessage(err);
             toast.error('Login failed', {
               description: message,
             });
