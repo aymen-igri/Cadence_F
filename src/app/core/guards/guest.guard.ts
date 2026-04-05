@@ -9,7 +9,7 @@ export const guestGuard: CanActivateFn = () => {
   if (!authService.isLoggedIn()) {
     return true;
   }
-
-  router.navigate(['/dashboard']);
+  // To handle roles and redirect to appropriate dashboard later
+  router.navigate(['/user/dashboard']);
   return false;
 };

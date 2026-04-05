@@ -5,6 +5,8 @@ import { SignUp } from '@app/pages/auth/sign-up/sign-up';
 import { Forbidden } from '@app/pages/forbidden/forbidden';
 import { NotFound } from '@app/pages/not-found/not-found';
 import { MainLayout } from '@app/layouts/main-layout/main-layout';
+import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
   {
@@ -24,10 +26,12 @@ export const routes: Routes = [
   },
   {
     path: 'sign-in',
+    canMatch: [guestGuard],
     component: SignIn,
   },
   {
     path: 'sign-up',
+    canMatch: [guestGuard],
     component: SignUp,
   },
   {
@@ -40,6 +44,7 @@ export const routes: Routes = [
   },
   {
     path: 'user',
+    canMatch: [authGuard],
     loadComponent: () =>
       import('./layouts/side-bar-layout/side-bar-layout').then((m) => m.SideBarLayout),
     children: [
@@ -76,6 +81,10 @@ export const routes: Routes = [
         path: 'study-map',
         loadComponent: () =>
           import('./pages/user/study-map/study-map').then((m) => m.StudyMapComponent),
+      },
+      {
+        path: 'logout',
+        loadComponent: () => import('./pages/user/logout/logout').then((m) => m.LogoutComponent),
       },
     ],
   },
