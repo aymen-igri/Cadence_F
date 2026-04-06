@@ -1,6 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HlmCardImports } from '@spartan-ng/helm/card';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
 import {
   LucideAngularModule,
   Bell,
@@ -14,7 +15,7 @@ import { Notification } from '@app/core/models/notification.model';
 
 @Component({
   selector: 'app-notification-item',
-  imports: [CommonModule, LucideAngularModule, ...HlmCardImports],
+  imports: [CommonModule, LucideAngularModule, ...HlmCardImports, ...HlmButtonImports],
   templateUrl: './notification-item.html',
 })
 export class NotificationItem {
