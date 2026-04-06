@@ -1,9 +1,9 @@
 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
   <div>
     <h1 class="text-3xl font-semibold tracking-tight text-foreground">Notifications</h1>
-    <p class="text-sm text-muted-foreground mt-0.5">12 unread</p>
+    <p class="text-sm text-muted-foreground mt-0.5">{{ unreadCount() }} unread</p>
   </div>
   <div class="flex items-center gap-2">
-    <button hlmBtn variant="ghost" size="sm">Mark all as read</button>
+    <button hlmBtn variant="ghost" size="sm" (click)="onMarkAllAsRead()">Mark all as read</button>
   </div>
 </div>

@@ -1,5 +1,5 @@
 <div class="flex flex-col gap-3">
-  @for (notification of notifications; track notification.title) {
-    <app-notification-item [item]="notification" />
+  @for (notification of notifications(); track notification.id) {
+    <app-notification-item [item]="notification" (markAsRead)="onMarkAsRead(notification.id)" />
   }
 </div>
