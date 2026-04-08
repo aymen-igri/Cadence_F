@@ -13,7 +13,7 @@ import { Group } from '../../../../core/models/group.model';
 })
 export class GroupCardComponent {
   group = input.required<Group>();
-  role = input<'MEMBER' | 'ADMIN' | undefined>();
+  userRole = input<'MEMBER' | 'ADMIN' | 'OWNER' | null>();
   memberCount = input.required<number>();
 
   cardClick = output<string>();

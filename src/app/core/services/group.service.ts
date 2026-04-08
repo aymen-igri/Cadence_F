@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject, linkedSignal } from '@angular/core';
 import {
   Group,
   GroupMembership,
@@ -8,18 +8,77 @@ import {
   FeedSharedSession,
   MemberItem,
   RequestItem,
+  GroupCreateRequest,
+  GroupResponse,
+  Member,
 } from '../models/group.model';
+import { HttpClient, httpResource } from '@angular/common/http';
+import { environment } from '../../environments/environments';
+import { tap } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GroupService {
-  public currentUserId = 'user-1'; // Mock user
+  private http = inject(HttpClient);
+  private authService = inject(AuthService);
+  readonly currentUserId = computed<string | null | undefined>(() => {
+    if (!this.authService.isReady()) return undefined;
+    return this.authService.currentUser()?.id ?? null;
+  });
+  private readonly url = `${environment.apiUrl}/groups`;
+  private groupId = signal<string | null>(null);
+
+  readonly allGroupsResource = httpResource<GroupResponse[]>(() => {
+    if (this.currentUserId() === undefined) return undefined;
+    return {
+      url: `${this.url}/all`,
+      method: 'GET',
+    };
+  });
+
+  readonly groupMembersResource = httpResource<Member[]>(() => {
+    const id = this.groupId();
+    if (this.currentUserId() === undefined || !id) return undefined;
+    return {
+      url: `${this.url}/${id}/members`,
+      method: 'GET',
+    };
+  });
+
+  readonly allGroupsData = linkedSignal<GroupResponse[], GroupResponse[]>({
+    source: () => (this.allGroupsResource.hasValue() ? this.allGroupsResource.value() : []),
+    computation: (value) => value,
+  });
+
+  readonly groupMembers = linkedSignal<Member[], Member[]>({
+    source: () => (this.groupMembersResource.hasValue() ? this.groupMembersResource.value() : []),
+    computation: (value) => value,
+  });
+
+  readonly isGroupsLoading = computed(() => this.allGroupsResource.isLoading());
+  readonly isMembersLoading = computed(() => this.groupMembersResource.isLoading());
 
   private _groups = signal<Group[]>([
-    { id: 'g1', name: 'Angular Lovers', description: 'Discussing Angular 21+', type: 'OPEN' },
-    { id: 'g2', name: 'Secret Club', description: 'Top secret discussions', type: 'LOCKED' },
-    { id: 'g3', name: 'TypeScript Fanatics', description: 'All about types', type: 'OPEN' },
+    {
+      id: 'g1',
+      name: 'Angular Lovers',
+      description: 'Discussing Angular 21+',
+      privacyLevel: 'PUBLIC',
+    },
+    {
+      id: 'g2',
+      name: 'Secret Club',
+      description: 'Top secret discussions',
+      privacyLevel: 'PRIVATE',
+    },
+    {
+      id: 'g3',
+      name: 'TypeScript Fanatics',
+      description: 'All about types',
+      privacyLevel: 'PUBLIC',
+    },
   ]);
 
   private _memberships = signal<GroupMembership[]>([
@@ -64,59 +123,65 @@ export class GroupService {
     'user-3': { initials: 'AR', name: 'Alice Ray' },
   };
 
+  private requireCurrentUserId(): string {
+    const userId = this.currentUserId();
+
+    if (userId === null || userId === undefined) {
+      throw new Error('Current user is not loaded or not authenticated.');
+    }
+
+    return userId;
+  }
+
   public allGroups = this._groups.asReadonly();
   public myMemberships = computed(() =>
-    this._memberships().filter((m) => m.userId === this.currentUserId),
+    this._memberships().filter((m) => m.userId === this.currentUserId()),
   );
 
   public myGroups = computed(() => {
-    const mems = this.myMemberships();
-    const allMems = this._memberships();
-    return this._groups()
-      .filter((g) => mems.some((m) => m.groupId === g.id))
-      .map((group) => {
-        const membership = mems.find((m) => m.groupId === group.id);
-        const memberCount = allMems.filter((m) => m.groupId === group.id).length;
-        return { group, role: membership?.role, memberCount };
-      });
+    return this.allGroupsData()
+      .filter((g) => g.userRole != null)
+      .map((g) => ({
+        group: g,
+        userRole: g.userRole,
+        memberCount: g.membersCount,
+      }));
   });
 
   public discoverGroups = computed(() => {
-    const mems = this.myMemberships();
-    const allMems = this._memberships();
-    return this._groups()
-      .filter((g) => !mems.some((m) => m.groupId === g.id))
-      .map((group) => {
-        const memberCount = allMems.filter((m) => m.groupId === group.id).length;
-        return { group, memberCount };
-      });
+    return this.allGroupsData()
+      .filter((g) => g.userRole == null)
+      .map((g) => ({
+        group: g,
+        memberCount: g.membersCount,
+      }));
   });
 
-  public createGroup(name: string, description: string, type: 'OPEN' | 'LOCKED') {
-    const newGroup: Group = {
-      id: Math.random().toString(36).substring(2, 9),
-      name,
-      description,
-      type,
-    };
+  public createGroup(payload: GroupCreateRequest) {
+    const userId = this.requireCurrentUserId();
+    return this.http.post<GroupResponse>(`${this.url}/create`, payload).pipe(
+      tap((response) => {
+        this._groups.update((groups) => [...groups, response]);
 
-    const newMembership: GroupMembership = {
-      id: Math.random().toString(36).substring(2, 9),
-      groupId: newGroup.id,
-      userId: this.currentUserId,
-      role: 'ADMIN',
-      joinedAt: new Date(),
-    };
-
-    this._groups.update((g) => [...g, newGroup]);
-    this._memberships.update((m) => [...m, newMembership]);
+        this._memberships.update((memberships) => [
+          ...memberships,
+          {
+            id: response.membershipId,
+            groupId: response.id,
+            userId: userId,
+            role: 'OWNER',
+            joinedAt: new Date(),
+          },
+        ]);
+      }),
+    );
   }
 
   public joinGroup(groupId: string) {
     const newMembership: GroupMembership = {
       id: Math.random().toString(36).substring(2, 9),
       groupId,
-      userId: this.currentUserId,
+      userId: this.requireCurrentUserId(),
       role: 'MEMBER',
       joinedAt: new Date(),
     };
@@ -128,7 +193,7 @@ export class GroupService {
     const req: GroupJoinRequest = {
       id: Math.random().toString(36).substring(2, 9),
       groupId,
-      userId: this.currentUserId,
+      userId: this.requireCurrentUserId(),
       requestedAt: new Date(),
     };
     this._joinRequests.update((r) => [...r, req]);
@@ -136,14 +201,14 @@ export class GroupService {
 
   // --- Group Detail Additions ---
 
-  public getGroupById(id: string): Group | undefined {
-    return this._groups().find((g) => g.id === id);
+  public getGroupById(id: string): GroupResponse | undefined {
+    return this.allGroupsData().find((g) => g.id === id);
   }
 
   public getMyRole(groupId: string) {
     return computed(() => {
       const mem = this._memberships().find(
-        (m) => m.groupId === groupId && m.userId === this.currentUserId,
+        (m) => m.groupId === groupId && m.userId === this.currentUserId(),
       );
       return mem ? mem.role : null;
     });
@@ -151,7 +216,7 @@ export class GroupService {
 
   public leaveGroup(groupId: string) {
     this._memberships.update((mems) =>
-      mems.filter((m) => !(m.groupId === groupId && m.userId === this.currentUserId)),
+      mems.filter((m) => !(m.groupId === groupId && m.userId === this.currentUserId())),
     );
   }
 
@@ -224,7 +289,7 @@ export class GroupService {
       id: Math.random().toString(36).substring(2, 9),
       sessionId,
       groupId,
-      sharedByUserId: this.currentUserId,
+      sharedByUserId: this.requireCurrentUserId(),
       sharedAt: new Date(),
     };
     this._sharedSessions.update((s) => [newShare, ...s]);
@@ -234,7 +299,7 @@ export class GroupService {
     const newComment: Comment = {
       id: Math.random().toString(36).substring(2, 9),
       sharedSessionId,
-      userId: this.currentUserId,
+      userId: this.requireCurrentUserId(),
       content,
       createdAt: new Date(),
     };
@@ -272,12 +337,19 @@ export class GroupService {
     this._joinRequests.update((requests) => requests.filter((r) => r.id !== requestId));
   }
 
-  public updateGroup(groupId: string, data: Partial<Pick<Group, 'name' | 'description' | 'type'>>) {
+  public updateGroup(
+    groupId: string,
+    data: Partial<Pick<Group, 'name' | 'description' | 'privacyLevel'>>,
+  ) {
     this._groups.update((groups) => groups.map((g) => (g.id === groupId ? { ...g, ...data } : g)));
   }
 
   public deleteGroup(groupId: string) {
     this._groups.update((groups) => groups.filter((g) => g.id !== groupId));
     this._memberships.update((mems) => mems.filter((m) => m.groupId !== groupId));
+  }
+
+  public setGroupId(id: string) {
+    this.groupId.set(id);
   }
 }

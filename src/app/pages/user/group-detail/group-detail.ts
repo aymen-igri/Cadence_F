@@ -1,8 +1,9 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '@app/core/services/auth.service';
 import { GroupService } from '@app/core/services/group.service';
-import { Group } from '@app/core/models/group.model';
+import { Group, GroupResponse, Member } from '@app/core/models/group.model';
 import { HlmTabsImports } from '@spartan-ng/helm/tabs';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
@@ -32,12 +33,13 @@ export class GroupDetailComponent {
   route = inject(ActivatedRoute);
   router = inject(Router);
   groupService = inject(GroupService);
+  authService = inject(AuthService);
 
   groupId = signal<string>('');
-  group = signal<Group | undefined>(undefined);
+  group = signal<GroupResponse | undefined>(undefined);
 
-  myRole = signal<'MEMBER' | 'ADMIN' | null>(null);
-  members = signal<any[]>([]);
+  myRole = computed(() => this.group()?.userRole || null);
+  members = signal<Member[]>([]);
   requests = signal<any[]>([]);
   feed = signal<any[]>([]);
 
@@ -55,22 +57,20 @@ export class GroupDetailComponent {
           return;
         }
         this.group.set(g);
+        console.log('Loaded group:', g);
       }
     });
 
-    effect(
-      () => {
-        const gId = this.groupId();
-        if (gId) {
-          // Sync state from services based on active group param
-          this.myRole = this.groupService.getMyRole(gId) as any;
-          this.members = this.groupService.getGroupMembers(gId) as any;
-          this.requests = this.groupService.getGroupRequests(gId) as any;
-          this.feed = this.groupService.getGroupFeed(gId) as any;
-        }
-      },
-      { allowSignalWrites: true },
-    );
+    effect(() => {
+      const gId = this.groupId();
+      if (gId) {
+        // Sync state from services based on active group param
+        this.groupService.setGroupId(gId);
+        this.members = this.groupService.groupMembers;
+        this.requests = this.groupService.getGroupRequests(gId) as any;
+        this.feed = this.groupService.getGroupFeed(gId) as any;
+      }
+    });
   }
 
   setActiveTab(tab: any) {
@@ -116,13 +116,13 @@ export class GroupDetailComponent {
     this.groupService.declineRequest(requestId);
   }
 
-  onUpdateGroup(data: { name: string; description: string; type: 'OPEN' | 'LOCKED' }) {
+  onUpdateGroup(data: { name: string; description: string; privacyLevel: 'PUBLIC' | 'PRIVATE' }) {
     this.groupService.updateGroup(this.groupId(), data);
   }
 
   onTransferAdmin(membershipId: string) {
     // Current user membership
-    const myMem = this.members().find((m) => m.userId === this.groupService.currentUserId);
+    const myMem = this.members().find((m) => m.userId === this.groupService.currentUserId());
     if (myMem) {
       this.groupService.updateRole(myMem.membershipId, 'MEMBER');
     }

@@ -1,7 +1,7 @@
 import { Component, input, output, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Group, MemberItem } from '../../../../core/models/group.model';
+import { Group, Member, MemberItem } from '../../../../core/models/group.model';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
@@ -26,16 +26,16 @@ import { BrnDialogImports } from '@spartan-ng/brain/dialog';
 })
 export class GroupSettingsTabComponent {
   group = input.required<Group>();
-  members = input.required<MemberItem[]>();
+  members = input.required<Member[]>();
   currentUserId = input.required<string>();
 
-  updateGroup = output<{ name: string; description: string; type: 'OPEN' | 'LOCKED' }>();
+  updateGroup = output<{ name: string; description: string; privacyLevel: 'PUBLIC' | 'PRIVATE' }>();
   transferAdmin = output<string>(); // emits membershipId
   deleteGroup = output<void>();
 
   name = signal('');
   description = signal('');
-  type = signal<'OPEN' | 'LOCKED'>('OPEN');
+  privacyLevel = signal<'PUBLIC' | 'PRIVATE'>('PUBLIC');
 
   selectedMemberId = signal<string>('');
 
@@ -49,17 +49,20 @@ export class GroupSettingsTabComponent {
         if (g) {
           this.name.set(g.name);
           this.description.set(g.description);
-          this.type.set(g.type);
+          this.privacyLevel.set(g.privacyLevel);
         }
       },
-      { allowSignalWrites: true },
     );
   }
 
   isChanged(): boolean {
     const g = this.group();
     if (!g) return false;
-    return this.name() !== g.name || this.description() !== g.description || this.type() !== g.type;
+    return (
+      this.name() !== g.name ||
+      this.description() !== g.description ||
+      this.privacyLevel() !== g.privacyLevel
+    );
   }
 
   saveSettings() {
@@ -67,7 +70,7 @@ export class GroupSettingsTabComponent {
     this.updateGroup.emit({
       name: this.name(),
       description: this.description(),
-      type: this.type(),
+      privacyLevel: this.privacyLevel(),
     });
   }
 

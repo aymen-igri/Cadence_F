@@ -5,12 +5,14 @@
 >
   <div hlmCardHeader>
     <div class="flex items-center justify-between mb-2">
-      <span hlmBadge [variant]="group().type === 'OPEN' ? 'default' : 'secondary'">
-        {{ group().type | titlecase }}
+      <span hlmBadge [variant]="group().privacyLevel === 'PUBLIC' ? 'default' : 'secondary'">
+        {{ group().privacyLevel | titlecase }}
       </span>
-      <span hlmBadge variant="outline" *ngIf="role()">
-        {{ role() | titlecase }}
-      </span>
+      @if (userRole()) {
+        <span hlmBadge variant="outline">
+          {{ userRole() | titlecase }}
+        </span>
+      }
     </div>
     <h3 hlmCardTitle class="text-xl line-clamp-1">{{ group().name }}</h3>
     <p hlmCardDescription class="line-clamp-2 mt-2">{{ group().description }}</p>
@@ -21,23 +23,19 @@
   <div hlmCardFooter class="flex items-center justify-between pt-4">
     <span class="text-sm text-muted-foreground">{{ memberCount() }} members</span>
 
-    <button
-      hlmBtn
-      variant="secondary"
-      size="sm"
-      *ngIf="!role() && group().type === 'OPEN'"
-      (click)="onJoinClick($event)"
-    >
-      Join
-    </button>
-    <button
-      hlmBtn
-      variant="outline"
-      size="sm"
-      *ngIf="!role() && group().type === 'LOCKED'"
-      (click)="onRequestJoinClick($event)"
-    >
-      Request to join
-    </button>
+    @if (!userRole() && group().privacyLevel === 'PUBLIC') {
+      <button hlmBtn variant="secondary" size="sm" (click)="onJoinClick($event)">Join</button>
+    }
+    @if (userRole() && group().privacyLevel === 'PRIVATE') {
+      <button
+        hlmBtn
+        variant="outline"
+        size="sm"
+        *ngIf="!userRole() && group().privacyLevel === 'PRIVATE'"
+        (click)="onRequestJoinClick($event)"
+      >
+        Request to join
+      </button>
+    }
   </div>
 </div>

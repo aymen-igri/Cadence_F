@@ -11,8 +11,8 @@
       <div class="space-y-1.5">
         <div class="flex items-center gap-3">
           <h1 class="text-3xl font-bold tracking-tight text-foreground">{{ group()?.name }}</h1>
-          <span hlmBadge [variant]="group()?.type === 'OPEN' ? 'default' : 'secondary'">
-            {{ group()?.type }}
+          <span hlmBadge [variant]="group()?.privacyLevel === 'PUBLIC' ? 'default' : 'secondary'">
+            {{ group()?.privacyLevel }}
           </span>
         </div>
         <p class="text-sm text-muted-foreground">
@@ -33,7 +33,7 @@
         <button hlmTabsTrigger="feed">Feed</button>
         <button hlmTabsTrigger="members">Members</button>
         <button hlmTabsTrigger="chat">Chat</button>
-        @if (myRole() === 'ADMIN') {
+        @if (myRole() === 'ADMIN' || myRole() === 'OWNER') {
           <button hlmTabsTrigger="settings">Settings</button>
         }
       </hlm-tabs-list>
@@ -63,36 +63,43 @@
       </div>
 
       <!-- Members Tab -->
-      <div hlmTabsContent="members">
-        <app-group-members-tab
-          [members]="members()"
-          [requests]="requests()"
-          [currentUserRole]="myRole()"
-          [currentUserId]="groupService.currentUserId"
-          (promote)="onPromote($event)"
-          (demote)="onDemote($event)"
-          (remove)="onRemove($event)"
-          (acceptRequest)="onAcceptRequest($event)"
-          (declineRequest)="onDeclineRequest($event)"
-        >
-        </app-group-members-tab>
-      </div>
+      @if (groupService.isMembersLoading()) {
+        <div class="flex items-center justify-center min-h-[50vh]">
+          <p class="text-muted-foreground">Loading members...</p>
+        </div>
+      } @else{
+        <div hlmTabsContent="members">
+          <app-group-members-tab
+            [members]="members()"
+            [requests]="requests()"
+            [currentUserRole]="myRole()"
+            [currentUserId]="groupService.currentUserId()!"
+            (promote)="onPromote($event)"
+            (demote)="onDemote($event)"
+            (remove)="onRemove($event)"
+            (acceptRequest)="onAcceptRequest($event)"
+            (declineRequest)="onDeclineRequest($event)"
+          >
+          </app-group-members-tab>
+        </div>
+      }
 
       <!-- CHAT TAB -->
       <div hlmTabsContent="chat" class="mt-4 border rounded-lg bg-card">
-        @if(groupId()){
-          <app-group-chat-tab [currentUserId]="groupService.currentUserId" [groupId]="groupId()"> </app-group-chat-tab>
+        @if (groupId()) {
+          <app-group-chat-tab [currentUserId]="groupService.currentUserId()!" [groupId]="groupId()">
+          </app-group-chat-tab>
         }
       </div>
 
       <!-- SETTINGS TAB (Admin Only via routing/permissions, but guarded by visibility or mock) -->
       <!-- For now, display it and internally the tab controls admin views -->
-      @if (myRole() === 'ADMIN') {
+      @if (myRole() === 'ADMIN' || myRole() === 'OWNER') {
         <div hlmTabsContent="settings" class="mt-4">
           <app-group-settings-tab
             [group]="group()!"
             [members]="members()"
-            [currentUserId]="groupService.currentUserId"
+            [currentUserId]="groupService.currentUserId()!"
             (updateGroup)="onUpdateGroup($event)"
             (transferAdmin)="onTransferAdmin($event)"
             (deleteGroup)="onDeleteGroup()"

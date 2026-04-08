@@ -42,14 +42,14 @@
 
         <div class="space-y-2">
           <label hlmLabel>Type</label>
-          <select hlmInput [formField]="groupForm.type" class="w-full">
-            <option value="OPEN">Open (Anyone can join)</option>
-            <option value="LOCKED">Locked (Requires approval)</option>
+          <select hlmInput [formField]="groupForm.privacyLevel" class="w-full">
+            <option value="PUBLIC">Public (Anyone can join)</option>
+            <option value="PRIVATE">Private (Requires approval)</option>
           </select>
         </div>
-        @if (groupForm.type().touched() && groupForm.type().invalid()) {
+        @if (groupForm.privacyLevel().touched() && groupForm.privacyLevel().invalid()) {
           <p class="text-xs text-destructive">
-            @for (error of groupForm.type().errors(); track error) {
+            @for (error of groupForm.privacyLevel().errors(); track error) {
               <p>{{ error.message }}</p>
             }
           </p>

@@ -18,9 +18,9 @@
 
       <div class="space-y-2">
         <label hlmLabel>Type</label>
-        <select hlmInput [(ngModel)]="type" class="w-full h-10 px-3 cursor-pointer">
-          <option value="OPEN">Open (Anyone can join)</option>
-          <option value="LOCKED">Locked (Requires approval)</option>
+        <select hlmInput [(ngModel)]="privacyLevel" class="w-full h-10 px-3 cursor-pointer">
+          <option value="PUBLIC">Public (Anyone can join)</option>
+          <option value="PRIVATE">Private (Requires approval)</option>
         </select>
       </div>
     </div>
@@ -43,7 +43,7 @@
         <select hlmInput [(ngModel)]="selectedMemberId" class="w-full h-10 px-3 cursor-pointer">
           <option value="">-- Choose a member --</option>
           @for (m of otherMembers(); track m.membershipId) {
-            <option [value]="m.membershipId">{{ m.fullName }} ({{ m.role }})</option>
+            <option [value]="m.membershipId">{{ m.firstName }} {{ m.lastName}} ({{ m.role }})</option>
           }
         </select>
       </div>

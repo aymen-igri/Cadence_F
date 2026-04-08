@@ -12,11 +12,11 @@
           <div
             class="bg-muted shrink-0 flex items-center justify-center rounded-full h-12 w-12 text-lg font-medium"
           >
-            {{ member.userInitials }}
+            {{ getUserInitials(member.firstName, member.lastName) }}
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
-              <p class="font-medium truncate">{{ member.fullName }}</p>
+              <p class="font-medium truncate">{{ member.firstName }} {{ member.lastName }}</p>
               <span
                 hlmBadge
                 [variant]="member.role === 'ADMIN' ? 'default' : 'secondary'"
@@ -30,7 +30,10 @@
             </p>
           </div>
 
-          @if (currentUserRole() === 'ADMIN' && member.userId !== currentUserId()) {
+          @if (
+            (currentUserRole() === 'ADMIN' || currentUserRole() === 'OWNER') &&
+            member.userId !== currentUserId()
+          ) {
             <button hlmBtn variant="ghost" size="icon" [hlmDropdownMenuTrigger]="memberMenu">
               <ng-icon hlm name="lucideMoreVertical" size="sm"></ng-icon>
             </button>
@@ -64,6 +67,7 @@
   </div>
 
   <!-- Pending Requests (Admin Only) -->
+  <!-- 
   @if (currentUserRole() === 'ADMIN' && requests().length > 0) {
     <div class="space-y-4 pt-6 border-t border-border">
       <h3 class="text-lg font-semibold">Pending Requests ({{ requests().length }})</h3>
@@ -110,4 +114,5 @@
       </div>
     </div>
   }
+    -->
 </div>

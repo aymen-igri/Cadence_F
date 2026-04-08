@@ -2,14 +2,31 @@ export interface Group {
   id: string;
   name: string;
   description: string;
-  type: 'OPEN' | 'LOCKED';
+  privacyLevel: 'PUBLIC' | 'PRIVATE';
+
 }
 
+export interface GroupCreateRequest {
+  name: string;
+  description: string;
+  privacyLevel: 'PUBLIC' | 'PRIVATE';
+}
+
+export interface GroupResponse {
+  id: string;
+  name: string;
+  description: string;
+  privacyLevel: 'PUBLIC' | 'PRIVATE';
+  membersCount: number;
+  membershipId: string;
+  userRole: 'MEMBER' | 'ADMIN' | 'OWNER' | null;
+  createdAt: Date;
+}
 export interface GroupMembership {
   id: string;
   groupId: string;
   userId: string;
-  role: 'MEMBER' | 'ADMIN';
+  role: 'MEMBER' | 'ADMIN' | 'OWNER';
   joinedAt: Date;
 }
 
@@ -57,7 +74,7 @@ export interface MemberItem {
   userId: string;
   userInitials: string;
   fullName: string;
-  role: 'MEMBER' | 'ADMIN';
+  role: 'MEMBER' | 'ADMIN' | 'OWNER';
   joinedAt: Date;
 }
 
@@ -67,6 +84,16 @@ export interface RequestItem {
   userInitials: string;
   fullName: string;
   requestedAt: Date;
+}
+
+export interface Member {
+  membershipId: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  role: 'MEMBER' | 'ADMIN' | 'OWNER';
+  joinedAt: Date;
 }
 
 

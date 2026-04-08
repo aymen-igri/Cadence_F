@@ -13,11 +13,22 @@ export class AuthService {
   private readonly url = `${environment.apiUrl}`;
 
   currentUser = signal<User | null>(null);
+  isReady = signal<boolean>(false);
 
   constructor(
     private http: HttpClient,
     private router: Router,
-  ) {}
+  ) {
+    const token = this.getAccessToken();
+    if (!token || this.isTokenExpired(token)) {
+      this.clearTokens();
+      this.isReady.set(true);
+    } else {
+      // TODO: Wrap your user fetching logic here and set isReady to true when done.
+      // For now, simulating resolution:
+      this.isReady.set(true);
+    }
+  }
 
   // ─── Auth calls ───────────────────────────────────────────
 
