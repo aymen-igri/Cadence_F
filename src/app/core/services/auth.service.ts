@@ -11,6 +11,7 @@ export class AuthService {
   private readonly ACCESS_TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly url = `${environment.apiUrl}`;
+  private readonly USER_KEY = 'current_user';
 
   currentUser = signal<User | null>(null);
   isReady = signal<boolean>(false);
@@ -24,9 +25,11 @@ export class AuthService {
       this.clearTokens();
       this.isReady.set(true);
     } else {
-      // TODO: Wrap your user fetching logic here and set isReady to true when done.
-      // For now, simulating resolution:
-      this.isReady.set(true);
+       const storedUser = localStorage.getItem(this.USER_KEY);
+       if (storedUser) {
+         this.currentUser.set(JSON.parse(storedUser));
+       }
+       this.isReady.set(true);
     }
   }
 
@@ -37,6 +40,7 @@ export class AuthService {
       tap((response) => {
         this.setTokens(response.tokens);
         this.currentUser.set(response.user);
+        localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
       }),
     );
   }
@@ -67,6 +71,7 @@ export class AuthService {
 
   logout() {
     this.clearTokens();
+    localStorage.removeItem(this.USER_KEY);
     this.currentUser.set(null);
     this.router.navigate(['/sign-in']);
   }
@@ -94,7 +99,7 @@ export class AuthService {
   // ─── Helpers ──────────────────────────────────────────────
 
   isLoggedIn(): boolean {
-    const token = this.getAccessToken();
+    const token = this.getRefreshToken();
     if (!token) return false;
 
     if (this.isTokenExpired(token)) {

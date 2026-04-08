@@ -31,7 +31,7 @@ export class GroupService {
   private groupId = signal<string | null>(null);
 
   readonly allGroupsResource = httpResource<GroupResponse[]>(() => {
-    if (this.currentUserId() === undefined) return undefined;
+     if (!this.authService.isReady() || !this.authService.currentUser()) return undefined;
     return {
       url: `${this.url}/all`,
       method: 'GET',
@@ -39,10 +39,9 @@ export class GroupService {
   });
 
   readonly groupMembersResource = httpResource<Member[]>(() => {
-    const id = this.groupId();
-    if (this.currentUserId() === undefined || !id) return undefined;
+    if (!this.authService.isReady() || !this.authService.currentUser() || !this.groupId()) return undefined;
     return {
-      url: `${this.url}/${id}/members`,
+      url: `${this.url}/${this.groupId()}/members`,
       method: 'GET',
     };
   });
