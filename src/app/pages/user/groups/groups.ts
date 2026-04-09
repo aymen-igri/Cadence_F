@@ -7,6 +7,7 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { BrnDialogImports } from '@spartan-ng/brain/dialog';
 import { HlmTabsImports } from '@spartan-ng/helm/tabs';
 import { Router } from '@angular/router';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-groups-page',
@@ -37,9 +38,18 @@ export class GroupsComponent {
   }
 
   joinGroup(groupId: string) {
-    this.groupService.joinGroup(groupId);
-    // Move to my groups tab after joining if it makes sense, or show a toast
-    setTimeout(() => this.activeTab.set('my-groups'), 300);
+    this.groupService.joinGroup(groupId).subscribe({
+      next: () => {
+        this.router.navigate(['/user/groups', groupId]);
+        toast.success('Group joined successfully!', {
+          description: 'You have successfully joined the group.',
+        });
+      },
+      error: (err) => {
+        console.error('Failed to join group:', err);
+        toast.error('Failed to join the group.');
+      },
+    });
   }
 
   requestToJoin(groupId: string) {

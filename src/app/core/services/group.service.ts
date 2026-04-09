@@ -31,7 +31,7 @@ export class GroupService {
   private groupId = signal<string | null>(null);
 
   readonly allGroupsResource = httpResource<GroupResponse[]>(() => {
-     if (!this.authService.isReady() || !this.authService.currentUser()) return undefined;
+    if (!this.authService.isReady() || !this.authService.currentUser()) return undefined;
     return {
       url: `${this.url}/all`,
       method: 'GET',
@@ -39,7 +39,8 @@ export class GroupService {
   });
 
   readonly groupMembersResource = httpResource<Member[]>(() => {
-    if (!this.authService.isReady() || !this.authService.currentUser() || !this.groupId()) return undefined;
+    if (!this.authService.isReady() || !this.authService.currentUser() || !this.groupId())
+      return undefined;
     return {
       url: `${this.url}/${this.groupId()}/members`,
       method: 'GET',
@@ -58,6 +59,49 @@ export class GroupService {
 
   readonly isGroupsLoading = computed(() => this.allGroupsResource.isLoading());
   readonly isMembersLoading = computed(() => this.groupMembersResource.isLoading());
+
+  public myGroups = computed(() => {
+    return this.allGroupsData()
+      .filter((g) => g.userRole != null)
+      .map((g) => ({
+        group: g,
+        userRole: g.userRole,
+        memberCount: g.membersCount,
+      }));
+  });
+
+  public discoverGroups = computed(() => {
+    return this.allGroupsData()
+      .filter((g) => g.userRole == null)
+      .map((g) => ({
+        group: g,
+        memberCount: g.membersCount,
+      }));
+  });
+
+  public createGroup(payload: GroupCreateRequest) {
+    const userId = this.requireCurrentUserId();
+    return this.http.post<GroupResponse>(`${this.url}/create`, payload).pipe(
+      tap((response) => {
+        this._groups.update((groups) => [...groups, response]);
+
+        this._memberships.update((memberships) => [
+          ...memberships,
+          {
+            id: response.membershipId,
+            groupId: response.id,
+            userId: userId,
+            role: 'OWNER',
+            joinedAt: new Date(),
+          },
+        ]);
+      }),
+    );
+  }
+
+  public joinGroup(groupId: string) {
+    return this.http.post<Member>(`${this.url}/${groupId}/join`, {});
+  }
 
   private _groups = signal<Group[]>([
     {
@@ -136,56 +180,6 @@ export class GroupService {
   public myMemberships = computed(() =>
     this._memberships().filter((m) => m.userId === this.currentUserId()),
   );
-
-  public myGroups = computed(() => {
-    return this.allGroupsData()
-      .filter((g) => g.userRole != null)
-      .map((g) => ({
-        group: g,
-        userRole: g.userRole,
-        memberCount: g.membersCount,
-      }));
-  });
-
-  public discoverGroups = computed(() => {
-    return this.allGroupsData()
-      .filter((g) => g.userRole == null)
-      .map((g) => ({
-        group: g,
-        memberCount: g.membersCount,
-      }));
-  });
-
-  public createGroup(payload: GroupCreateRequest) {
-    const userId = this.requireCurrentUserId();
-    return this.http.post<GroupResponse>(`${this.url}/create`, payload).pipe(
-      tap((response) => {
-        this._groups.update((groups) => [...groups, response]);
-
-        this._memberships.update((memberships) => [
-          ...memberships,
-          {
-            id: response.membershipId,
-            groupId: response.id,
-            userId: userId,
-            role: 'OWNER',
-            joinedAt: new Date(),
-          },
-        ]);
-      }),
-    );
-  }
-
-  public joinGroup(groupId: string) {
-    const newMembership: GroupMembership = {
-      id: Math.random().toString(36).substring(2, 9),
-      groupId,
-      userId: this.requireCurrentUserId(),
-      role: 'MEMBER',
-      joinedAt: new Date(),
-    };
-    this._memberships.update((m) => [...m, newMembership]);
-  }
 
   public requestToJoin(groupId: string) {
     console.log(`Requested to join group ${groupId}`);
