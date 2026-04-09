@@ -1,45 +1,61 @@
 <div class="flex flex-col h-125 border border-border rounded-lg bg-card/30 mt-6">
   <!-- Chat Messages Area -->
   <div #scrollContainer class="flex-1 overflow-y-auto p-4 space-y-4">
-    @for (msg of messages(); track msg.id) {
-      <div
-        class="flex"
-        [ngClass]="{
-          'justify-end': msg.userId === currentUserId(),
-          'justify-start': msg.userId !== currentUserId(),
-        }"
-      >
+    @if (isLoading()) {
+      <div class="h-full flex items-center justify-center">
+        <p class="text-muted-foreground text-sm">Loading messages...</p>
+      </div>
+    } @else if (error()) {
+      <div class="h-full flex items-center justify-center flex-col gap-2">
+        <ng-icon hlm name="lucideAlertCircle" size="lg" class="text-destructive"></ng-icon>
+        <p class="text-destructive text-sm">{{ error() }}</p>
+        <button hlmBtn variant="outline" size="sm" class="mt-2" (click)="ngOnInit()">Retry</button>
+      </div>
+    } @else {
+      @for (msg of messages(); track msg.id) {
         <div
-          class="flex max-w-[75%] gap-2"
-          [ngClass]="{ 'flex-row-reverse': msg.userId === currentUserId() }"
+          class="flex"
+          [ngClass]="{
+            'justify-end': msg.senderId === currentUserId(),
+            'justify-start': msg.senderId !== currentUserId(),
+          }"
         >
           <div
-            class="shrink-0 bg-muted flex items-center justify-center rounded-full h-8 w-8 text-xs font-medium mt-1"
+            class="flex max-w-[75%] gap-2"
+            [ngClass]="{ 'flex-row-reverse': msg.senderId === currentUserId() }"
           >
-            {{ msg.userInitials }}
-          </div>
-
-          <div class="flex flex-col" [ngClass]="{ 'items-end': msg.userId === currentUserId() }">
-            <span class="text-xs text-muted-foreground mb-1 px-1">
-              {{ msg.userName }} &bull; {{ msg.timestamp | date: 'shortTime' }}
-            </span>
+            <div
+              class="shrink-0 bg-muted flex items-center justify-center rounded-full h-8 w-8 text-xs font-medium mt-1"
+            >
+              {{ msg.senderFirstName.charAt(0) }}{{ msg.senderLastName.charAt(0) }}
+            </div>
 
             <div
-              class="px-4 py-2 rounded-2xl text-sm"
-              [ngClass]="{
-                'bg-primary text-primary-foreground rounded-tr-sm': msg.userId === currentUserId(),
-                'bg-muted rounded-tl-sm': msg.userId !== currentUserId(),
-              }"
+              class="flex flex-col"
+              [ngClass]="{ 'items-end': msg.senderId === currentUserId() }"
             >
-              {{ msg.content }}
+              <span class="text-xs text-muted-foreground mb-1 px-1">
+                {{ msg.senderFirstName }} &bull; {{ msg.sentAt | date: 'shortTime' }}
+              </span>
+
+              <div
+                class="px-4 py-2 rounded-2xl text-sm"
+                [ngClass]="{
+                  'bg-primary text-primary-foreground rounded-tr-sm':
+                    msg.senderId === currentUserId(),
+                  'bg-muted rounded-tl-sm': msg.senderId !== currentUserId(),
+                }"
+              >
+                {{ msg.content }}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    } @empty {
-      <div class="h-full flex items-center justify-center">
-        <p class="text-muted-foreground text-sm">No messages yet. Say hi!</p>
-      </div>
+      } @empty {
+        <div class="h-full flex items-center justify-center">
+          <p class="text-muted-foreground text-sm">No messages yet. Say hi!</p>
+        </div>
+      }
     }
   </div>
 
