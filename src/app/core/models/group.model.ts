@@ -20,6 +20,7 @@ export interface GroupResponse {
   membersCount: number;
   membershipId: string;
   userRole: 'MEMBER' | 'ADMIN' | 'OWNER' | null;
+  membershipStatus: 'APPROVED' | 'PENDING' | null;
   createdAt: Date;
 }
 export interface GroupMembership {

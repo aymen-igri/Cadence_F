@@ -62,18 +62,21 @@
             </ng-template>
           }
         </div>
+      } @empty {
+        <div class="col-span-full py-12 text-center border rounded-lg border-dashed">
+          <p class="text-muted-foreground">No members in this group yet.</p>
+        </div>
       }
     </div>
   </div>
 
   <!-- Pending Requests (Admin Only) -->
-  <!-- 
-  @if (currentUserRole() === 'ADMIN' && requests().length > 0) {
+  @if (currentUserRole() === 'ADMIN' || currentUserRole() === 'OWNER') {
     <div class="space-y-4 pt-6 border-t border-border">
-      <h3 class="text-lg font-semibold">Pending Requests ({{ requests().length }})</h3>
+      <h3 class="text-lg font-semibold">Pending Requests ({{ requests.length }})</h3>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        @for (req of requests(); track req.requestId) {
+      <div class="grid grid-cols-1 md:grid gap-4">
+        @for (req of requests; track req.membershipId) {
           <div
             hlmCard
             class="flex flex-row flex-wrap sm:flex-nowrap items-center p-4 gap-4 bg-muted/20 border-dashed"
@@ -81,12 +84,12 @@
             <div
               class="bg-card shrink-0 flex items-center justify-center rounded-full h-10 w-10 text-sm font-medium border border-border"
             >
-              {{ req.userInitials }}
+              {{ req.firstName.charAt(0) }}{{ req.lastName.charAt(0) }}
             </div>
             <div class="flex-1 min-w-50">
-              <p class="font-medium truncate">{{ req.fullName }}</p>
+              <p class="font-medium truncate">{{ req.firstName }} {{ req.lastName }}</p>
               <p class="text-xs text-muted-foreground mt-0.5">
-                Requested {{ req.requestedAt | date: 'shortDate' }}
+                Requested {{ req.joinedAt | date: 'shortDate' }}
               </p>
             </div>
 
@@ -96,7 +99,7 @@
                 size="sm"
                 variant="outline"
                 class="flex-1 sm:flex-none"
-                (click)="declineRequest.emit(req.requestId)"
+                (click)="declineRequest.emit(req.userId)"
               >
                 Decline
               </button>
@@ -104,15 +107,18 @@
                 hlmBtn
                 size="sm"
                 class="flex-1 sm:flex-none"
-                (click)="acceptRequest.emit(req.requestId)"
+                (click)="acceptRequest.emit(req.userId)"
               >
                 Accept
               </button>
             </div>
           </div>
+        } @empty {
+          <div class="col-span-full py-12 text-center border rounded-lg border-dashed">
+            <p class="text-muted-foreground">No pending join requests.</p>
+          </div>
         }
       </div>
     </div>
   }
-    -->
 </div>

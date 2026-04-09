@@ -39,10 +39,19 @@ export class GroupService {
   });
 
   readonly groupMembersResource = httpResource<Member[]>(() => {
-    if (!this.authService.isReady() || !this.authService.currentUser() || !this.groupId())
-      return undefined;
+    const id = this.groupId();
+    if (!this.authService.isReady() || !this.authService.currentUser() || !id) return undefined;
     return {
-      url: `${this.url}/${this.groupId()}/members`,
+      url: `${this.url}/${id}/members`,
+      method: 'GET',
+    };
+  });
+
+  readonly joinGroupRequestsResource = httpResource<Member[]>(() => {
+    const id = this.groupId();
+    if (!id || !this.authService.currentUser()) return undefined;
+    return {
+      url: `${this.url}/${id}/requests`,
       method: 'GET',
     };
   });
@@ -57,12 +66,21 @@ export class GroupService {
     computation: (value) => value,
   });
 
+  readonly joinRequests = linkedSignal<Member[], Member[]>({
+    source: () =>
+      this.joinGroupRequestsResource.hasValue() ? this.joinGroupRequestsResource.value() : [],
+    computation: (value) => value,
+  });
+
   readonly isGroupsLoading = computed(() => this.allGroupsResource.isLoading());
   readonly isMembersLoading = computed(() => this.groupMembersResource.isLoading());
+  readonly isjoinRequestsLoading = computed(() => this.joinGroupRequestsResource.isLoading());
 
   public myGroups = computed(() => {
     return this.allGroupsData()
-      .filter((g) => g.userRole != null)
+      .filter((g) => {
+        return g.userRole != null && g.membershipStatus === 'APPROVED';
+      })
       .map((g) => ({
         group: g,
         userRole: g.userRole,
@@ -80,27 +98,32 @@ export class GroupService {
   });
 
   public createGroup(payload: GroupCreateRequest) {
-    const userId = this.requireCurrentUserId();
     return this.http.post<GroupResponse>(`${this.url}/create`, payload).pipe(
       tap((response) => {
-        this._groups.update((groups) => [...groups, response]);
-
-        this._memberships.update((memberships) => [
-          ...memberships,
-          {
-            id: response.membershipId,
-            groupId: response.id,
-            userId: userId,
-            role: 'OWNER',
-            joinedAt: new Date(),
-          },
-        ]);
+        this.allGroupsData.update((groups) => [...groups, response]);
       }),
     );
   }
 
   public joinGroup(groupId: string) {
     return this.http.post<Member>(`${this.url}/${groupId}/join`, {});
+  }
+
+  public acceptJoinRequest(groupId: string, userId: string) {
+    return this.http.patch<Member>(`${this.url}/${groupId}/requests/${userId}/approve`, {}).pipe(
+      tap((newMember) => {
+        this.joinRequests.update((r) => r.filter((req) => req.userId !== userId));
+        this.groupMembers.update((m) => [...m, newMember]);
+      })
+    );
+  }
+
+  public declineJoinRequest(groupId: string, userId: string) {
+    return this.http.delete(`${this.url}/${groupId}/requests/${userId}/reject`, {}).pipe(
+      tap(() => {
+        this.joinRequests.update((r) => r.filter((req) => req.userId !== userId));
+      })
+    );
   }
 
   private _groups = signal<Group[]>([
@@ -180,17 +203,6 @@ export class GroupService {
   public myMemberships = computed(() =>
     this._memberships().filter((m) => m.userId === this.currentUserId()),
   );
-
-  public requestToJoin(groupId: string) {
-    console.log(`Requested to join group ${groupId}`);
-    const req: GroupJoinRequest = {
-      id: Math.random().toString(36).substring(2, 9),
-      groupId,
-      userId: this.requireCurrentUserId(),
-      requestedAt: new Date(),
-    };
-    this._joinRequests.update((r) => [...r, req]);
-  }
 
   // --- Group Detail Additions ---
 

@@ -53,7 +53,17 @@ export class GroupsComponent {
   }
 
   requestToJoin(groupId: string) {
-    this.groupService.requestToJoin(groupId);
-    // Show a toast ideally
+    this.groupService.joinGroup(groupId).subscribe({
+      next: () => {
+        this.router.navigate(['/user/groups', groupId]);
+        toast.success('Request sent successfully!', {
+          description: 'You have successfully requested to join the group.',
+        });
+      },
+      error: (err) => {
+        console.error('Failed to send group request:', err);
+        toast.error('Failed to send the group request.');
+      },
+    });
   }
 }

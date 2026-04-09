@@ -12,6 +12,7 @@ import { GroupFeedCardComponent } from '@app/components/user/group-detail/group-
 import { GroupMembersTabComponent } from '@app/components/user/group-detail/group-members-tab/group-members-tab';
 import { GroupChatTabComponent } from '@app/components/user/group-detail/group-chat-tab/group-chat-tab';
 import { GroupSettingsTabComponent } from '@app/components/user/group-detail/group-settings-tab/group-settings-tab';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-group-detail-page',
@@ -40,7 +41,6 @@ export class GroupDetailComponent {
 
   myRole = computed(() => this.group()?.userRole || null);
   members = signal<Member[]>([]);
-  requests = signal<any[]>([]);
   feed = signal<any[]>([]);
 
   activeTab = signal<'feed' | 'members' | 'chat' | 'settings'>('feed');
@@ -67,7 +67,6 @@ export class GroupDetailComponent {
         // Sync state from services based on active group param
         this.groupService.setGroupId(gId);
         this.members = this.groupService.groupMembers;
-        this.requests = this.groupService.getGroupRequests(gId) as any;
         this.feed = this.groupService.getGroupFeed(gId) as any;
       }
     });
@@ -108,12 +107,47 @@ export class GroupDetailComponent {
     this.groupService.removeMember(membershipId);
   }
 
-  onAcceptRequest(requestId: string) {
-    this.groupService.acceptRequest(requestId);
+  getUserInitials = (firstName: string, lastName: string) => {
+    const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
+    const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
+    return `${firstInitial}${lastInitial}`;
+  };
+
+  getUserFullName = (firstName: string, lastName: string) => {
+    return `${firstName} ${lastName}`;
   }
 
-  onDeclineRequest(requestId: string) {
-    this.groupService.declineRequest(requestId);
+  onAcceptRequest(userId: string) {
+    this.groupService.acceptJoinRequest(this.groupId(), userId).subscribe({
+      next: () => {
+        toast.success('Join request accepted.', {
+          description:
+            'The user has been added to the group and can now participate in group activities.',
+        });
+      },
+      error: (err) => {
+        toast.error('Failed to accept join request.', {
+          description: 'An error occurred while accepting the join request. Please try again.',
+        });
+        console.error('Failed to accept join request:', err);
+      },
+    });
+  }
+
+  onDeclineRequest(userId: string) {
+    this.groupService.declineJoinRequest(this.groupId(), userId).subscribe({
+      next: () => {
+        toast.success('Join request declined.', {
+          description: "The user's request to join the group has been declined.",
+        });
+      },
+      error: (err) => {
+        toast.error('Failed to decline join request.', {
+          description: 'An error occurred while declining the join request. Please try again.',
+        });
+        console.error('Failed to decline join request:', err);
+      },
+    });
   }
 
   onUpdateGroup(data: { name: string; description: string; privacyLevel: 'PUBLIC' | 'PRIVATE' }) {

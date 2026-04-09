@@ -1,4 +1,4 @@
-import { Component, effect, input, output, signal } from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
@@ -8,6 +8,8 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { provideIcons } from '@ng-icons/core';
 import { lucideMoreVertical } from '@ng-icons/lucide';
 import { Member, RequestItem } from '@app/core/models/group.model';
+import { GroupService } from '@app/core/services/group.service';
+import { BrnTabs } from "@spartan-ng/brain/tabs";
 
 @Component({
   selector: 'app-group-members-tab',
@@ -20,13 +22,14 @@ import { Member, RequestItem } from '@app/core/models/group.model';
     HlmDropdownMenuImports,
     HlmIconImports,
     DatePipe,
-  ],
+],
   providers: [provideIcons({ lucideMoreVertical })],
   templateUrl: './group-members-tab.html',
 })
 export class GroupMembersTabComponent {
+  private groupService = inject(GroupService);
   members = input.required<Member[]>();
-  requests = input.required<RequestItem[]>();
+  readonly requests = this.groupService.joinRequests();
   currentUserRole = input<'ADMIN' | 'MEMBER' | 'OWNER' | null>();
   currentUserId = input.required<string>();
 

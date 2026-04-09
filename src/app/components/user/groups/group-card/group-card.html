@@ -26,12 +26,11 @@
     @if (!userRole() && group().privacyLevel === 'PUBLIC') {
       <button hlmBtn variant="secondary" size="sm" (click)="onJoinClick($event)">Join</button>
     }
-    @if (userRole() && group().privacyLevel === 'PRIVATE') {
+    @if (!userRole() && group().privacyLevel === 'PRIVATE') {
       <button
         hlmBtn
         variant="outline"
         size="sm"
-        *ngIf="!userRole() && group().privacyLevel === 'PRIVATE'"
         (click)="onRequestJoinClick($event)"
       >
         Request to join
