@@ -7,9 +7,9 @@ import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { provideIcons } from '@ng-icons/core';
 import { lucideMoreVertical } from '@ng-icons/lucide';
-import { Member, RequestItem } from '@app/core/models/group.model';
+import { Member } from '@app/core/models/group.model';
 import { GroupService } from '@app/core/services/group.service';
-import { BrnTabs } from "@spartan-ng/brain/tabs";
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-group-members-tab',
@@ -22,7 +22,7 @@ import { BrnTabs } from "@spartan-ng/brain/tabs";
     HlmDropdownMenuImports,
     HlmIconImports,
     DatePipe,
-],
+  ],
   providers: [provideIcons({ lucideMoreVertical })],
   templateUrl: './group-members-tab.html',
 })
@@ -32,16 +32,48 @@ export class GroupMembersTabComponent {
   readonly requests = this.groupService.joinRequests();
   currentUserRole = input<'ADMIN' | 'MEMBER' | 'OWNER' | null>();
   currentUserId = input.required<string>();
+  groupId = input.required<string>();
 
   getUserInitials = (firstName: string, lastName: string) => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
     return `${firstInitial}${lastInitial}`;
-  }
+  };
 
   promote = output<string>();
   demote = output<string>();
   remove = output<string>();
-  acceptRequest = output<string>();
-  declineRequest = output<string>();
+
+  acceptRequest(userId: string) {
+    this.groupService.acceptJoinRequest(this.groupId(), userId).subscribe({
+      next: () => {
+        toast.success('Join request accepted.', {
+          description:
+            'The user has been added to the group and can now participate in group activities.',
+        });
+      },
+      error: (err) => {
+        toast.error('Failed to accept join request.', {
+          description: 'An error occurred while accepting the join request. Please try again.',
+        });
+        console.error('Failed to accept join request:', err);
+      },
+    });
+  }
+
+  declineRequest(userId: string) {
+    this.groupService.declineJoinRequest(this.groupId(), userId).subscribe({
+      next: () => {
+        toast.success('Join request declined.', {
+          description: "The user's request to join the group has been declined.",
+        });
+      },
+      error: (err) => {
+        toast.error('Failed to decline join request.', {
+          description: 'An error occurred while declining the join request. Please try again.',
+        });
+        console.error('Failed to decline join request:', err);
+      },
+    });
+  }
 }

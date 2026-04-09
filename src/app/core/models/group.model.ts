@@ -97,5 +97,11 @@ export interface Member {
   joinedAt: Date;
 }
 
+export interface GroupUpdateRequest {
+  name?: string;
+  description?: string;
+  privacyLevel?: 'PUBLIC' | 'PRIVATE';
+}
+
 
 export type GroupData = Omit<Group, 'id'>

@@ -99,7 +99,7 @@
                 size="sm"
                 variant="outline"
                 class="flex-1 sm:flex-none"
-                (click)="declineRequest.emit(req.userId)"
+                (click)="declineRequest(req.userId)"
               >
                 Decline
               </button>
@@ -107,7 +107,7 @@
                 hlmBtn
                 size="sm"
                 class="flex-1 sm:flex-none"
-                (click)="acceptRequest.emit(req.userId)"
+                (click)="acceptRequest(req.userId)"
               >
                 Accept
               </button>

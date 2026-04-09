@@ -73,11 +73,10 @@
             [members]="members()"
             [currentUserRole]="myRole()"
             [currentUserId]="userId"
+            [groupId]="groupId()"
             (promote)="onPromote($event)"
             (demote)="onDemote($event)"
             (remove)="onRemove($event)"
-            (acceptRequest)="onAcceptRequest($event)"
-            (declineRequest)="onDeclineRequest($event)"
           >
           </app-group-members-tab>
         </div>
@@ -99,9 +98,6 @@
             [group]="group()!"
             [members]="members()"
             [currentUserId]="groupService.currentUserId()!"
-            (updateGroup)="onUpdateGroup($event)"
-            (transferAdmin)="onTransferAdmin($event)"
-            (deleteGroup)="onDeleteGroup()"
           >
           </app-group-settings-tab>
         </div>

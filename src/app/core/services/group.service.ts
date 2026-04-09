@@ -1,16 +1,12 @@
 import { Injectable, signal, computed, inject, linkedSignal } from '@angular/core';
 import {
-  Group,
-  GroupMembership,
   SharedSession,
   Comment,
-  GroupJoinRequest,
   FeedSharedSession,
-  MemberItem,
-  RequestItem,
   GroupCreateRequest,
   GroupResponse,
   Member,
+  GroupUpdateRequest,
 } from '../models/group.model';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../environments/environments';
@@ -105,6 +101,28 @@ export class GroupService {
     );
   }
 
+  public updateGroup(groupId: string, payload: GroupUpdateRequest) {
+    return this.http.patch<GroupResponse>(`${this.url}/${groupId}`, payload).pipe(
+      tap((response) => {
+        this.allGroupsData.update((groups) =>
+          groups.map((g) => (g.id === groupId ? response : g))
+        );
+      }),
+    );
+  }
+
+  public transferOwnership(newOwnerId: string) {
+    return this.http.patch(`${this.url}/${this.groupId()}/transfer/${newOwnerId}`, {});
+  }
+
+  public deleteGroup(groupId: string) {
+    return this.http.delete(`${this.url}/${groupId}`).pipe(
+      tap(() => {
+        this.allGroupsData.update((groups) => groups.filter((g) => g.id !== groupId));
+      }),
+    );
+  }
+
   public joinGroup(groupId: string) {
     return this.http.post<Member>(`${this.url}/${groupId}/join`, {});
   }
@@ -124,6 +142,10 @@ export class GroupService {
         this.joinRequests.update((r) => r.filter((req) => req.userId !== userId));
       })
     );
+  }
+
+  public leaveGroup(groupId: string) {
+    return this.http.delete(`${this.url}/${groupId}/leave`, {});
   }
 
   private _sharedSessions = signal<SharedSession[]>([
@@ -167,10 +189,6 @@ export class GroupService {
 
   public getGroupById(id: string): GroupResponse | undefined {
     return this.allGroupsData().find((g) => g.id === id);
-  }
-
-  public leaveGroup(groupId: string) {
-
   }
 
   public getGroupFeed(groupId: string) {
@@ -231,17 +249,7 @@ export class GroupService {
   public removeMember(membershipId: string) {
 
   }
-
-  public updateGroup(
-    groupId: string,
-    data: Partial<Pick<Group, 'name' | 'description' | 'privacyLevel'>>,
-  ) {
-  }
-
-  public deleteGroup(groupId: string) {
-
-  }
-
+  
   public setGroupId(id: string) {
     this.groupId.set(id);
   }

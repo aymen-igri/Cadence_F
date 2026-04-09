@@ -1,40 +1,55 @@
 <div
   hlmCard
-  class="flex flex-col h-full bg-card hover:border-border transition-colors"
+  class="flex flex-col bg-card hover:border-border hover:shadow-sm transition-all duration-200 h-full"
   [class.cursor-pointer]="isClickable()"
   (click)="handleCardClick()"
 >
-  <div hlmCardHeader>
-    <div class="flex items-center justify-between mb-2">
-      <span hlmBadge [variant]="group().privacyLevel === 'PUBLIC' ? 'default' : 'secondary'">
-        {{ group().privacyLevel | titlecase }}
+  <div hlmCardHeader class="p-4 pb-2">
+    <div class="flex items-center justify-between mb-1.5">
+      <span
+        hlmBadge
+        [variant]="group().privacyLevel === 'PUBLIC' ? 'default' : 'secondary'"
+        class="text-[10px] uppercase tracking-wider px-1.5 py-0"
+      >
+        {{ group().privacyLevel }}
       </span>
       @if (userRole()) {
-        <span hlmBadge variant="outline">
-          {{ userRole() | titlecase }}
+        <span hlmBadge variant="outline" class="text-[10px] uppercase tracking-wider px-1.5 py-0">
+          {{ userRole() }}
         </span>
       }
     </div>
-    <h3 hlmCardTitle class="text-xl line-clamp-1">{{ group().name }}</h3>
-    <p hlmCardDescription class="line-clamp-2 mt-2">{{ group().description }}</p>
+    <h3 hlmCardTitle class="text-sm font-semibold line-clamp-1 leading-tight">
+      {{ group().name }}
+    </h3>
+    <p hlmCardDescription class="line-clamp-1 text-xs mt-1">{{ group().description }}</p>
   </div>
 
-  <div class="grow"></div>
-
-  <div hlmCardFooter class="flex items-center justify-between pt-4">
-    <span class="text-sm text-muted-foreground">{{ memberCount() }} members</span>
-
+  <div
+    hlmCardFooter
+    class="flex items-center justify-between px-4 py-2 border-t border-border/40 mt-2"
+  >
+    <span class="text-[11px] text-muted-foreground font-medium">{{ memberCount() }} members</span>
     @if (!userRole() && group().privacyLevel === 'PUBLIC') {
-      <button hlmBtn variant="secondary" size="sm" (click)="onJoinClick($event)">Join</button>
+      <button
+        hlmBtn
+        variant="secondary"
+        size="sm"
+        class="h-6 text-[10px] px-2 rounded-md"
+        (click)="onJoinClick($event)"
+      >
+        Join
+      </button>
     }
     @if (!userRole() && group().privacyLevel === 'PRIVATE') {
       <button
         hlmBtn
         variant="outline"
         size="sm"
+        class="h-6 text-[10px] px-2 rounded-md"
         (click)="onRequestJoinClick($event)"
       >
-        Request to join
+        Request
       </button>
     }
   </div>

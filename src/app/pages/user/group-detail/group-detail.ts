@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@app/core/services/auth.service';
 import { GroupService } from '@app/core/services/group.service';
-import { Group, GroupResponse, Member } from '@app/core/models/group.model';
+import { GroupResponse, Member } from '@app/core/models/group.model';
 import { HlmTabsImports } from '@spartan-ng/helm/tabs';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
@@ -83,8 +83,18 @@ export class GroupDetailComponent {
   }
 
   leaveGroup() {
-    this.groupService.leaveGroup(this.groupId());
-    this.router.navigate(['/user/groups']);
+    this.groupService.leaveGroup(this.groupId()).subscribe({
+      next: () => {
+        this.router.navigate(['/user/groups']);
+        toast.success('You have left the group');
+      },
+      error: (err) => {
+        toast.error('Failed to leave group.', {
+          duration: 3000,
+        });
+        console.error('Error leaving group:', err);
+      },
+    });
   }
 
   onShareSession(sessionId: string) {
@@ -115,57 +125,5 @@ export class GroupDetailComponent {
 
   getUserFullName = (firstName: string, lastName: string) => {
     return `${firstName} ${lastName}`;
-  }
-
-  onAcceptRequest(userId: string) {
-    this.groupService.acceptJoinRequest(this.groupId(), userId).subscribe({
-      next: () => {
-        toast.success('Join request accepted.', {
-          description:
-            'The user has been added to the group and can now participate in group activities.',
-        });
-      },
-      error: (err) => {
-        toast.error('Failed to accept join request.', {
-          description: 'An error occurred while accepting the join request. Please try again.',
-        });
-        console.error('Failed to accept join request:', err);
-      },
-    });
-  }
-
-  onDeclineRequest(userId: string) {
-    this.groupService.declineJoinRequest(this.groupId(), userId).subscribe({
-      next: () => {
-        toast.success('Join request declined.', {
-          description: "The user's request to join the group has been declined.",
-        });
-      },
-      error: (err) => {
-        toast.error('Failed to decline join request.', {
-          description: 'An error occurred while declining the join request. Please try again.',
-        });
-        console.error('Failed to decline join request:', err);
-      },
-    });
-  }
-
-  onUpdateGroup(data: { name: string; description: string; privacyLevel: 'PUBLIC' | 'PRIVATE' }) {
-    this.groupService.updateGroup(this.groupId(), data);
-  }
-
-  onTransferAdmin(membershipId: string) {
-    // Current user membership
-    const myMem = this.members().find((m) => m.userId === this.groupService.currentUserId());
-    if (myMem) {
-      this.groupService.updateRole(myMem.membershipId, 'MEMBER');
-    }
-    // Promote selected
-    this.groupService.updateRole(membershipId, 'ADMIN');
-  }
-
-  onDeleteGroup() {
-    this.groupService.deleteGroup(this.groupId());
-    this.router.navigate(['/user/groups']);
-  }
+  };
 }

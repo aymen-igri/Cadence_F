@@ -5,45 +5,49 @@
       <h3 hlmCardTitle>Group Settings</h3>
       <p hlmCardDescription>Update your group's details and preferences.</p>
     </div>
-    <div hlmCardContent class="space-y-4">
+    <div hlmCardContent class="space-y-4" [formGroup]="settingsForm">
       <div class="space-y-2">
         <label hlmLabel>Group Name</label>
-        <input hlmInput [(ngModel)]="name" class="w-full" />
+        <input hlmInput formControlName="name" class="w-full" />
       </div>
 
       <div class="space-y-2">
         <label hlmLabel>Description</label>
-        <textarea hlmInput [(ngModel)]="description" class="min-h-24 w-full"></textarea>
+        <textarea hlmInput formControlName="description" class="min-h-24 w-full"></textarea>
       </div>
 
       <div class="space-y-2">
         <label hlmLabel>Type</label>
-        <select hlmInput [(ngModel)]="privacyLevel" class="w-full h-10 px-3 cursor-pointer">
+        <select hlmInput formControlName="privacyLevel" class="w-full h-10 px-3 cursor-pointer">
           <option value="PUBLIC">Public (Anyone can join)</option>
           <option value="PRIVATE">Private (Requires approval)</option>
         </select>
       </div>
     </div>
     <div hlmCardFooter class="justify-end">
-      <button hlmBtn [disabled]="!isChanged()" (click)="saveSettings()">Save Changes</button>
+      <button hlmBtn [disabled]="!isChanged() || settingsForm.invalid" (click)="saveSettings()">
+        Save Changes
+      </button>
     </div>
   </div>
 
-  <!-- Transfer Admin -->
+  <!-- Transfer Ownership -->
   <div hlmCard>
     <div hlmCardHeader>
-      <h3 hlmCardTitle>Transfer Admin</h3>
+      <h3 hlmCardTitle>Transfer Ownership</h3>
       <p hlmCardDescription>
-        Transfer your admin rights to another member. You will become a regular member.
+        Transfer your ownership rights to another member. You will become a regular member.
       </p>
     </div>
     <div hlmCardContent class="space-y-4">
       <div class="space-y-2">
         <label hlmLabel>Select Member</label>
-        <select hlmInput [(ngModel)]="selectedMemberId" class="w-full h-10 px-3 cursor-pointer">
+        <select hlmInput [formControl]="selectedMemberCtrl" class="w-full h-10 px-3 cursor-pointer">
           <option value="">-- Choose a member --</option>
           @for (m of otherMembers(); track m.membershipId) {
-            <option [value]="m.membershipId">{{ m.firstName }} {{ m.lastName}} ({{ m.role }})</option>
+            <option [value]="m.userId">
+              {{ m.firstName }} {{ m.lastName }} ({{ m.role }})
+            </option>
           }
         </select>
       </div>
@@ -52,10 +56,10 @@
       <button
         hlmBtn
         variant="outline"
-        [disabled]="!selectedMemberId()"
+        [disabled]="!selectedMemberCtrl.value"
         (click)="transferState.set('open')"
       >
-        Transfer Admin Rights
+        Transfer Ownership Rights
       </button>
     </div>
   </div>
@@ -75,15 +79,15 @@
   <hlm-dialog [state]="transferState()" (stateChanged)="transferState.set($event)">
     <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-w-md">
       <hlm-dialog-header>
-        <h3 hlmDialogTitle>Transfer Admin Rights</h3>
+        <h3 hlmDialogTitle>Transfer Ownership Rights</h3>
         <p hlmDialogDescription>
-          Are you sure you want to transfer your admin rights? You will no longer be an admin of
+          Are you sure you want to transfer your ownership rights? You will no longer be an owner of
           this group.
         </p>
       </hlm-dialog-header>
       <hlm-dialog-footer>
         <button hlmBtn variant="outline" (click)="transferState.set('closed')">Cancel</button>
-        <button hlmBtn (click)="confirmTransfer()">Confirm Transfer</button>
+        <button hlmBtn (click)="transferOwnership()">Confirm Transfer</button>
       </hlm-dialog-footer>
     </hlm-dialog-content>
   </hlm-dialog>
