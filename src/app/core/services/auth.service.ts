@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
@@ -12,24 +12,23 @@ export class AuthService {
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly url = `${environment.apiUrl}`;
   private readonly USER_KEY = 'current_user';
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
   currentUser = signal<User | null>(null);
   isReady = signal<boolean>(false);
 
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-  ) {
-    const token = this.getAccessToken();
-    if (!token || this.isTokenExpired(token)) {
+  constructor() {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken || this.isTokenExpired(refreshToken)) {
       this.clearTokens();
       this.isReady.set(true);
     } else {
-       const storedUser = localStorage.getItem(this.USER_KEY);
-       if (storedUser) {
-         this.currentUser.set(JSON.parse(storedUser));
-       }
-       this.isReady.set(true);
+      const storedUser = localStorage.getItem(this.USER_KEY);
+      if (storedUser) {
+        this.currentUser.set(JSON.parse(storedUser));
+      }
+      this.isReady.set(true);
     }
   }
 
@@ -57,10 +56,7 @@ export class AuthService {
   refresh() {
     const refreshToken = this.getRefreshToken();
     return this.http
-      .post<AuthTokens>(
-        `${this.url}/auth/refreshToken`,
-        { refreshToken },
-      )
+      .post<AuthTokens>(`${this.url}/auth/refreshToken`, { refreshToken })
       .pipe(tap((tokens) => this.setTokens(tokens)));
   }
 
