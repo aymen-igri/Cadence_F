@@ -21,7 +21,8 @@ export class GroupCardComponent {
   requestJoinClick = output<string>();
   isClickable = input<boolean>(true);
 
-  handleCardClick() {
+  handleCardClick(event: Event) {
+    event.stopPropagation();
     if (!this.isClickable()) return;
     this.cardClick.emit(this.group().id);
   }

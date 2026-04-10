@@ -37,8 +37,6 @@ export class GroupDetailComponent {
   authService = inject(AuthService);
 
   groupId = signal<string>('');
-  group = signal<GroupResponse | undefined>(undefined);
-
   myRole = computed(() => this.group()?.userRole || null);
   members = signal<Member[]>([]);
   feed = signal<any[]>([]);
@@ -49,28 +47,22 @@ export class GroupDetailComponent {
   constructor() {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
-      if (id) {
-        this.groupId.set(id);
-        const g = this.groupService.getGroupById(id);
-        if (!g) {
-          this.router.navigate(['/user/groups']);
-          return;
-        }
-        this.group.set(g);
-        console.log('Loaded group:', g);
-      }
-    });
+      if (!id) return;
 
-    effect(() => {
-      const gId = this.groupId();
-      if (gId) {
-        // Sync state from services based on active group param
-        this.groupService.setGroupId(gId);
-        this.members = this.groupService.groupMembers;
-        this.feed = this.groupService.getGroupFeed(gId) as any;
-      }
+      this.groupId.set(id);
+      this.groupService.setGroupId(id);
+
+      this.members = this.groupService.groupMembers;
+      this.feed = this.groupService.getGroupFeed(id) as any;
     });
   }
+
+  group = computed(() => {
+    const id = this.groupId();
+    if (!id) return undefined;
+
+    return this.groupService.getGroupById(id);
+  });
 
   setActiveTab(tab: any) {
     this.activeTab.set(tab);

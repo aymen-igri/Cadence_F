@@ -24,11 +24,11 @@
       <!-- My Groups Section -->
       <div hlmTabsContent="my-groups">
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-2">
-          @for (item of groupService.myGroups(); track item.group.id) {
+          @for (item of groupService.myGroups(); track item.id) {
             <app-group-card
-              [group]="item.group"
+              [group]="item"
               [userRole]="item.userRole"
-              [memberCount]="item.memberCount"
+              [memberCount]="item.membersCount"
               (cardClick)="navigateToGroup($event)"
               [isClickable]="true"
             >
@@ -47,10 +47,10 @@
       <!-- Discover Section -->
       <div hlmTabsContent="discover">
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-2">
-          @for (item of groupService.discoverGroups(); track item.group.id) {
+          @for (item of groupService.discoverGroups(); track item.id) {
             <app-group-card
-              [group]="item.group"
-              [memberCount]="item.memberCount"
+              [group]="item"
+              [memberCount]="item.membersCount"
               (cardClick)="navigateToGroup($event)"
               (joinClick)="joinGroup($event)"
               (requestJoinClick)="requestToJoin($event)"

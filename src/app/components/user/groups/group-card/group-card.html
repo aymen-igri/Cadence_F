@@ -2,7 +2,7 @@
   hlmCard
   class="flex flex-col bg-card hover:border-border hover:shadow-sm transition-all duration-200 h-full"
   [class.cursor-pointer]="isClickable()"
-  (click)="handleCardClick()"
+  (click)="handleCardClick($event)"
 >
   <div hlmCardHeader class="p-4 pb-2">
     <div class="flex items-center justify-between mb-1.5">

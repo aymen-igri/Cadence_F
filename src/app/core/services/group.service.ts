@@ -76,21 +76,12 @@ export class GroupService {
     return this.allGroupsData()
       .filter((g) => {
         return g.userRole != null && g.membershipStatus === 'APPROVED';
-      })
-      .map((g) => ({
-        group: g,
-        userRole: g.userRole,
-        memberCount: g.membersCount,
-      }));
+      });
   });
 
   public discoverGroups = computed(() => {
     return this.allGroupsData()
-      .filter((g) => g.userRole == null)
-      .map((g) => ({
-        group: g,
-        memberCount: g.membersCount,
-      }));
+      .filter((g) => g.userRole == null);
   });
 
   public createGroup(payload: GroupCreateRequest) {
@@ -104,15 +95,25 @@ export class GroupService {
   public updateGroup(groupId: string, payload: GroupUpdateRequest) {
     return this.http.patch<GroupResponse>(`${this.url}/${groupId}`, payload).pipe(
       tap((response) => {
-        this.allGroupsData.update((groups) =>
-          groups.map((g) => (g.id === groupId ? response : g))
-        );
+        this.allGroupsData.update((groups) => groups.map((g) => (g.id === groupId ? response : g)));
       }),
     );
   }
 
   public transferOwnership(newOwnerId: string) {
-    return this.http.patch(`${this.url}/${this.groupId()}/transfer/${newOwnerId}`, {});
+    return this.http.patch(`${this.url}/${this.groupId()}/transfer/${newOwnerId}`, {}).pipe(
+      tap(() => {
+        const groupId = this.groupId();
+        this.allGroupsData.update((groups) => {
+          return groups.map((group) => {
+            if (group.id === groupId) {
+              return { ...group, userRole: 'MEMBER' };
+            }
+            return group;
+          });
+        });
+      })
+    );
   }
 
   public deleteGroup(groupId: string) {
@@ -132,7 +133,7 @@ export class GroupService {
       tap((newMember) => {
         this.joinRequests.update((r) => r.filter((req) => req.userId !== userId));
         this.groupMembers.update((m) => [...m, newMember]);
-      })
+      }),
     );
   }
 
@@ -140,7 +141,7 @@ export class GroupService {
     return this.http.delete(`${this.url}/${groupId}/requests/${userId}/reject`, {}).pipe(
       tap(() => {
         this.joinRequests.update((r) => r.filter((req) => req.userId !== userId));
-      })
+      }),
     );
   }
 
@@ -154,9 +155,9 @@ export class GroupService {
         this.groupMembers.update((members) => {
           return members.map((m) => {
             return m.membershipId === targetMemberId ? { ...m, role: 'ADMIN' } : m;
-          })
-        })
-      })
+          });
+        });
+      }),
     );
   }
 
@@ -178,8 +179,22 @@ export class GroupService {
         this.groupMembers.update((members) => {
           return members.filter((m) => m.membershipId !== targetMemberId);
         });
-      })
+      }),
     );
+  }
+
+  public getGroupById(id: string): GroupResponse | undefined {
+    return this.allGroupsData().find((g) => g.id === id);
+  }
+
+  private requireCurrentUserId(): string {
+    const userId = this.currentUserId();
+
+    if (userId === null || userId === undefined) {
+      throw new Error('Current user is not loaded or not authenticated.');
+    }
+
+    return userId;
   }
 
   private _sharedSessions = signal<SharedSession[]>([
@@ -209,21 +224,7 @@ export class GroupService {
     'user-3': { initials: 'AR', name: 'Alice Ray' },
   };
 
-  private requireCurrentUserId(): string {
-    const userId = this.currentUserId();
-
-    if (userId === null || userId === undefined) {
-      throw new Error('Current user is not loaded or not authenticated.');
-    }
-
-    return userId;
-  }
-
   // --- Group Detail Additions ---
-
-  public getGroupById(id: string): GroupResponse | undefined {
-    return this.allGroupsData().find((g) => g.id === id);
-  }
 
   public getGroupFeed(groupId: string) {
     return computed<FeedSharedSession[]>(() => {
