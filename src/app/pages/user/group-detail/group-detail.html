@@ -51,7 +51,6 @@
           @for (session of feed(); track session.id) {
             <app-group-feed-card
               [session]="session"
-              (addComment)="onAddComment($event.sessionId, $event.content)"
             >
             </app-group-feed-card>
           } @empty {
@@ -74,9 +73,6 @@
             [currentUserRole]="myRole()"
             [currentUserId]="userId"
             [groupId]="groupId()"
-            (promote)="onPromote($event)"
-            (demote)="onDemote($event)"
-            (remove)="onRemove($event)"
           >
           </app-group-members-tab>
         </div>

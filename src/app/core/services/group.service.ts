@@ -148,6 +148,40 @@ export class GroupService {
     return this.http.delete(`${this.url}/${groupId}/leave`, {});
   }
 
+  public promoteMember(groupId: string, targetMemberId: string) {
+    return this.http.patch(`${this.url}/${groupId}/members/${targetMemberId}/promote`, {}).pipe(
+      tap(() => {
+        this.groupMembers.update((members) => {
+          return members.map((m) => {
+            return m.membershipId === targetMemberId ? { ...m, role: 'ADMIN' } : m;
+          })
+        })
+      })
+    );
+  }
+
+  public demoteMember(groupId: string, targetMemberId: string) {
+    return this.http.patch(`${this.url}/${groupId}/members/${targetMemberId}/demote`, {}).pipe(
+      tap(() => {
+        this.groupMembers.update((members) => {
+          return members.map((m) => {
+            return m.membershipId === targetMemberId ? { ...m, role: 'MEMBER' } : m;
+          });
+        });
+      }),
+    );
+  }
+
+  public removeMember(groupId: string, targetMemberId: string) {
+    return this.http.delete(`${this.url}/${groupId}/members/${targetMemberId}`).pipe(
+      tap(() => {
+        this.groupMembers.update((members) => {
+          return members.filter((m) => m.membershipId !== targetMemberId);
+        });
+      })
+    );
+  }
+
   private _sharedSessions = signal<SharedSession[]>([
     {
       id: 'ss1',
@@ -242,14 +276,6 @@ export class GroupService {
     this._comments.update((c) => [...c, newComment]);
   }
 
-  public updateRole(membershipId: string, newRole: 'MEMBER' | 'ADMIN') {
-
-  }
-
-  public removeMember(membershipId: string) {
-
-  }
-  
   public setGroupId(id: string) {
     this.groupId.set(id);
   }

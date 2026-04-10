@@ -101,22 +101,6 @@ export class GroupDetailComponent {
     this.groupService.shareSession(this.groupId(), sessionId);
   }
 
-  onAddComment(sessionId: string, content: string) {
-    this.groupService.addComment(sessionId, content);
-  }
-
-  onPromote(membershipId: string) {
-    this.groupService.updateRole(membershipId, 'ADMIN');
-  }
-
-  onDemote(membershipId: string) {
-    this.groupService.updateRole(membershipId, 'MEMBER');
-  }
-
-  onRemove(membershipId: string) {
-    this.groupService.removeMember(membershipId);
-  }
-
   getUserInitials = (firstName: string, lastName: string) => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';

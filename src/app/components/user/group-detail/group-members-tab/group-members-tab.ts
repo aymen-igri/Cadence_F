@@ -10,6 +10,7 @@ import { lucideMoreVertical } from '@ng-icons/lucide';
 import { Member } from '@app/core/models/group.model';
 import { GroupService } from '@app/core/services/group.service';
 import { toast } from 'ngx-sonner';
+import { AlertService } from '@app/components/shared/alert/alert.service';
 
 @Component({
   selector: 'app-group-members-tab',
@@ -28,6 +29,7 @@ import { toast } from 'ngx-sonner';
 })
 export class GroupMembersTabComponent {
   private groupService = inject(GroupService);
+  private alertService = inject(AlertService);
   members = input.required<Member[]>();
   readonly requests = this.groupService.joinRequests();
   currentUserRole = input<'ADMIN' | 'MEMBER' | 'OWNER' | null>();
@@ -39,10 +41,6 @@ export class GroupMembersTabComponent {
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';
     return `${firstInitial}${lastInitial}`;
   };
-
-  promote = output<string>();
-  demote = output<string>();
-  remove = output<string>();
 
   acceptRequest(userId: string) {
     this.groupService.acceptJoinRequest(this.groupId(), userId).subscribe({
@@ -74,6 +72,102 @@ export class GroupMembersTabComponent {
         });
         console.error('Failed to decline join request:', err);
       },
+    });
+  }
+
+  promoteMember(membershipId: string) {
+    this.groupService.promoteMember(this.groupId(), membershipId).subscribe({
+      next: () => {
+        toast.success('Member promoted to admin.', {
+          description:
+            'The member now has admin privileges and can manage group settings and members.',
+        });
+      },
+      error: (err) => {
+        toast.error('Failed to promote member.', {
+          description: 'An error occurred while promoting the member. Please try again.',
+        });
+        console.error('Failed to promote member:', err);
+      },
+    });
+  }
+
+  demoteMember(membershipId: string) {
+    this.groupService.demoteMember(this.groupId(), membershipId).subscribe({
+      next: () => {
+        toast.success('Member demoted to member.', {
+          description: 'The member is no longer an admin and has limited privileges.',
+        });
+      },
+      error: (err) => {
+        toast.error('Failed to demote member.', {
+          description: 'An error occurred while demoting the member. Please try again.',
+        });
+        console.error('Failed to demote member:', err);
+      },
+    });
+  }
+
+  removeMember(membershipId: string) {
+    this.groupService.removeMember(this.groupId(), membershipId).subscribe({
+      next: () => {
+        toast.success('Member removed from group.', {
+          description: 'The member has been removed from the group.',
+        });
+      },
+      error: (err) => {
+        toast.error('Failed to remove member.', {
+          description: 'An error occurred while removing the member. Please try again.',
+        });
+        console.error('Failed to remove member:', err);
+      },
+    });
+  }
+
+  onPromoteClick(membershipId: string) {
+    this.alertService.show({
+      description:
+        'Are you sure you want to promote this member to admin? They will have additional privileges, including managing group settings and members.',
+      actionLabel: 'Promote',
+      variant: 'destructive',
+      action: () => this.promoteMember(membershipId),
+    });
+  }
+
+  onRemoveClick(membershipId: string) {
+    this.alertService.show({
+      description: 'Are you sure you want to remove this member from the group? This action cannot be undone.',
+      actionLabel: 'Remove',
+      variant: 'destructive',
+      action: () => this.removeMember(membershipId),
+    });
+  }
+
+  onDemoteClick(membershipId: string) {
+    this.alertService.show({
+      description:
+        'Are you sure you want to demote this admin to a regular member? They will lose their admin privileges and will no longer be able to manage group settings and members.',
+      actionLabel: 'Demote',
+      variant: 'destructive',
+      action: () => this.demoteMember(membershipId),
+    });
+  }
+
+  onAcceptClick(userId: string) {
+    this.alertService.show({
+      description: 'Are you sure you want to accept this join request? The user will be added to the group and can participate in group activities.',
+      actionLabel: 'Accept',
+      variant: 'default',
+      action: () => this.acceptRequest(userId),
+    });
+  }
+
+  onDeclineClick(userId: string) {
+    this.alertService.show({
+      description: "Are you sure you want to decline this join request? The user's request to join the group will be declined.",
+      actionLabel: 'Decline',
+      variant: 'destructive',
+      action: () => this.declineRequest(userId),
     });
   }
 }

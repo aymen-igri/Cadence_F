@@ -41,12 +41,12 @@
             <ng-template #memberMenu>
               <hlm-dropdown-menu>
                 @if (member.role === 'MEMBER') {
-                  <button hlmDropdownMenuItem (click)="promote.emit(member.membershipId)">
+                  <button hlmDropdownMenuItem (click)="onPromoteClick(member.membershipId)">
                     Promote to admin
                   </button>
                 }
                 @if (member.role === 'ADMIN') {
-                  <button hlmDropdownMenuItem (click)="demote.emit(member.membershipId)">
+                  <button hlmDropdownMenuItem (click)="onDemoteClick(member.membershipId)">
                     Demote to member
                   </button>
                 }
@@ -54,7 +54,7 @@
                 <button
                   hlmDropdownMenuItem
                   class="text-destructive focus:bg-destructive/10"
-                  (click)="remove.emit(member.membershipId)"
+                  (click)="onRemoveClick(member.membershipId)"
                 >
                   Remove from group
                 </button>
@@ -99,7 +99,7 @@
                 size="sm"
                 variant="outline"
                 class="flex-1 sm:flex-none"
-                (click)="declineRequest(req.userId)"
+                (click)="onDeclineClick(req.userId)"
               >
                 Decline
               </button>
@@ -107,7 +107,7 @@
                 hlmBtn
                 size="sm"
                 class="flex-1 sm:flex-none"
-                (click)="acceptRequest(req.userId)"
+                (click)="onAcceptClick(req.userId)"
               >
                 Accept
               </button>
