@@ -7,6 +7,7 @@ import {
   GroupResponse,
   Member,
   GroupUpdateRequest,
+  JoinRequestResponse,
 } from '../models/group.model';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../environments/environments';
@@ -43,7 +44,7 @@ export class GroupService {
     };
   });
 
-  readonly joinGroupRequestsResource = httpResource<Member[]>(() => {
+  readonly joinGroupRequestsResource = httpResource<JoinRequestResponse[]>(() => {
     const id = this.groupId();
     if (!id || !this.authService.currentUser()) return undefined;
     return {
@@ -62,7 +63,7 @@ export class GroupService {
     computation: (value) => value,
   });
 
-  readonly joinRequests = linkedSignal<Member[], Member[]>({
+  readonly joinRequests = linkedSignal<JoinRequestResponse[], JoinRequestResponse[]>({
     source: () =>
       this.joinGroupRequestsResource.hasValue() ? this.joinGroupRequestsResource.value() : [],
     computation: (value) => value,
@@ -73,15 +74,15 @@ export class GroupService {
   readonly isjoinRequestsLoading = computed(() => this.joinGroupRequestsResource.isLoading());
 
   public myGroups = computed(() => {
-    return this.allGroupsData()
-      .filter((g) => {
-        return g.userRole != null && g.membershipStatus === 'APPROVED';
-      });
+    return this.allGroupsData().filter((g) => {
+      return g.userRole != null;
+    });
   });
 
   public discoverGroups = computed(() => {
-    return this.allGroupsData()
-      .filter((g) => g.userRole == null);
+    return this.allGroupsData().filter(
+      (g) => g.userRole == null,
+    );
   });
 
   public createGroup(payload: GroupCreateRequest) {
@@ -112,7 +113,7 @@ export class GroupService {
             return group;
           });
         });
-      })
+      }),
     );
   }
 
@@ -131,8 +132,8 @@ export class GroupService {
   public acceptJoinRequest(groupId: string, userId: string) {
     return this.http.patch<Member>(`${this.url}/${groupId}/requests/${userId}/approve`, {}).pipe(
       tap((newMember) => {
-        this.joinRequests.update((r) => r.filter((req) => req.userId !== userId));
         this.groupMembers.update((m) => [...m, newMember]);
+        this.joinRequests.update((r) => r.filter((m) => m.userId !== newMember.userId));
       }),
     );
   }

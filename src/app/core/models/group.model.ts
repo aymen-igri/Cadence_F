@@ -20,7 +20,6 @@ export interface GroupResponse {
   membersCount: number;
   membershipId: string;
   userRole: 'MEMBER' | 'ADMIN' | 'OWNER' | null;
-  membershipStatus: 'APPROVED' | 'PENDING' | null;
   createdAt: Date;
 }
 export interface GroupMembership {
@@ -103,5 +102,15 @@ export interface GroupUpdateRequest {
   privacyLevel?: 'PUBLIC' | 'PRIVATE';
 }
 
+export interface JoinRequestResponse {
+  id: string;
+  groupId: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  status: 'APPROVED' | 'PENDING' | 'REJECTED';
+  requestedAt: Date;
+}
 
 export type GroupData = Omit<Group, 'id'>

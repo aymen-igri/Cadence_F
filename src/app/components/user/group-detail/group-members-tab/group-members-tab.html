@@ -76,7 +76,7 @@
       <h3 class="text-lg font-semibold">Pending Requests ({{ requests.length }})</h3>
 
       <div class="grid grid-cols-1 md:grid gap-4">
-        @for (req of requests; track req.membershipId) {
+        @for (req of requests; track req.id) {
           <div
             hlmCard
             class="flex flex-row flex-wrap sm:flex-nowrap items-center p-4 gap-4 bg-muted/20 border-dashed"
@@ -89,7 +89,7 @@
             <div class="flex-1 min-w-50">
               <p class="font-medium truncate">{{ req.firstName }} {{ req.lastName }}</p>
               <p class="text-xs text-muted-foreground mt-0.5">
-                Requested {{ req.joinedAt | date: 'shortDate' }}
+                Requested {{ req.requestedAt | date: 'shortDate' }}
               </p>
             </div>
 
