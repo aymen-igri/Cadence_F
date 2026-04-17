@@ -32,11 +32,11 @@ export class GroupMembersTabComponent {
   private groupService = inject(GroupService);
   private alertService = inject(AlertService);
   members = input.required<Member[]>();
-  readonly requests = this.groupService.joinRequests;
+  readonly requests = this.groupService.joinRequests.data;
   currentUserRole = input<'ADMIN' | 'MEMBER' | 'OWNER' | null>();
   currentUserId = input.required<string>();
   groupId = input.required<string>();
-  readonly isJoinRequestsLoading = this.groupService.isJoinRequestsLoading;
+  readonly isJoinRequestsLoading = this.groupService.joinRequests.isLoading;
 
   ngOnInit() {
     this.groupService.loadJoinRequests(this.groupId()).subscribe();

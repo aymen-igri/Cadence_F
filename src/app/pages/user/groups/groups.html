@@ -10,7 +10,7 @@
     <button hlmBtn (click)="createGroupState.set('open')">Create group</button>
   </div>
 
-  @if (groupService.isGroupsLoading()) {
+  @if (isGroupsLoading()) {
     <div class="flex items-center justify-center min-h-[50vh]">
       <p class="text-muted-foreground">Loading groups...</p>
     </div>

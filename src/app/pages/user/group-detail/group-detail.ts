@@ -43,11 +43,12 @@ export class GroupDetailComponent {
   groupId = signal<string>('');
   myRole = computed(() => this.group()?.userRole || null);
   feed = signal<any[]>([]);
-  readonly members = this.groupService.groupMembers;
   activeTab = signal<'feed' | 'members' | 'chat' | 'settings'>('feed');
   shareDialogState = signal<'closed' | 'open'>('closed');
-  readonly group = this.groupService.currentGroup;
-  readonly isGroupLoading = this.groupService.isCurrentGroupLoading;
+  readonly members = this.groupService.groupMembers.data;
+  readonly group = this.groupService.currentGroup.data;
+  readonly isGroupLoading = this.groupService.currentGroup.isLoading;
+  readonly isMembersLoading = this.groupService.groupMembers.isLoading;
 
   constructor() {
     this.route.paramMap.subscribe((params) => {

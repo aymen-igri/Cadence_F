@@ -31,6 +31,7 @@ export class GroupsComponent {
   createGroupState = signal<'closed' | 'open'>('closed');
   readonly myGroups = this.groupService.myGroups;
   readonly discoverGroups = this.groupService.discoverGroups;
+  readonly isGroupsLoading = this.groupService.allGroups.isLoading;
 
   ngOnInit() {
     this.groupService.loadAllGroups().subscribe();
