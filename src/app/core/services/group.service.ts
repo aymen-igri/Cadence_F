@@ -125,15 +125,21 @@ export class GroupService {
     );
   }
 
-  public joinGroup(groupId: string) {
+  public joinPublicGroup(groupId: string) {
     return this.http.post<Member>(`${this.url}/${groupId}/join`, {});
+  }
+
+  public requestJoin(groupId: string) {
+    return this.http.post<JoinRequestResponse>(`${this.url}/${groupId}/join-request`, {});
   }
 
   public acceptJoinRequest(groupId: string, userId: string) {
     return this.http.patch<Member>(`${this.url}/${groupId}/requests/${userId}/approve`, {}).pipe(
       tap((newMember) => {
         this.groupMembers.update((m) => [...m, newMember]);
-        this.joinRequests.update((r) => r.filter((m) => m.userId !== newMember.userId));
+        this.joinRequests.update((r) =>{
+          return r.filter((m) => m.userId !== userId);
+        });
       }),
     );
   }

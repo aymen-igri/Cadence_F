@@ -80,7 +80,7 @@
 
       <!-- CHAT TAB -->
       <div hlmTabsContent="chat" class="mt-4 border rounded-lg bg-card">
-        @if (groupId()) {
+        @if (groupId() && myRole()) {
           <app-group-chat-tab [currentUserId]="groupService.currentUserId()!" [groupId]="groupId()">
           </app-group-chat-tab>
         }

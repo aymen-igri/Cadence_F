@@ -39,7 +39,7 @@ export class GroupsComponent {
   }
 
   joinGroup(groupId: string) {
-    this.groupService.joinGroup(groupId).subscribe({
+    this.groupService.joinPublicGroup(groupId).subscribe({
       next: () => {
         this.router.navigate(['/user/groups', groupId]);
         toast.success('Group joined successfully!', {
@@ -55,9 +55,8 @@ export class GroupsComponent {
   }
 
   requestToJoin(groupId: string) {
-    this.groupService.joinGroup(groupId).subscribe({
+    this.groupService.requestJoin(groupId).subscribe({
       next: () => {
-        this.router.navigate(['/user/groups', groupId]);
         toast.success('Request sent successfully!', {
           description: 'You have successfully requested to join the group.',
         });

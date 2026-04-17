@@ -73,10 +73,10 @@
   <!-- Pending Requests (Admin Only) -->
   @if (currentUserRole() === 'ADMIN' || currentUserRole() === 'OWNER') {
     <div class="space-y-4 pt-6 border-t border-border">
-      <h3 class="text-lg font-semibold">Pending Requests ({{ requests.length }})</h3>
+      <h3 class="text-lg font-semibold">Pending Requests ({{ requests().length }})</h3>
 
       <div class="grid grid-cols-1 md:grid gap-4">
-        @for (req of requests; track req.id) {
+        @for (req of requests(); track req.id) {
           <div
             hlmCard
             class="flex flex-row flex-wrap sm:flex-nowrap items-center p-4 gap-4 bg-muted/20 border-dashed"

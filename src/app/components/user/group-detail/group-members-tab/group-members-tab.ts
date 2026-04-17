@@ -32,7 +32,7 @@ export class GroupMembersTabComponent {
   private groupService = inject(GroupService);
   private alertService = inject(AlertService);
   members = input.required<Member[]>();
-  readonly requests = this.groupService.joinRequests();
+  readonly requests = this.groupService.joinRequests;
   currentUserRole = input<'ADMIN' | 'MEMBER' | 'OWNER' | null>();
   currentUserId = input.required<string>();
   groupId = input.required<string>();
