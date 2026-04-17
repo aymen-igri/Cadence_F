@@ -71,54 +71,60 @@
   </div>
 
   <!-- Pending Requests (Admin Only) -->
-  @if (currentUserRole() === 'ADMIN' || currentUserRole() === 'OWNER') {
-    <div class="space-y-4 pt-6 border-t border-border">
-      <h3 class="text-lg font-semibold">Pending Requests ({{ requests().length }})</h3>
-
-      <div class="grid grid-cols-1 md:grid gap-4">
-        @for (req of requests(); track req.id) {
-          <div
-            hlmCard
-            class="flex flex-row flex-wrap sm:flex-nowrap items-center p-4 gap-4 bg-muted/20 border-dashed"
-          >
-            <div
-              class="bg-card shrink-0 flex items-center justify-center rounded-full h-10 w-10 text-sm font-medium border border-border"
-            >
-              {{ req.firstName.charAt(0) }}{{ req.lastName.charAt(0) }}
-            </div>
-            <div class="flex-1 min-w-50">
-              <p class="font-medium truncate">{{ req.firstName }} {{ req.lastName }}</p>
-              <p class="text-xs text-muted-foreground mt-0.5">
-                Requested {{ req.requestedAt | date: 'shortDate' }}
-              </p>
-            </div>
-
-            <div class="flex flex-row gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-              <button
-                hlmBtn
-                size="sm"
-                variant="outline"
-                class="flex-1 sm:flex-none"
-                (click)="onDeclineClick(req.userId)"
-              >
-                Decline
-              </button>
-              <button
-                hlmBtn
-                size="sm"
-                class="flex-1 sm:flex-none"
-                (click)="onAcceptClick(req.userId)"
-              >
-                Accept
-              </button>
-            </div>
-          </div>
-        } @empty {
-          <div class="col-span-full py-12 text-center border rounded-lg border-dashed">
-            <p class="text-muted-foreground">No pending join requests.</p>
-          </div>
-        }
-      </div>
+  @if (isJoinRequestsLoading()) {
+    <div class="flex items-center justify-center min-h-[20vh]">
+      <p class="text-muted-foreground">Loading pending requests...</p>
     </div>
+  } @else {
+    @if (currentUserRole() === 'ADMIN' || currentUserRole() === 'OWNER') {
+      <div class="space-y-4 pt-6 border-t border-border">
+        <h3 class="text-lg font-semibold">Pending Requests ({{ requests().length }})</h3>
+
+        <div class="grid grid-cols-1 md:grid gap-4">
+          @for (req of requests(); track req.id) {
+            <div
+              hlmCard
+              class="flex flex-row flex-wrap sm:flex-nowrap items-center p-4 gap-4 bg-muted/20 border-dashed"
+            >
+              <div
+                class="bg-card shrink-0 flex items-center justify-center rounded-full h-10 w-10 text-sm font-medium border border-border"
+              >
+                {{ req.firstName.charAt(0) }}{{ req.lastName.charAt(0) }}
+              </div>
+              <div class="flex-1 min-w-50">
+                <p class="font-medium truncate">{{ req.firstName }} {{ req.lastName }}</p>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                  Requested {{ req.requestedAt | date: 'shortDate' }}
+                </p>
+              </div>
+
+              <div class="flex flex-row gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                <button
+                  hlmBtn
+                  size="sm"
+                  variant="outline"
+                  class="flex-1 sm:flex-none"
+                  (click)="onDeclineClick(req.userId)"
+                >
+                  Decline
+                </button>
+                <button
+                  hlmBtn
+                  size="sm"
+                  class="flex-1 sm:flex-none"
+                  (click)="onAcceptClick(req.userId)"
+                >
+                  Accept
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <div class="col-span-full py-12 text-center border rounded-lg border-dashed">
+              <p class="text-muted-foreground">No pending join requests.</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
   }
 </div>

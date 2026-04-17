@@ -36,7 +36,11 @@ export class GroupMembersTabComponent {
   currentUserRole = input<'ADMIN' | 'MEMBER' | 'OWNER' | null>();
   currentUserId = input.required<string>();
   groupId = input.required<string>();
+  readonly isJoinRequestsLoading = this.groupService.isJoinRequestsLoading;
 
+  ngOnInit() {
+    this.groupService.loadJoinRequests(this.groupId()).subscribe();
+  }
   getUserInitials = (firstName: string, lastName: string) => {
     const firstInitial = firstName ? firstName.charAt(0).toUpperCase() : '';
     const lastInitial = lastName ? lastName.charAt(0).toUpperCase() : '';

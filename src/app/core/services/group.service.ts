@@ -11,7 +11,7 @@ import {
 } from '../models/group.model';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { environment } from '../../environments/environments';
-import { tap } from 'rxjs';
+import { finalize, tap } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -26,69 +26,77 @@ export class GroupService {
   });
   private readonly url = `${environment.apiUrl}/groups`;
   private groupId = signal<string | null>(null);
-
-  readonly allGroupsResource = httpResource<GroupResponse[]>(() => {
-    if (!this.authService.isReady() || !this.authService.currentUser()) return undefined;
-    return {
-      url: `${this.url}/all`,
-      method: 'GET',
-    };
-  });
-
-  readonly groupMembersResource = httpResource<Member[]>(() => {
-    const id = this.groupId();
-    if (!this.authService.isReady() || !this.authService.currentUser() || !id) return undefined;
-    return {
-      url: `${this.url}/${id}/members`,
-      method: 'GET',
-    };
-  });
-
-  readonly joinGroupRequestsResource = httpResource<JoinRequestResponse[]>(() => {
-    const id = this.groupId();
-    if (!id || !this.authService.currentUser()) return undefined;
-    return {
-      url: `${this.url}/${id}/requests`,
-      method: 'GET',
-    };
-  });
-
-  readonly allGroupsData = linkedSignal<GroupResponse[], GroupResponse[]>({
-    source: () => (this.allGroupsResource.hasValue() ? this.allGroupsResource.value() : []),
-    computation: (value) => value,
-  });
-
-  readonly groupMembers = linkedSignal<Member[], Member[]>({
-    source: () => (this.groupMembersResource.hasValue() ? this.groupMembersResource.value() : []),
-    computation: (value) => value,
-  });
-
-  readonly joinRequests = linkedSignal<JoinRequestResponse[], JoinRequestResponse[]>({
-    source: () =>
-      this.joinGroupRequestsResource.hasValue() ? this.joinGroupRequestsResource.value() : [],
-    computation: (value) => value,
-  });
-
-  readonly isGroupsLoading = computed(() => this.allGroupsResource.isLoading());
-  readonly isMembersLoading = computed(() => this.groupMembersResource.isLoading());
-  readonly isjoinRequestsLoading = computed(() => this.joinGroupRequestsResource.isLoading());
+  private readonly _groupMembers = signal<Member[]>([]);
+  readonly groupMembers = this._groupMembers.asReadonly();
+  private readonly _isMembersLoading = signal(false);
+  readonly isMembersLoading = this._isMembersLoading.asReadonly();
+  private readonly _allGroupsData = signal<GroupResponse[]>([]);
+  readonly allGroupsData = this._allGroupsData.asReadonly();
+  private readonly _isGroupsLoading = signal(false);
+  readonly isGroupsLoading = this._isGroupsLoading.asReadonly();
+  private readonly _currentGroup = signal<GroupResponse | null>(null);
+  readonly currentGroup = this._currentGroup.asReadonly();
+  private readonly _isCurrentGroupLoading = signal(false);
+  readonly isCurrentGroupLoading = this._isCurrentGroupLoading.asReadonly();
+  private readonly _joinRequests = signal<JoinRequestResponse[]>([]);
+  readonly joinRequests = this._joinRequests.asReadonly();
+  private readonly _isJoinRequestsLoading = signal(false);
+  readonly isJoinRequestsLoading = this._isJoinRequestsLoading.asReadonly();
 
   public myGroups = computed(() => {
-    return this.allGroupsData().filter((g) => {
-      return g.userRole != null;
-    });
+    const groups = this.allGroupsData();
+    return groups.filter((g) => g.userRole != null);
   });
 
   public discoverGroups = computed(() => {
-    return this.allGroupsData().filter(
-      (g) => g.userRole == null,
-    );
+    const groups = this.allGroupsData();
+    return groups.filter((g) => g.userRole == null);
   });
+
+  public loadJoinRequests(groupId: string) {
+    this._isJoinRequestsLoading.set(true);
+    return this.http.get<JoinRequestResponse[]>(`${this.url}/${groupId}/requests`).pipe(
+      tap((requests) => {
+        this._joinRequests.set(requests);
+      }),
+      finalize(() => this._isJoinRequestsLoading.set(false)),
+    );
+  }
+
+  public getGroupDataById(groupId: string) {
+    this._isCurrentGroupLoading.set(true);
+    return this.http.get<GroupResponse>(`${this.url}/${groupId}`).pipe(
+      tap((group) => {
+        this._currentGroup.set(group);
+      }),
+      finalize(() => this._isCurrentGroupLoading.set(false)),
+    );
+  }
+
+  public loadAllGroups() {
+    this._isGroupsLoading.set(true);
+    return this.http.get<GroupResponse[]>(`${this.url}/all`).pipe(
+      tap((groups) => {
+        this._allGroupsData.set(groups);
+      }),
+      finalize(() => this._isGroupsLoading.set(false)),
+    );
+  }
+
+  public loadGroupMembers(groupId: string) {
+    this._isMembersLoading.set(true);
+    return this.http.get<Member[]>(`${this.url}/${groupId}/members`).pipe(
+      tap((members) => {
+        this._groupMembers.set(members);
+      }),
+      finalize(() => this._isMembersLoading.set(false)),
+    );
+  }
 
   public createGroup(payload: GroupCreateRequest) {
     return this.http.post<GroupResponse>(`${this.url}/create`, payload).pipe(
       tap((response) => {
-        this.allGroupsData.update((groups) => [...groups, response]);
+        this._allGroupsData.update((groups) => [...groups, response]);
       }),
     );
   }
@@ -96,7 +104,9 @@ export class GroupService {
   public updateGroup(groupId: string, payload: GroupUpdateRequest) {
     return this.http.patch<GroupResponse>(`${this.url}/${groupId}`, payload).pipe(
       tap((response) => {
-        this.allGroupsData.update((groups) => groups.map((g) => (g.id === groupId ? response : g)));
+        this._allGroupsData.update((groups) =>
+          groups.map((g) => (g.id === groupId ? response : g)),
+        );
       }),
     );
   }
@@ -105,7 +115,7 @@ export class GroupService {
     return this.http.patch(`${this.url}/${this.groupId()}/transfer/${newOwnerId}`, {}).pipe(
       tap(() => {
         const groupId = this.groupId();
-        this.allGroupsData.update((groups) => {
+        this._allGroupsData.update((groups) => {
           return groups.map((group) => {
             if (group.id === groupId) {
               return { ...group, userRole: 'MEMBER' };
@@ -120,7 +130,7 @@ export class GroupService {
   public deleteGroup(groupId: string) {
     return this.http.delete(`${this.url}/${groupId}`).pipe(
       tap(() => {
-        this.allGroupsData.update((groups) => groups.filter((g) => g.id !== groupId));
+        this._allGroupsData.update((groups) => groups.filter((g) => g.id !== groupId));
       }),
     );
   }
@@ -136,8 +146,8 @@ export class GroupService {
   public acceptJoinRequest(groupId: string, userId: string) {
     return this.http.patch<Member>(`${this.url}/${groupId}/requests/${userId}/approve`, {}).pipe(
       tap((newMember) => {
-        this.groupMembers.update((m) => [...m, newMember]);
-        this.joinRequests.update((r) =>{
+        this._groupMembers.update((m) => [...m, newMember]);
+        this._joinRequests.update((r) => {
           return r.filter((m) => m.userId !== userId);
         });
       }),
@@ -147,7 +157,7 @@ export class GroupService {
   public declineJoinRequest(groupId: string, userId: string) {
     return this.http.delete(`${this.url}/${groupId}/requests/${userId}/reject`, {}).pipe(
       tap(() => {
-        this.joinRequests.update((r) => r.filter((req) => req.userId !== userId));
+        this._joinRequests.update((r) => r.filter((req) => req.userId !== userId));
       }),
     );
   }
@@ -159,7 +169,7 @@ export class GroupService {
   public promoteMember(groupId: string, targetMemberId: string) {
     return this.http.patch(`${this.url}/${groupId}/members/${targetMemberId}/promote`, {}).pipe(
       tap(() => {
-        this.groupMembers.update((members) => {
+        this._groupMembers.update((members) => {
           return members.map((m) => {
             return m.membershipId === targetMemberId ? { ...m, role: 'ADMIN' } : m;
           });
@@ -171,7 +181,7 @@ export class GroupService {
   public demoteMember(groupId: string, targetMemberId: string) {
     return this.http.patch(`${this.url}/${groupId}/members/${targetMemberId}/demote`, {}).pipe(
       tap(() => {
-        this.groupMembers.update((members) => {
+        this._groupMembers.update((members) => {
           return members.map((m) => {
             return m.membershipId === targetMemberId ? { ...m, role: 'MEMBER' } : m;
           });
@@ -183,7 +193,7 @@ export class GroupService {
   public removeMember(groupId: string, targetMemberId: string) {
     return this.http.delete(`${this.url}/${groupId}/members/${targetMemberId}`).pipe(
       tap(() => {
-        this.groupMembers.update((members) => {
+        this._groupMembers.update((members) => {
           return members.filter((m) => m.membershipId !== targetMemberId);
         });
       }),

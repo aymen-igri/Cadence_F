@@ -24,7 +24,7 @@
       <!-- My Groups Section -->
       <div hlmTabsContent="my-groups">
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-2">
-          @for (item of groupService.myGroups(); track item.id) {
+          @for (item of myGroups(); track item.id) {
             <app-group-card
               [group]="item"
               [userRole]="item.userRole"
@@ -47,7 +47,7 @@
       <!-- Discover Section -->
       <div hlmTabsContent="discover">
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-2">
-          @for (item of groupService.discoverGroups(); track item.id) {
+          @for (item of discoverGroups(); track item.id) {
             <app-group-card
               [group]="item"
               [memberCount]="item.membersCount"

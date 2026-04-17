@@ -15,6 +15,7 @@ import { GroupSettingsTabComponent } from '@app/components/user/group-detail/gro
 import { toast } from 'ngx-sonner';
 import { extractErrorMessage } from '@app/core/utils/error.util';
 import { AlertService } from '@app/components/shared/alert/alert.service';
+import { readonly } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-group-detail-page',
@@ -41,11 +42,12 @@ export class GroupDetailComponent {
 
   groupId = signal<string>('');
   myRole = computed(() => this.group()?.userRole || null);
-  members = signal<Member[]>([]);
   feed = signal<any[]>([]);
-
+  readonly members = this.groupService.groupMembers;
   activeTab = signal<'feed' | 'members' | 'chat' | 'settings'>('feed');
   shareDialogState = signal<'closed' | 'open'>('closed');
+  readonly group = this.groupService.currentGroup;
+  readonly isGroupLoading = this.groupService.isCurrentGroupLoading;
 
   constructor() {
     this.route.paramMap.subscribe((params) => {
@@ -53,19 +55,11 @@ export class GroupDetailComponent {
       if (!id) return;
 
       this.groupId.set(id);
-      this.groupService.setGroupId(id);
-
-      this.members = this.groupService.groupMembers;
+      this.groupService.getGroupDataById(id).subscribe();
+      this.groupService.loadGroupMembers(id).subscribe();
       this.feed = this.groupService.getGroupFeed(id) as any;
     });
   }
-
-  group = computed(() => {
-    const id = this.groupId();
-    if (!id) return undefined;
-
-    return this.groupService.getGroupById(id);
-  });
 
   setActiveTab(tab: any) {
     this.activeTab.set(tab);

@@ -29,6 +29,12 @@ export class GroupsComponent {
 
   activeTab = signal<'my-groups' | 'discover'>('my-groups');
   createGroupState = signal<'closed' | 'open'>('closed');
+  readonly myGroups = this.groupService.myGroups;
+  readonly discoverGroups = this.groupService.discoverGroups;
+
+  ngOnInit() {
+    this.groupService.loadAllGroups().subscribe();
+  }
 
   setActiveTab(tab: any) {
     this.activeTab.set(tab);
