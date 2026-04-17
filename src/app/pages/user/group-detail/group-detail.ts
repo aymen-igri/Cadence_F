@@ -14,6 +14,7 @@ import { GroupChatTabComponent } from '@app/components/user/group-detail/group-c
 import { GroupSettingsTabComponent } from '@app/components/user/group-detail/group-settings-tab/group-settings-tab';
 import { toast } from 'ngx-sonner';
 import { extractErrorMessage } from '@app/core/utils/error.util';
+import { AlertService } from '@app/components/shared/alert/alert.service';
 
 @Component({
   selector: 'app-group-detail-page',
@@ -36,6 +37,7 @@ export class GroupDetailComponent {
   router = inject(Router);
   groupService = inject(GroupService);
   authService = inject(AuthService);
+  alertService = inject(AlertService);
 
   groupId = signal<string>('');
   myRole = computed(() => this.group()?.userRole || null);
@@ -71,7 +73,16 @@ export class GroupDetailComponent {
 
   get canLeaveGroup(): boolean {
     if (!this.group()) return false;
-    return (this.myRole() !== 'OWNER');
+    return this.myRole() !== 'OWNER';
+  }
+
+  onLeaveGroupClick() {
+    this.alertService.show({
+      description: 'Are you sure you want to leave the group? This action cannot be undone.',
+      variant: 'destructive',
+      actionLabel: 'Leave Group',
+      action: () => this.leaveGroup(),
+    });
   }
 
   leaveGroup() {
