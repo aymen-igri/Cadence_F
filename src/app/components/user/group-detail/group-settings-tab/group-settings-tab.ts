@@ -1,4 +1,4 @@
-import { Component, input, output, signal, effect, inject } from '@angular/core';
+import { Component, input, signal, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -17,7 +17,7 @@ import { BrnDialogImports } from '@spartan-ng/brain/dialog';
 import { GroupService } from '@app/core/services/group.service';
 import { toast } from 'ngx-sonner';
 import { Router } from '@angular/router';
-import { extractErrorMessage } from '@app/core/utils/error.util';
+import { createMutation } from '@app/core/utils/mutation.helper';
 
 @Component({
   selector: 'app-group-settings-tab',
@@ -102,54 +102,57 @@ export class GroupSettingsTabComponent {
     return changed;
   }
 
+  readonly updateGroup = createMutation({
+    mutationFn: (payload: any) => this.groupService.updateGroup(this.group().id, payload),
+    onSuccess: () => {
+      toast.success('Group updated successfully.');
+    },
+    onError: (err) => {
+      toast.error('Failed to update group.', { description: err });
+    },
+  });
+
   saveSettings() {
     if (!this.isChanged() || this.settingsForm.invalid) return;
     const payload = this.getChangedFields();
-    this.groupService.updateGroup(this.group().id, payload).subscribe({
-      next: () => {
-        toast.success('Group updated successfully.');
-      },
-      error: (err) => {
-        const errorMessage = extractErrorMessage(err);
-        toast.error('Failed to update group.', { description: errorMessage });
-        console.error('Failed to update group:', err);
-      },
-    });
+    this.updateGroup.mutate(payload);
   }
 
   get otherMembers() {
     return signal(this.members().filter((m) => m.userId !== this.currentUserId()));
   }
 
+  readonly deleteGroup = createMutation({
+    mutationFn: () => this.groupService.deleteGroup(this.group().id),
+    onSuccess: () => {
+      toast.success('Group deleted successfully.');
+      this.router.navigate(['/user/groups']);
+    },
+    onError: (err) => {
+      toast.error('Failed to delete group.', { description: err });
+    },
+  });
+
   confirmDelete() {
-    this.groupService.deleteGroup(this.group().id).subscribe({
-      next: () => {
-        toast.success('Group deleted successfully.');
-        this.router.navigate(['/user/groups']);
-      },
-      error: (err) => {
-        const errorMessage = extractErrorMessage(err);
-        toast.error('Failed to delete group.', { description: errorMessage });
-        console.error('Failed to delete group:', err);
-      },
-    });
+    this.deleteGroup.mutate({});
     this.deleteState.set('closed');
   }
+
+  readonly transferGroupOwnership = createMutation({
+    mutationFn: (selectedId: string) => this.groupService.transferOwnership(selectedId),
+    onSuccess: () => {
+      toast.success('Ownership transferred successfully.');
+      this.router.navigate(['/user/groups']);
+    },
+    onError: (err) => {
+      toast.error('Failed to transfer ownership.', { description: err });
+    },
+  });
 
   transferOwnership() {
     const selectedId = this.selectedMemberCtrl.value;
     if (selectedId) {
-      this.groupService.transferOwnership(selectedId).subscribe({
-        next: () => {
-          toast.success('Ownership transferred successfully.');
-          this.router.navigate(['/user/groups']);
-        },
-        error: (err) => {
-          const errorMessage = extractErrorMessage(err);
-          toast.error('Failed to transfer ownership.', { description: errorMessage });
-          console.error('Failed to transfer ownership:', err);
-        },
-      });
+      this.transferGroupOwnership.mutate(selectedId);
     }
     this.transferState.set('closed');
     this.selectedMemberCtrl.setValue('');
