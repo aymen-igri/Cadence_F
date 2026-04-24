@@ -22,4 +22,14 @@ export class SubjectService {
       }),
     );
   }
+
+  public deleteSubject(subjectId: string) {
+    return this.http.delete(`${this.url}/delete/${subjectId}`).pipe(
+      tap(() => {
+        this.allSubjects.mutate((subjects) =>
+          subjects.filter((subject) => subject.id !== subjectId),
+        );
+      }),
+    );
+  }
 }

@@ -11,6 +11,10 @@ import { GoalFormComponent } from '../goal-form/goal-form';
 import { Goal } from '@app/core/models/goal.model';
 import { SubjectModel } from '@app/core/models/subject.model';
 import { GoalService } from '@app/core/services/goal.service';
+import { AlertService } from '@app/components/shared/alert/alert.service';
+import { createMutation } from '@app/core/utils/mutation.helper';
+import { toast } from 'ngx-sonner';
+import { SubjectService } from '@app/core/services/subject.service';
 
 @Component({
   selector: 'app-subject-card',
@@ -31,6 +35,8 @@ import { GoalService } from '@app/core/services/goal.service';
 })
 export class SubjectCardComponent {
   private goalService = inject(GoalService);
+  private alertService = inject(AlertService);
+  private subjectService = inject(SubjectService);
   subject = input.required<SubjectModel>();
   isExpanded = input<boolean>(false);
   toggleExpand = output<void>();
@@ -43,6 +49,21 @@ export class SubjectCardComponent {
   readonly isLoadingGoals = this.goalService.allGoals.isLoading;
 
   expandedGoalId: string | null = null;
+
+  readonly deleteSubject = createMutation({
+    mutationFn: (subjectId: string) => this.subjectService.deleteSubject(subjectId),
+    onSuccess: () => {
+      toast.success('Subject deleted', {
+        description: 'The subject has been removed from your study map.',
+      });
+    },
+    onError: (error) => {
+      toast.error('Failed to delete subject', {
+        description: error,
+      });
+      console.error('Failed to delete subject :', error);
+    },
+  });
 
   ngOnInit() {
     this.goalService.loadAllGoals(this.subject().id).subscribe();
@@ -80,5 +101,16 @@ export class SubjectCardComponent {
       default:
         return 'default';
     }
+  }
+
+  onDeleteSubject(subjectId: string) {
+    this.alertService.show({
+      description: 'Are you sure you want to delete this subject?',
+      variant: 'destructive',
+      actionLabel: 'Delete',
+      action: () => {
+        this.deleteSubject.mutate(subjectId);
+      },
+    });
   }
 }

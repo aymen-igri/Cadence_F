@@ -36,4 +36,14 @@ export class GoalService {
     );
   }
 
+
+  public deleteGoal(goalId: string) {
+    return this.http.delete(`${this.url}/goal/delete/${goalId}`).pipe(
+      tap(() => {
+        this.allGoals.mutate((goals) =>
+          goals.filter((goal) => goal.id !== goalId),
+        );
+      }),
+    );
+  }
 }
