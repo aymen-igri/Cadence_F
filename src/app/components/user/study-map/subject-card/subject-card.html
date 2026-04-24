@@ -69,7 +69,7 @@
                 [goal]="goal"
                 [isExpanded]="expandedGoalId === goal.id"
                 (toggleExpand)="toggleGoal(goal.id)"
-                  [SubjectName]="subject().name"
+                [SubjectName]="subject().name"
               />
             }
           </div>
@@ -88,10 +88,9 @@
 
 <ng-template #subjectMenu>
   <hlm-dropdown-menu>
-    <hlm-sheet side="right">
-      <button hlmSheetTrigger hlmDropdownMenuItem class="w-full text-left">Edit subject</button>
-      <app-subject-form [subject]="subject()"></app-subject-form>
-    </hlm-sheet>
+    <button hlmDropdownMenuItem class="w-full text-left" (click)="updateSubjectDialogState.set('open')">
+      Edit subject
+    </button>
     <button hlmDropdownMenuItem class="text-destructive" (click)="onDeleteSubject(subject().id)">
       Delete subject
     </button>
@@ -104,3 +103,8 @@
   [SubjectName]="subject().name"
 >
 </app-goal-form-dialog>
+<app-subject-form-dialog
+  [state]="updateSubjectDialogState()"
+  (dialogStateChange)="updateSubjectDialogState.set($event)"
+  [subject]="subject()"
+></app-subject-form-dialog>

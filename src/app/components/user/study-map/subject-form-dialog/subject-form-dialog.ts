@@ -1,15 +1,4 @@
-import {
-  Component,
-  effect,
-  ElementRef,
-  inject,
-  input,
-  output,
-  signal,
-  ViewChild,
-} from '@angular/core';
-import { HlmLabelImports } from '@spartan-ng/helm/label';
-import { HlmInputImports } from '@spartan-ng/helm/input';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { form, FormField, FormRoot, required } from '@angular/forms/signals';
 import {
   CreateSubjectRequest,
@@ -17,35 +6,28 @@ import {
   SubjectPriority,
   UpdateSubjectRequest,
 } from '@app/core/models/subject.model';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmSheetImports } from '@spartan-ng/helm/sheet';
 import { SubjectService } from '@app/core/services/subject.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmDialogImports } from '@spartan-ng/helm/dialog';
+import { HlmInputImports } from '@spartan-ng/helm/input';
+import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { toast } from 'ngx-sonner';
 
 @Component({
-  selector: 'app-subject-form',
-  standalone: true,
-  imports: [
-    HlmLabelImports,
-    HlmInputImports,
-    FormField,
-    FormRoot,
-    HlmButtonImports,
-    HlmSheetImports,
-  ],
-  templateUrl: './subject-form.html',
+  selector: 'app-subject-form-dialog',
+  templateUrl: './subject-form-dialog.html',
+  imports: [HlmButtonImports, HlmDialogImports,HlmInputImports,HlmLabelImports, FormRoot, FormField],
 })
-export class SubjectFormComponent {
+export class SubjectFormDialogComponent {
   subject = input<SubjectModel>();
   subjectModel = signal<CreateSubjectRequest>({
     name: '',
     description: '',
     priority: SubjectPriority.LOW,
   });
-
-  @ViewChild('closeBtn') closeBtn!: ElementRef<HTMLButtonElement>;
-
+  state = input.required<'closed' | 'open'>();
+  dialogStateChange = output<'closed' | 'open'>();
   private readonly subjectService = inject(SubjectService);
 
   constructor() {
@@ -67,7 +49,7 @@ export class SubjectFormComponent {
       toast.success('Subject created successfully', {
         description: 'The new subject has been added to your study map.',
       });
-      this.closeBtn.nativeElement.click();
+      this.dialogStateChange.emit('closed');
     },
     onError: (err) => {
       toast.error('Failed to create subject', {
@@ -84,7 +66,7 @@ export class SubjectFormComponent {
       toast.success('Subject updated successfully', {
         description: 'Your subject details have been updated.',
       });
-      this.closeBtn.nativeElement.click();
+      this.dialogStateChange.emit('closed');
     },
     onError: (err) => {
       toast.error('Failed to update subject', {
@@ -115,4 +97,13 @@ export class SubjectFormComponent {
       },
     },
   );
+
+  onStateChange(event: 'closed' | 'open') {
+    this.dialogStateChange.emit(event);
+  }
+
+  closeDialog(ctx: any) {
+    this.dialogStateChange.emit('closed');
+    ctx.close();
+  }
 }

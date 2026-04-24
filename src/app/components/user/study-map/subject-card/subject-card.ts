@@ -6,8 +6,6 @@ import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { CommonModule } from '@angular/common';
 import { GoalItemComponent } from '../goal-item/goal-item';
-import { HlmSheetImports } from '@spartan-ng/helm/sheet';
-import { SubjectFormComponent } from '../subject-form/subject-form';
 import { SubjectModel } from '@app/core/models/subject.model';
 import { GoalService } from '@app/core/services/goal.service';
 import { AlertService } from '@app/components/shared/alert/alert.service';
@@ -15,6 +13,7 @@ import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
 import { SubjectService } from '@app/core/services/subject.service';
 import { GoalFormDialogComponent } from "../goal-form-dialog/goal-form-dialog";
+import { SubjectFormDialogComponent } from "../subject-form-dialog/subject-form-dialog";
 
 @Component({
   selector: 'app-subject-card',
@@ -27,10 +26,9 @@ import { GoalFormDialogComponent } from "../goal-form-dialog/goal-form-dialog";
     HlmBadgeImports,
     HlmDropdownMenuImports,
     GoalItemComponent,
-    HlmSheetImports,
-    SubjectFormComponent,
     LucideAngularModule,
     GoalFormDialogComponent,
+    SubjectFormDialogComponent,
   ],
   templateUrl: './subject-card.html',
 })
@@ -49,6 +47,7 @@ export class SubjectCardComponent {
   protected Plus = Plus;
   readonly goals = this.goalService.allGoals.data;
   readonly isLoadingGoals = this.goalService.allGoals.isLoading;
+  updateSubjectDialogState = signal<'closed' | 'open'>('closed');
 
   expandedGoalId: string | null = null;
 

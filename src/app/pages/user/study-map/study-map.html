@@ -1,24 +1,25 @@
 <div class="flex flex-1 flex-col gap-6">
   <!-- Header -->
-  <hlm-sheet>
-    <div
-      class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-border"
-    >
-      <div class="space-y-1">
-        <h1 class="text-3xl font-bold tracking-tight text-foreground">Study Map</h1>
-        <p class="text-sm text-muted-foreground">
-          Manage your subjects, goals, and tasks in one place.
-        </p>
-      </div>
-      <button hlmBtn size="sm" class="gap-2 shadow-sm" hlmSheetTrigger side="right">
-        <lucide-angular [img]="Plus" class="h-4 w-4" />
-        Add subject
-      </button>
+  <div
+    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-border"
+  >
+    <div class="space-y-1">
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">Study Map</h1>
+      <p class="text-sm text-muted-foreground">
+        Manage your subjects, goals, and tasks in one place.
+      </p>
     </div>
-
-    <!-- Subject Sheet -->
-    <app-subject-form />
-  </hlm-sheet>
+    <button
+      hlmBtn
+      size="sm"
+      class="gap-2 shadow-sm"
+      side="right"
+      (click)="createSubjectDialogState.set('open')"
+    >
+      <lucide-angular [img]="Plus" class="h-4 w-4" />
+      Add subject
+    </button>
+  </div>
 
   <!-- Content -->
   @if (isSubjectsLoading()) {
@@ -50,13 +51,21 @@
             Create your first subject to start building your study map and organizing your goals.
           </p>
         </div>
-        <hlm-sheet >
-          <button hlmBtn size="sm" class="mt-4" hlmSheetTrigger side="right">
-            Add your first subject
-          </button>
-          <app-subject-form />
-        </hlm-sheet>
+
+        <button
+          hlmBtn
+          size="sm"
+          class="mt-4"
+          side="right"
+          (click)="createSubjectDialogState.set('open')"
+        >
+          Add your first subject
+        </button>
       </hlm-card>
     }
   }
+  <app-subject-form-dialog
+    [state]="createSubjectDialogState()"
+    (dialogStateChange)="createSubjectDialogState.set($event)"
+  ></app-subject-form-dialog>
 </div>
