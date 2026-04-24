@@ -35,7 +35,7 @@
   <ng-template #taskMenu>
     <hlm-dropdown-menu>
       <button hlmDropdownMenuItem (click)="updateTaskDialogState.set('open')">Edit task</button>
-      <button hlmDropdownMenuItem class="text-destructive">Delete task</button>
+      <button hlmDropdownMenuItem class="text-destructive" (click)="onDeleteTask(task().id)">Delete task</button>
     </hlm-dropdown-menu>
   </ng-template>
 

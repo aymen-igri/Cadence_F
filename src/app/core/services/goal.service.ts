@@ -59,4 +59,22 @@ export class GoalService {
       }),
     );
   }
+
+  public updateTask(taskId: string, payload: Partial<CreateGoalTask>) {
+    return this.http.patch<Task>(`${this.url}/task/update/${taskId}`, payload).pipe(
+      tap((updatedTask) => {
+        this.allTasks.mutate((tasks) =>
+          tasks.map((task) => (task.id === taskId ? updatedTask : task)),
+        );
+      }),
+    );
+  }
+
+  public deleteTask(taskId: string) {
+    return this.http.delete(`${this.url}/task/delete/${taskId}`).pipe(
+      tap(() => {
+        this.allTasks.mutate((tasks) => tasks.filter((task) => task.id !== taskId));
+      }),
+    );
+  }
 }

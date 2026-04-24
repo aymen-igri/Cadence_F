@@ -59,6 +59,23 @@ export class TaskFormDialogComponent {
     },
   });
 
+  readonly updateTaskMutation = createMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: Partial<CreateGoalTask> }) =>
+      this.goalService.updateTask(id, payload),
+    onSuccess: () => {
+      toast.success('Task updated successfully', {
+        description: 'Your task details have been updated.',
+      });
+      this.dialogStateChange.emit('closed');
+    },
+    onError: (err) => {
+      toast.error('Failed to update task', {
+        description: 'An error occurred while updating the task. Please try again.',
+      });
+      console.error('Failed to update task', err);
+    },
+  });
+
   taskForm = form(
     this.taskModel,
     (schema) => {
@@ -70,7 +87,12 @@ export class TaskFormDialogComponent {
       submission: {
         action: async () => {
           const payload = this.taskModel();
-          this.createTaskMutation.mutate(payload);
+          const existing = this.task();
+          if (existing) {
+            this.updateTaskMutation.mutate({ id: existing.id, payload });
+          } else {
+            this.createTaskMutation.mutate(payload);
+          }
         },
       },
     },
