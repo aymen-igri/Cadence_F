@@ -108,12 +108,23 @@
 
 <ng-template #goalMenu>
   <hlm-dropdown-menu>
-    <hlm-sheet side="right">
-      <button hlmSheetTrigger hlmDropdownMenuItem class="w-full text-left">Edit goal</button>
-      <app-goal-form [goal]="goal()"></app-goal-form>
-    </hlm-sheet>
+    <button
+      hlmDropdownMenuItem
+      class="w-full text-left"
+      (click)="updateGoalDialogState.set('open')"
+    >
+      Edit goal
+    </button>
     <button hlmDropdownMenuItem class="text-destructive w-full" (click)="onDeleteGoal(goal().id)">
       Delete goal
     </button>
   </hlm-dropdown-menu>
 </ng-template>
+
+<app-goal-form-dialog
+  [state]="updateGoalDialogState()"
+  (dialogStateChange)="updateGoalDialogState.set($event)"
+  [goal]="goal()"
+  [SubjectName]="SubjectName()"
+>
+</app-goal-form-dialog>

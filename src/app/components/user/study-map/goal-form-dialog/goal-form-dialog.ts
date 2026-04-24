@@ -1,48 +1,35 @@
-import {
-  Component,
-  computed,
-  effect,
-  inject,
-  input,
-  signal,
-  output,
-  ViewChild,
-  ElementRef,
-} from '@angular/core';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
+import { CreateGoalRequest, Goal, UpdateGoalRequest } from '@app/core/models/goal.model';
+import { GoalService } from '@app/core/services/goal.service';
+import { createMutation } from '@app/core/utils/mutation.helper';
+import { LucideAngularModule, Plus } from 'lucide-angular';
+import { toast } from 'ngx-sonner';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmSheetImports } from '@spartan-ng/helm/sheet';
-import { LucideAngularModule, Plus } from 'lucide-angular';
-import {
-  CreateGoalRequest,
-  Goal,
-  UpdateGoalRequest,
-} from '@app/core/models/goal.model';
-import { form, required, FormRoot, FormField } from '@angular/forms/signals';
-import { createMutation } from '@app/core/utils/mutation.helper';
-import { GoalService } from '@app/core/services/goal.service';
-import { toast } from 'ngx-sonner';
-
+import { HlmDialogImports } from '@spartan-ng/helm/dialog';
 @Component({
-  selector: 'app-goal-form',
+  selector: 'app-goal-form-dialog',
   standalone: true,
   imports: [
     HlmLabelImports,
     HlmInputImports,
     HlmButtonImports,
-    HlmSheetImports,
     LucideAngularModule,
     FormRoot,
     FormField,
+    HlmDialogImports,
   ],
-  templateUrl: './goal-form.html',
+  templateUrl: './goal-form-dialog.html',
 })
-export class GoalFormComponent {
+export class GoalFormDialogComponent {
   protected Plus = Plus;
   readonly SubjectName = input<string>();
   readonly subjectId = input<string>('');
   readonly goal = input<Goal>();
+  state = input.required<'closed' | 'open'>();
+  dialogStateChange = output<'closed' | 'open'>();
 
   private goalService = inject(GoalService);
 
@@ -74,6 +61,7 @@ export class GoalFormComponent {
       toast.success('Goal created successfully', {
         description: 'The new goal has been added to your subject.',
       });
+      this.dialogStateChange.emit('closed');
     },
     onError: (error) => {
       toast.error('Failed to create goal', {
@@ -90,6 +78,7 @@ export class GoalFormComponent {
       toast.success('Goal updated successfully', {
         description: 'Your goal details have been updated.',
       });
+      this.dialogStateChange.emit('closed');
     },
     onError: (error) => {
       toast.error('Failed to update goal', {
@@ -121,4 +110,12 @@ export class GoalFormComponent {
       },
     },
   );
+  onStateChange(event: 'closed' | 'open') {
+    this.dialogStateChange.emit(event);
+  }
+
+  closeDialog(ctx: any) {
+    this.dialogStateChange.emit('closed');
+    ctx.close();
+  }
 }

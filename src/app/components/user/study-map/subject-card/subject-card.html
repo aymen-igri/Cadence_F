@@ -48,20 +48,17 @@
         <div class="flex items-center justify-between mb-4 mt-4">
           <h4 class="text-sm font-medium text-foreground">Goals</h4>
           <!-- Add Goal Sheet -->
-          <hlm-sheet>
-            <button
-              hlmBtn
-              size="sm"
-              variant="outline"
-              class="h-8 text-xs gap-1.5"
-              hlmSheetTrigger
-              side="right"
-            >
-              <lucide-angular [img]="Plus" class="h-3.5 w-3.5" />
-              Add goal
-            </button>
-            <app-goal-form [SubjectName]="subject().name" [subjectId]="subject().id" />
-          </hlm-sheet>
+          <button
+            hlmBtn
+            size="sm"
+            variant="outline"
+            class="h-8 text-xs gap-1.5"
+            (click)="createGoalDialogState.set('open')"
+            side="right"
+          >
+            <lucide-angular [img]="Plus" class="h-3.5 w-3.5" />
+            Add goal
+          </button>
         </div>
 
         <!-- Goals List -->
@@ -72,6 +69,7 @@
                 [goal]="goal"
                 [isExpanded]="expandedGoalId === goal.id"
                 (toggleExpand)="toggleGoal(goal.id)"
+                  [SubjectName]="subject().name"
               />
             }
           </div>
@@ -99,3 +97,10 @@
     </button>
   </hlm-dropdown-menu>
 </ng-template>
+
+<app-goal-form-dialog
+  [state]="createGoalDialogState()"
+  (dialogStateChange)="createGoalDialogState.set($event)"
+  [SubjectName]="subject().name"
+>
+</app-goal-form-dialog>

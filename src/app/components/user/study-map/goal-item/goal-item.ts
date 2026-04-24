@@ -25,12 +25,12 @@ import { HlmSheetImports } from '@spartan-ng/helm/sheet';
 import { TaskFormComponent } from '../task-form/task-form';
 import { HlmProgressImports } from '@spartan-ng/helm/progress';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
-import { Goal, Task } from '@app/core/models/goal.model';
+import { Goal } from '@app/core/models/goal.model';
 import { GoalService } from '@app/core/services/goal.service';
 import { AlertService } from '@app/components/shared/alert/alert.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
-import { GoalFormComponent } from '../goal-form/goal-form';
+import { GoalFormDialogComponent } from "../goal-form-dialog/goal-form-dialog";
 
 @Component({
   selector: 'app-goal-item',
@@ -45,7 +45,7 @@ import { GoalFormComponent } from '../goal-form/goal-form';
     TaskFormComponent,
     HlmDropdownMenuImports,
     HlmProgressImports,
-    GoalFormComponent,
+    GoalFormDialogComponent,
   ],
   templateUrl: './goal-item.html',
 })
@@ -57,6 +57,8 @@ export class GoalItemComponent {
   toggleExpand = output<void>();
   tasks = this.goalService.allTasks.data;
   isLoadingTasks = this.goalService.allTasks.isLoading;
+  updateGoalDialogState = signal<'closed' | 'open'>('closed');
+  SubjectName = input<string>('');
 
   ngOnInit() {
     this.goalService.loadAllTasks(this.goal().id).subscribe();

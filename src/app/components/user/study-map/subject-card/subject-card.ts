@@ -7,15 +7,14 @@ import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
 import { CommonModule } from '@angular/common';
 import { GoalItemComponent } from '../goal-item/goal-item';
 import { HlmSheetImports } from '@spartan-ng/helm/sheet';
-import { GoalFormComponent } from '../goal-form/goal-form';
 import { SubjectFormComponent } from '../subject-form/subject-form';
-import { Goal } from '@app/core/models/goal.model';
 import { SubjectModel } from '@app/core/models/subject.model';
 import { GoalService } from '@app/core/services/goal.service';
 import { AlertService } from '@app/components/shared/alert/alert.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
 import { SubjectService } from '@app/core/services/subject.service';
+import { GoalFormDialogComponent } from "../goal-form-dialog/goal-form-dialog";
 
 @Component({
   selector: 'app-subject-card',
@@ -29,9 +28,9 @@ import { SubjectService } from '@app/core/services/subject.service';
     HlmDropdownMenuImports,
     GoalItemComponent,
     HlmSheetImports,
-    GoalFormComponent,
     SubjectFormComponent,
     LucideAngularModule,
+    GoalFormDialogComponent,
   ],
   templateUrl: './subject-card.html',
 })
@@ -43,7 +42,7 @@ export class SubjectCardComponent {
   isExpanded = input<boolean>(false);
   toggleExpand = output<void>();
   isSheetOpen = signal(false);
-
+  createGoalDialogState = signal<'closed' | 'open'>('closed');
   protected ChevronDown = ChevronDown;
   protected ChevronRight = ChevronRight;
   protected MoreVertical = MoreVertical;
