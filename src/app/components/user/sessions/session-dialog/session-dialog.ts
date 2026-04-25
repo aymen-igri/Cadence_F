@@ -1,6 +1,10 @@
-import { Component, inject, input, output, signal } from '@angular/core';
-import { form, FormField, FormRoot, required, schema } from '@angular/forms/signals';
-import { CreateSessionRequest } from '@app/core/models/session.model';
+import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { form, FormField, FormRoot, required } from '@angular/forms/signals';
+import {
+  CreateSessionRequest,
+  CreateSessionResponse,
+  UpdateSessionRequest,
+} from '@app/core/models/session.model';
 import { SessionService } from '@app/core/services/session.service';
 import { SubjectService } from '@app/core/services/subject.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
@@ -25,7 +29,7 @@ import { toast } from 'ngx-sonner';
 export class SessionDialogComponent {
   private subjectService = inject(SubjectService);
   private sessionService = inject(SessionService);
-  session = input<CreateSessionRequest>();
+  session = input<CreateSessionResponse>();
   sessionModel = signal<CreateSessionRequest>({
     weeklySession: {
       title: '',
@@ -50,6 +54,28 @@ export class SessionDialogComponent {
     this.subjectService.loadAllSubjects().subscribe();
   }
 
+  constructor() {
+    effect(() => {
+      const existing = this.session();
+      if (existing) {
+        this.sessionModel.set({
+          weeklySession: {
+            title: existing.weeklySession.title,
+            startTime: existing.weeklySession.startTime,
+            status: existing.weeklySession.sessionStatus,
+          },
+          subSessions: existing.subSessions.map((sub) => ({
+            dayOfWeek: sub.dayOfWeek,
+            startTime: sub.startTime,
+            endTime: sub.endTime,
+            status: sub.status,
+            subjectId: sub.subjectId,
+          })),
+        });
+      }
+    });
+  }
+
   createSessionMutation = createMutation({
     mutationFn: (payload: CreateSessionRequest) => this.sessionService.createSession(payload),
     onSuccess: () => {
@@ -58,6 +84,18 @@ export class SessionDialogComponent {
     },
     onError: (error) => {
       toast.error('Session Creation failed', { description: error });
+    },
+  });
+
+  updateSessionMutation = createMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateSessionRequest }) =>
+      this.sessionService.updateSession(id, payload),
+    onSuccess: () => {
+      toast.success('Session Updated Successfully');
+      this.dialogStateChange.emit('closed');
+    },
+    onError: (error) => {
+      toast.error('Session Update failed', { description: error });
     },
   });
 
@@ -72,8 +110,14 @@ export class SessionDialogComponent {
       submission: {
         action: async () => {
           const payload = this.sessionModel();
-          console.log('PAYLOAD', payload)
-          this.createSessionMutation.mutate(payload);
+          const existing = this.session();
+          if (existing) {
+            console.log('Updating session with id:', existing.weeklySession.id, 'and payload:', payload);
+            this.updateSessionMutation.mutate({ id: existing.weeklySession.id, payload });
+          } else {
+            console.log('Creating session with payload:', payload);
+            this.createSessionMutation.mutate(payload);
+          }
         },
       },
     },

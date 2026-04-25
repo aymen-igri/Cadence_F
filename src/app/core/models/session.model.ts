@@ -54,3 +54,5 @@ export interface CreateSessionResponse {
   weeklySession: CreateWeeklySessionResponse;
   subSessions: CreateSubSessionResponse[];
 }
+
+export type UpdateSessionRequest = Partial<CreateSessionRequest>;

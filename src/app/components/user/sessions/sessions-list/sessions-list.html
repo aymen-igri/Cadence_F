@@ -50,6 +50,47 @@
                 </div>
               </div>
             </div>
+
+            <button
+              hlmBtn
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 self-end sm:self-auto"
+              [hlmDropdownMenuTrigger]="weeklySessionMenu"
+              aria-label="Open weekly session actions"
+            >
+              <lucide-angular [img]="MoreVertical" class="h-4 w-4"></lucide-angular>
+            </button>
+
+            <ng-template #weeklySessionMenu>
+              <hlm-dropdown-menu>
+                <button
+                  hlmDropdownMenuItem
+                  class="gap-2"
+                  (click)="updateSubjectDialogState.set('open')"
+                >
+                  <lucide-angular [img]="Edit" class="h-4 w-4"></lucide-angular>
+                  Edit
+                </button>
+                <hlm-dropdown-menu-separator></hlm-dropdown-menu-separator>
+                <button
+                  hlmDropdownMenuItem
+                  variant="destructive"
+                  class="gap-2"
+                  (click)="onDeleteSession(sessionRes.weeklySession.id)"
+                >
+                  <lucide-angular [img]="Trash2" class="h-4 w-4"></lucide-angular>
+                  Delete
+                </button>
+              </hlm-dropdown-menu>
+            </ng-template>
+
+            <app-session-dialog
+              [state]="updateSubjectDialogState()"
+              (dialogStateChange)="updateSubjectDialogState.set($event)"
+              [session]="sessionRes"
+            >
+            </app-session-dialog>
           </div>
 
           <!-- Accordion for Sub-sessions -->
