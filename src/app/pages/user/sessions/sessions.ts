@@ -1,9 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SessionsHeaderComponent } from '@app/components/user/sessions/sessions-header/sessions-header';
 import { SessionsCalendarComponent } from '@app/components/user/sessions/sessions-calendar/sessions-calendar';
 import { SessionsListComponent } from '@app/components/user/sessions/sessions-list/sessions-list';
-import { SessionSheetComponent } from '@app/components/user/sessions/session-sheet/session-sheet';
 import { AppSession } from '@app/core/models/session.model';
 
 @Component({
@@ -14,14 +13,11 @@ import { AppSession } from '@app/core/models/session.model';
     SessionsHeaderComponent,
     SessionsCalendarComponent,
     SessionsListComponent,
-    SessionSheetComponent,
   ],
   templateUrl: './sessions.html',
 })
 export class SessionsComponent {
   viewMode: 'calendar' | 'list' = 'list';
-
-  @ViewChild('sessionSheet') sessionSheet!: SessionSheetComponent;
 
   // Mock data for initial view
   sessions: AppSession[] = [
@@ -60,10 +56,6 @@ export class SessionsComponent {
     },
   ];
 
-  openSessionSheet() {
-    this.sessionSheet.open();
-  }
-
   onSlotClick(event: { dateStr: string; timeStr: string }) {
     // Generate derived end time (default to 1 hr later)
     let timeParts = event.timeStr.split(':');
@@ -74,11 +66,6 @@ export class SessionsComponent {
     let endHours = (hours + 1).toString().padStart(2, '0');
     let endTimeStr = endHours + ':' + minsStr.padStart(2, '0');
 
-    this.sessionSheet.open({
-      date: event.dateStr,
-      startTime: event.timeStr,
-      endTime: endTimeStr,
-    });
   }
 
   onSessionClick(id: string) {

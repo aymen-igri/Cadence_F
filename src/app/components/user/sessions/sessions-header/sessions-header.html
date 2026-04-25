@@ -28,9 +28,14 @@
         Calendar
       </button>
     </div>
-    <button hlmBtn size="sm" class="gap-2 shadow-sm" (click)="addSession.emit()">
+    <button hlmBtn size="sm" class="gap-2 shadow-sm" (click)="createSessionDialogState.set('open')">
       <lucide-angular [img]="Plus" class="h-4 w-4" />
       Add session
     </button>
   </div>
 </div>
+<app-session-dialog
+  [state]="createSessionDialogState()"
+  (dialogStateChange)="createSessionDialogState.set($event)"
+>
+</app-session-dialog>

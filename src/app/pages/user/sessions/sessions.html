@@ -1,29 +1,27 @@
 <div class="space-y-6 max-w-7xl mx-auto min-h-screen">
-      <app-sessions-header
-        [viewMode]="viewMode"
-        (viewModeChange)="viewMode = $event"
-        (addSession)="openSessionSheet()"
+  <app-sessions-header
+    [viewMode]="viewMode"
+    (viewModeChange)="viewMode = $event"
+  >
+  </app-sessions-header>
+
+  <div class="mt-6">
+    @if (viewMode === 'calendar') {
+      <app-sessions-calendar
+        [sessions]="sessions"
+        (slotClick)="onSlotClick($event)"
+        (sessionClick)="onSessionClick($event)"
       >
-      </app-sessions-header>
+      </app-sessions-calendar>
+    } @else {
+      <app-sessions-list
+        [sessions]="sessions"
+        (sessionClick)="onSessionClick($event)"
+        (startSession)="onStartSession($event)"
+        (completeSession)="onCompleteSession($event)"
+      >
+      </app-sessions-list>
+    }
+  </div>
 
-      <div class="mt-6">
-        @if (viewMode === 'calendar') {
-          <app-sessions-calendar
-            [sessions]="sessions"
-            (slotClick)="onSlotClick($event)"
-            (sessionClick)="onSessionClick($event)"
-          >
-          </app-sessions-calendar>
-        } @else {
-          <app-sessions-list
-            [sessions]="sessions"
-            (sessionClick)="onSessionClick($event)"
-            (startSession)="onStartSession($event)"
-            (completeSession)="onCompleteSession($event)"
-          >
-          </app-sessions-list>
-        }
-      </div>
-
-      <app-session-sheet #sessionSheet (save)="onSaveSession($event)"></app-session-sheet>
-    </div>
+</div>
