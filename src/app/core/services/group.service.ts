@@ -10,7 +10,7 @@ import {
   JoinRequestResponse,
 } from '../models/group.model';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environments';
+import { environment } from '../../environments/environment';
 import { finalize, tap } from 'rxjs';
 import { AuthService } from './auth.service';
 import { createQuery } from '../utils/query.helper';
@@ -43,7 +43,9 @@ export class GroupService {
   });
 
   public loadJoinRequests(groupId: string) {
-    return this.joinRequests.load(this.http.get<JoinRequestResponse[]>(`${this.url}/${groupId}/requests`));
+    return this.joinRequests.load(
+      this.http.get<JoinRequestResponse[]>(`${this.url}/${groupId}/requests`),
+    );
   }
 
   public getGroupDataById(groupId: string) {

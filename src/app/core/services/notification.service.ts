@@ -2,7 +2,7 @@ import { Injectable, inject, linkedSignal } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { Client, StompSubscription } from '@stomp/stompjs';
-import { environment } from '../../environments/environments';
+import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { Notification } from '../models/notification.model';
 

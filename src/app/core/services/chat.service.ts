@@ -5,7 +5,7 @@ import { GroupMessageResponse, SendGroupMessageRequest } from '../models/chat.mo
 import { BehaviorSubject, Observable } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environments';
+import { environment } from '../../environments/environment';
 
 export interface ChatMessage {
   groupId: string;
