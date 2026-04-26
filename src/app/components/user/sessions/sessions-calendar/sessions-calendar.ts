@@ -1,10 +1,33 @@
-import { Component, OnInit, output, input } from '@angular/core';
+import { Component, effect, output, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventInput } from '@fullcalendar/core';
+import { CalendarOptions, EventClickArg, EventContentArg, EventInput } from '@fullcalendar/core';
 import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { AppSession } from '../../../../core/models/session.model';
+import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
+import { CreateSubSessionResponse } from '@app/core/models/session.model';
+
+type CalendarStatus = CreateSubSessionResponse['status'];
+
+export interface SessionCalendarEvent {
+  id: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  subjectName?: string;
+  status: CalendarStatus;
+}
+
+interface SessionEventExtendedProps {
+  subjectName: string;
+  status: CalendarStatus;
+  badgeClass: string;
+}
+
+function normalizeCalendarTime(value: string): string {
+  const [hours = '00', minutes = '00', seconds = '00'] = (value || '').split(':');
+  return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+}
 
 @Component({
   selector: 'app-sessions-calendar',
@@ -43,8 +66,8 @@ import { AppSession } from '../../../../core/models/session.model';
     `,
   ],
 })
-export class SessionsCalendarComponent implements OnInit {
-  sessions = input<AppSession[]>([]);
+export class SessionsCalendarComponent {
+  sessions = input<SessionCalendarEvent[]>([]);
   slotClick = output<{ dateStr: string; timeStr: string }>();
   sessionClick = output<string>();
 
@@ -68,51 +91,68 @@ export class SessionsCalendarComponent implements OnInit {
     eventContent: this.renderEventContent.bind(this),
   };
 
-  ngOnInit() {
-    this.updateEvents();
-  }
-
-  ngOnChanges() {
-    this.updateEvents();
+  constructor() {
+    effect(() => {
+      this.sessions();
+      this.updateEvents();
+    });
   }
 
   updateEvents() {
-    const events: EventInput[] = this.sessions().map((s) => {
-      const status = s.status;
-      let badgeClass = 'bg-secondary text-secondary-foreground';
+    const badgeClassByStatus: Record<CalendarStatus, string> = {
+      PENDING: 'bg-secondary text-secondary-foreground',
+      INCOMPLETED: 'bg-destructive text-destructive-foreground',
+      COMPLETED: 'bg-green-500 text-white',
+      CLOSED: 'bg-muted text-muted-foreground',
+    };
 
-      if (status === 'COMPLETED') badgeClass = 'bg-green-500 text-white';
-      if (status === 'MISSED') badgeClass = 'bg-destructive text-destructive-foreground';
+    const events: EventInput[] = this.sessions().map((s) => {
+      const badgeClass = badgeClassByStatus[s.status];
+      const extendedProps: SessionEventExtendedProps = {
+        subjectName: s.subjectName || 'No Subject',
+        status: s.status,
+        badgeClass,
+      };
+
+      const startDateTime = `${s.date}T${normalizeCalendarTime(s.startTime)}`;
+      const endDateTime = `${s.date}T${normalizeCalendarTime(s.endTime)}`;
 
       return {
         id: s.id,
         title: s.title,
-        start: s.date + 'T' + s.startTime + ':00',
-        end: s.date + 'T' + s.endTime + ':00',
-        extendedProps: {
-          subjectName: s.subjectName || 'No Subject',
-          status: s.status,
-          badgeClass: badgeClass,
-        },
+        start: startDateTime,
+        end: endDateTime,
+        extendedProps,
       };
     });
-    this.calendarOptions.events = events;
+
+    const nextInitialDate =
+      events.length > 0 && typeof events[0].start === 'string'
+        ? events[0].start.split('T')[0]
+        : this.calendarOptions.initialDate;
+
+    this.calendarOptions = {
+      ...this.calendarOptions,
+      events,
+      initialDate: nextInitialDate,
+    };
   }
 
-  handleDateClick(arg: any) {
+  handleDateClick(arg: DateClickArg) {
     const dateStr = arg.dateStr.split('T')[0];
     const timeStr = arg.dateStr.split('T')[1]?.substring(0, 5) || '12:00';
     this.slotClick.emit({ dateStr, timeStr });
   }
 
-  handleEventClick(arg: any) {
+  handleEventClick(arg: EventClickArg) {
     this.sessionClick.emit(arg.event.id);
   }
 
-  renderEventContent(arg: any) {
-    const badgeClass = arg.event.extendedProps['badgeClass'];
-    const status = arg.event.extendedProps['status'];
-    const subjectName = arg.event.extendedProps['subjectName'];
+  renderEventContent(arg: EventContentArg) {
+    const props = arg.event.extendedProps as SessionEventExtendedProps;
+    const badgeClass = props.badgeClass;
+    const status = props.status;
+    const subjectName = props.subjectName;
 
     return {
       html:

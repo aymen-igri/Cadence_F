@@ -1,10 +1,50 @@
-import { Component, signal, ViewChild, inject, OnInit, computed } from '@angular/core';
+import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SessionsHeaderComponent } from '@app/components/user/sessions/sessions-header/sessions-header';
-import { SessionsCalendarComponent } from '@app/components/user/sessions/sessions-calendar/sessions-calendar';
+import {
+  SessionCalendarEvent,
+  SessionsCalendarComponent,
+} from '@app/components/user/sessions/sessions-calendar/sessions-calendar';
 import { SessionsListComponent } from '@app/components/user/sessions/sessions-list/sessions-list';
-import { AppSession } from '@app/core/models/session.model';
+import { CreateSessionResponse, CreateSubSessionResponse } from '@app/core/models/session.model';
 import { SessionService } from '@app/core/services/session.service';
+
+const DAY_OF_WEEK_TO_OFFSET: Record<CreateSubSessionResponse['dayOfWeek'], number> = {
+  MONDAY: 0,
+  TUESDAY: 1,
+  WEDNESDAY: 2,
+  THURSDAY: 3,
+  FRIDAY: 4,
+  SATURDAY: 5,
+  SUNDAY: 6,
+};
+
+function formatLocalDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getSubSessionDate(
+  weeklyStartTime: string,
+  dayOfWeek: CreateSubSessionResponse['dayOfWeek'],
+): string {
+  let anchor = new Date(weeklyStartTime);
+  if (Number.isNaN(anchor.getTime())) {
+    const extractedDate = weeklyStartTime.match(/\d{4}-\d{2}-\d{2}/)?.[0];
+    anchor = extractedDate ? new Date(extractedDate) : new Date();
+  }
+
+  const mondayBasedIndex = (anchor.getDay() + 6) % 7;
+  const weekStart = new Date(anchor);
+  weekStart.setHours(0, 0, 0, 0);
+  weekStart.setDate(anchor.getDate() - mondayBasedIndex);
+
+  const targetDate = new Date(weekStart);
+  targetDate.setDate(weekStart.getDate() + DAY_OF_WEEK_TO_OFFSET[dayOfWeek]);
+  return formatLocalDate(targetDate);
+}
 
 @Component({
   selector: 'app-sessions',
@@ -24,27 +64,29 @@ export class SessionsComponent implements OnInit {
   sessions = this.sessionService.allSessions.data;
   isLoadingSesions = this.sessionService.allSessions.isLoading;
 
-  calendarSessions = computed<AppSession[]>(() => {
+  calendarSessions = computed<SessionCalendarEvent[]>(() => {
     const rawSessions = this.sessions() || [];
-    const flat: AppSession[] = [];
+    const flat: SessionCalendarEvent[] = [];
 
-    rawSessions.forEach((ws) => {
-      const wDate = new Date(ws.weeklySession.startTime);
-      ws.subSessions.forEach((sub) => {
-        const subDateStr = wDate.toISOString().split('T')[0];
+    rawSessions.forEach((sessionResponse: CreateSessionResponse) => {
+      sessionResponse.subSessions.forEach((subSession) => {
+        const subDate = getSubSessionDate(
+          sessionResponse.weeklySession.startTime,
+          subSession.dayOfWeek,
+        );
+
         flat.push({
-          id: sub.id,
-          title: ws.weeklySession.title + ' - ' + sub.subjectName,
-          date: subDateStr,
-          startTime: sub.startTime,
-          endTime: sub.endTime,
-          subjectId: sub.subjectId,
-          subjectName: sub.subjectName,
-          status: (sub.status === 'PENDING' ? 'PLANNED' : sub.status) as any,
-          type: 'FOCUS',
+          id: subSession.id,
+          title: `${sessionResponse.weeklySession.title} - ${subSession.subjectName}`,
+          date: subDate,
+          startTime: subSession.startTime,
+          endTime: subSession.endTime,
+          subjectName: subSession.subjectName,
+          status: subSession.status,
         });
       });
     });
+
     return flat;
   });
 
@@ -53,22 +95,11 @@ export class SessionsComponent implements OnInit {
   }
 
   onSlotClick(event: { dateStr: string; timeStr: string }) {
-    // Generate derived end time (default to 1 hr later)
-    let timeParts = event.timeStr.split(':');
-    let hoursStr = timeParts[0];
-    let minsStr = timeParts[1];
-    let hours = parseInt(hoursStr, 10);
-    let mins = parseInt(minsStr, 10);
-    let endHours = (hours + 1).toString().padStart(2, '0');
-    let endTimeStr = endHours + ':' + minsStr.padStart(2, '0');
+    console.log('Calendar slot clicked:', event);
   }
 
   onSessionClick(id: string) {
     console.log('View session ID:', id);
-  }
-
-  onSaveSession(sessionData: Partial<AppSession>) {
-    console.log('Would save session via API:', sessionData);
   }
 
   onStartSession(id: string) {
