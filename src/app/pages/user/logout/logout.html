@@ -1,0 +1,26 @@
+<div class="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4">
+  <div class="max-w-md w-full">
+    <div hlmAlert variant="destructive">
+      <lucide-angular
+        hlmAlertIcon
+        [img]="TriangleAlert"
+        class="w-4 h-4"
+      ></lucide-angular>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <h4 hlmAlertTitle class="mb-2">Log Out</h4>
+          <p hlmAlertDescription>
+            Are you sure you want to sign out of your account? You will need to sign back in to access
+            your sessions and groups.
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button hlmBtn variant="outline" (click)="cancel()">Cancel</button>
+          <button hlmBtn variant="destructive" (click)="confirmLogout()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+  @for (goal of goals(); track goal.id) {
+    <div hlmCard class="p-4 flex flex-col gap-3">
+      <div>
+        <h4 class="font-semibold text-foreground">{{ goal.goalTitle }}</h4>
+        <p class="text-xs text-muted-foreground">{{ goal.subjectName }}</p>
+      </div>
+
+      <div class="space-y-1.5 mt-auto">
+        <div class="flex justify-between text-xs">
+          <span class="text-muted-foreground">Planned this week</span>
+          <span class="font-medium text-foreground">
+            {{ goal.hoursPlannedCurrentWeek }} / {{ goal.targetHoursPerWeek }} h
+          </span>
+        </div>
+
+        <hlm-progress [value]="getProgressValue(goal)" class="h-2 w-full">
+          <hlm-progress-indicator class="h-full w-full bg-primary transition-all" />
+        </hlm-progress>
+      </div>
+    </div>
+  }
+  @if (goals().length === 0) {
+    <div
+      class="col-span-full py-8 text-center text-muted-foreground text-sm border border-dashed rounded-lg"
+    >
+      No goals selected or active for this week.
+    </div>
+  }
+</div>

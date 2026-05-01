@@ -1,0 +1,188 @@
+<div class="flex flex-col items-center justify-between gap-4 py-4 sm:flex-row">
+  <input
+    hlmInput
+    class="w-full transition-colors focus-visible:ring-1 focus-visible:ring-primary/50 sm:max-w-xs"
+    placeholder="Filter groups..."
+    (input)="_filterChanged($event)"
+  />
+
+  <button
+    hlmBtn
+    variant="outline"
+    size="sm"
+    align="end"
+    [hlmDropdownMenuTrigger]="menu"
+    class="ml-auto hidden sm:flex"
+  >
+    Columns
+    <ng-icon hlm name="lucideChevronDown" class="ml-2 h-2 w-2" />
+  </button>
+  <ng-template #menu>
+    <hlm-dropdown-menu class="w-32">
+      @for (column of _hidableColumns; track column.id) {
+        <button
+          hlmDropdownMenuCheckbox
+          class="capitalize"
+          [checked]="column.getIsVisible()"
+          (triggered)="column.toggleVisibility()"
+        >
+          <hlm-dropdown-menu-checkbox-indicator />
+          {{ column.columnDef.id }}
+        </button>
+      }
+    </hlm-dropdown-menu>
+  </ng-template>
+  <ng-template #actionsCell let-cell="cell">
+    <div class="flex justify-end pr-2">
+      @if (isClickable()) {
+        <button
+          hlmBtn
+          variant="ghost"
+          size="icon"
+          class="h-8 w-8 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          [routerLink]="['/user/groups', cell.row.original?.id]"
+        >
+          <lucide-angular [img]="SquareArrowOutUpRight" size="16" />
+        </button>
+      } @else {
+        <button
+          hlmBtn
+          variant="ghost"
+          size="icon"
+          class="h-8 w-8 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          [hlmDropdownMenuTrigger]="actionsMenu"
+        >
+          <lucide-angular size="16" [img]="Ellipsis" />
+        </button>
+        <ng-template #actionsMenu>
+          <hlm-dropdown-menu>
+            @if (!cell.row.original?.userRole && cell.row.original?.privacyLevel === 'PUBLIC') {
+              <button hlmDropdownMenuItem (click)="onJoinClick($event, cell.row.original?.id)">
+                Join group
+              </button>
+            }
+            @if (!cell.row.original?.userRole && cell.row.original?.privacyLevel === 'PRIVATE') {
+              <button
+                hlmDropdownMenuItem
+                (click)="onRequestJoinClick($event, cell.row.original?.id)"
+              >
+                Request to join
+              </button>
+            }
+          </hlm-dropdown-menu>
+        </ng-template>
+      }
+    </div>
+  </ng-template>
+</div>
+<div class="overflow-hidden rounded-md border">
+  <!-- we defer the loading of the table, because tanstack manipulates the DOM with flexRender which can cause errors during SSR -->
+  @defer {
+    <div hlmTableContainer>
+      <table hlmTable>
+        <thead hlmTHead>
+          @for (headerGroup of _table.getHeaderGroups(); track headerGroup.id) {
+            <tr hlmTr class="border-b transition-none hover:bg-transparent">
+              @for (header of headerGroup.headers; track header.id) {
+                <th
+                  class="whitespace-nowrap text-xs font-semibold uppercase tracking-wider text-muted-foreground/80"
+                  hlmTh
+                  [attr.colSpan]="header.colSpan"
+                >
+                  @if (!header.isPlaceholder) {
+                    <ng-container
+                      *flexRender="
+                        header.column.columnDef.header;
+                        props: header.getContext();
+                        let headerText
+                      "
+                    >
+                      <div [innerHTML]="headerText"></div>
+                    </ng-container>
+                  }
+                </th>
+              }
+            </tr>
+          }
+        </thead>
+        <tbody hlmTBody>
+          @for (row of _table().getRowModel().rows; track row.id) {
+            <tr
+              hlmTr
+              class="border-b transition-colors hover:bg-muted/30 data-[state=selected]:bg-muted"
+              [attr.key]="row.id"
+              [attr.data-state]="row.getIsSelected() && 'selected'"
+            >
+              @for (cell of row.getVisibleCells(); track $index) {
+                <td hlmTd class="align-middle">
+                  @if (cell.column.id === 'actions') {
+                    <ng-container *ngTemplateOutlet="actionsCell; context: { cell: cell }" />
+                  } @else if (cell.column.id === 'privacyLevel') {
+                    <div
+                      hlmBadge
+                      variant="outline"
+                      [class]="
+                        cell.getValue() === 'Public'
+                          ? 'border-transparent bg-green-500/10 text-green-700 hover:bg-green-500/20 dark:text-green-400 font-medium transition-colors'
+                          : 'border-transparent bg-red-500/10 text-red-700 hover:bg-red-500/20 dark:text-red-400 font-medium transition-colors'
+                      "
+                    >
+                      {{ cell.getValue() }}
+                    </div>
+                  } @else if (cell.column.id === 'name') {
+                    <div class="text-sm font-medium text-foreground">
+                      {{ cell.getValue() }}
+                    </div>
+                  } @else {
+                    <div class="text-sm font-normal text-muted-foreground/80">
+                      {{ cell.getValue() }}
+                    </div>
+                  }
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr hlmTr>
+              <td hlmTd class="h-32 text-center" [attr.colspan]="_columns().length">
+                <div class="flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                  <span class="text-sm">No groups found.</span>
+                  <span class="text-xs text-muted-foreground/60">Try adjusting your filters</span>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<div class="flex flex-col items-center justify-between py-4 sm:flex-row">
+  <div class="flex-1 text-sm text-muted-foreground/80">
+    @if (_table().getRowCount() > 0) {
+      Showing {{ _table().getRowModel().rows.length }} of {{ _table().getRowCount() }} groups.
+    }
+  </div>
+  @if (_table().getRowCount() > 0) {
+    <div class="mt-2 flex space-x-2 sm:mt-0">
+      <button
+        size="sm"
+        variant="outline"
+        hlmBtn
+        [disabled]="!_table.getCanPreviousPage()"
+        (click)="_table.previousPage()"
+      >
+        Previous
+      </button>
+      <button
+        size="sm"
+        variant="outline"
+        hlmBtn
+        [disabled]="!_table.getCanNextPage()"
+        (click)="_table.nextPage()"
+      >
+        Next
+      </button>
+    </div>
+  }
+</div>

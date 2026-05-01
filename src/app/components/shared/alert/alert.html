@@ -1,0 +1,27 @@
+@if (alertService.alert(); as alert) {
+<div class="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-background/80 backdrop:backdrop-blur-sm">
+  <div class="max-w-md w-full">
+    <div hlmAlert [variant]="alert.variant || 'default'">
+      <lucide-angular
+        hlmAlertIcon
+        [img]="TriangleAlert"
+        class="w-4 h-4"
+      ></lucide-angular>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <h4 hlmAlertTitle class="mb-2">Are you sure?</h4>
+          <p hlmAlertDescription>
+           {{ alert.description}}
+          </p>
+        </div>
+
+        <div class="flex justify-end gap-3">
+          <button hlmBtn variant="outline" (click)="alertService.close()">Cancel</button>
+          <button hlmBtn variant="destructive" (click)="onAction()">{{ alert.actionLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}

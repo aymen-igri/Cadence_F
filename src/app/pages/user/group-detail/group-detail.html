@@ -1,0 +1,110 @@
+@if (isGroupLoading()) {
+  <div class="flex items-center justify-center min-h-[50vh]">
+    <p class="text-muted-foreground">Loading group...</p>
+  </div>
+} @else {
+  <div class="max-w-4xl mx-auto space-y-6 pt-4 pb-12">
+    <!-- Header -->
+    <div
+      class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6"
+    >
+      <div class="space-y-1.5">
+        <div class="flex items-center gap-3">
+          <h1 class="text-3xl font-bold tracking-tight text-foreground">{{ group()?.name }}</h1>
+          <span hlmBadge [variant]="group()?.privacyLevel === 'PUBLIC' ? 'default' : 'secondary'">
+            {{ group()?.privacyLevel }}
+          </span>
+        </div>
+        <p class="text-sm text-muted-foreground">
+          {{ group()?.description }} &bull; {{ members().length }} member(s)
+        </p>
+      </div>
+
+      <div class="flex gap-2">
+        @if (canLeaveGroup) {
+          <button hlmBtn variant="destructive" size="sm" (click)="onLeaveGroupClick()">Leave group</button>
+        }
+      </div>
+    </div>
+
+    <!-- Layout Tabs -->
+    <hlm-tabs [tab]="activeTab()" (tabChanged)="setActiveTab($event)">
+      <hlm-tabs-list aria-label="tabs" class="w-full sm:w-auto overflow-x-auto justify-start">
+        <button hlmTabsTrigger="feed">Feed</button>
+        <button hlmTabsTrigger="members">Members</button>
+        <button hlmTabsTrigger="chat">Chat</button>
+        @if (myRole() === 'ADMIN' || myRole() === 'OWNER') {
+          <button hlmTabsTrigger="settings">Settings</button>
+        }
+      </hlm-tabs-list>
+
+      <!-- Feed Tab -->
+      <div hlmTabsContent="feed" class="mt-6 space-y-6">
+        <div
+          class="flex justify-between items-center bg-muted/30 p-4 rounded-lg border border-border"
+        >
+          <p class="text-sm font-medium">Have something to share?</p>
+          <button hlmBtn (click)="shareDialogState.set('open')">Share a session</button>
+        </div>
+
+        <div class="space-y-4">
+          @for (session of feed(); track session.id) {
+            <app-group-feed-card
+              [session]="session"
+            >
+            </app-group-feed-card>
+          } @empty {
+            <div class="py-12 text-center border rounded-lg border-dashed">
+              <p class="text-muted-foreground text-sm">No sessions shared yet in this group.</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Members Tab -->
+      @if (isMembersLoading()) {
+        <div class="flex items-center justify-center min-h-[50vh]">
+          <p class="text-muted-foreground">Loading members...</p>
+        </div>
+      } @else if (groupService.currentUserId(); as userId){
+        <div hlmTabsContent="members">
+          <app-group-members-tab
+            [members]="members()"
+            [currentUserRole]="myRole()"
+            [currentUserId]="userId"
+            [groupId]="groupId()"
+          >
+          </app-group-members-tab>
+        </div>
+      }
+
+      <!-- CHAT TAB -->
+      <div hlmTabsContent="chat" class="mt-4 border rounded-lg bg-card">
+        @if (groupId() && myRole()) {
+          <app-group-chat-tab [currentUserId]="groupService.currentUserId()!" [groupId]="groupId()">
+          </app-group-chat-tab>
+        }
+      </div>
+
+      <!-- SETTINGS TAB (Admin Only via routing/permissions, but guarded by visibility or mock) -->
+      <!-- For now, display it and internally the tab controls admin views -->
+      @if (myRole() === 'ADMIN' || myRole() === 'OWNER') {
+        <div hlmTabsContent="settings" class="mt-4">
+          <app-group-settings-tab
+            [group]="group()!"
+            [members]="members()"
+            [currentUserId]="groupService.currentUserId()!"
+          >
+          </app-group-settings-tab>
+        </div>
+      }
+    </hlm-tabs>
+  </div>
+
+  <app-share-session-dialog
+    [state]="shareDialogState()"
+    (dialogStateChange)="shareDialogState.set($event)"
+    (confirmClick)="onShareSession($event)"
+  >
+  </app-share-session-dialog>
+}

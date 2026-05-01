@@ -3,9 +3,9 @@ import { provideRouter } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHlmSidebarConfig } from '@spartan-ng/helm/sidebar';
-import { authInterceptor } from './core/interceptors/auth.interceptor';
-import { errorInterceptor } from './core/interceptors/error.interceptor';
-import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+import { authInterceptor } from '@app/core/interceptors/auth.interceptor';
+import { errorInterceptor } from '@app/core/interceptors/error.interceptor';
+import { loadingInterceptor } from '@app/core/interceptors/loading.interceptor';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {

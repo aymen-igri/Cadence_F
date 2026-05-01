@@ -1,0 +1,17 @@
+<div class="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 text-center">
+  <div class="bg-muted/50 p-6 rounded-full mb-6">
+    <lucide-angular [img]="ServerCrash" class="w-16 h-16 text-destructive"></lucide-angular>
+  </div>
+
+  <h1 class="text-4xl font-extrabold tracking-tight lg:text-5xl mb-2 text-destructive">500</h1>
+  <h2 class="text-2xl font-semibold tracking-tight mb-4">Internal Server Error</h2>
+
+  <p class="text-muted-foreground mb-8 max-w-125">
+    Oops! We encountered an unexpected condition that prevented it from fulfilling the request. Our
+    team has been notified and we are working to fix the issue.
+  </p>
+
+  <div class="flex gap-4">
+    <button hlmBtn variant="outline" (click)="goBack()">Go Back</button>
+  </div>
+</div>

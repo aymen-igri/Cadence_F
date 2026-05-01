@@ -1,0 +1,110 @@
+<hlm-card class="bg-card shadow-sm border border-border" [ngClass]="getBorderColor()">
+  <div
+    class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4 cursor-pointer"
+    (click)="toggleExpand.emit()"
+  >
+    <div class="flex-1">
+      <div class="flex flex-wrap items-center gap-2 mb-1">
+        <h3 class="font-semibold text-foreground text-lg">{{ subject().name }}</h3>
+        <hlm-badge [variant]="getBadgeVariant()" class="text-[10px] h-5 px-2">{{
+          subject().priority
+        }}</hlm-badge>
+      </div>
+      <p class="text-sm text-muted-foreground">{{ subject().description }}</p>
+    </div>
+
+    <div class="flex items-center gap-2" (click)="$event.stopPropagation()">
+      <button
+        [hlmDropdownMenuTrigger]="subjectMenu"
+        hlmBtn
+        variant="ghost"
+        size="icon"
+        class="h-8 w-8 text-muted-foreground"
+      >
+        <lucide-angular [img]="MoreVertical" class="h-4 w-4" />
+      </button>
+      <button
+        hlmBtn
+        variant="ghost"
+        size="icon"
+        class="h-8 w-8 text-muted-foreground"
+        (click)="toggleExpand.emit()"
+      >
+        <lucide-angular [img]="isExpanded() ? ChevronDown : ChevronRight" class="h-5 w-5" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Expanded Content (Goals) -->
+
+  @if (isExpanded()) {
+    @if (isLoadingGoals()) {
+      <div class="flex justify-center p-6 text-muted-foreground">
+        <lucide-angular name="loader-2" class="h-6 w-6 animate-spin"></lucide-angular>
+        <span class="ml-2 text-sm">Loading goals...</span>
+      </div>
+    } @else {
+      <div class="px-4 pb-5 sm:px-5 sm:pb-5 pt-0 border-t border-border/50 bg-muted/20">
+        <div class="flex items-center justify-between mb-4 mt-4">
+          <h4 class="text-sm font-medium text-foreground">Goals</h4>
+          <!-- Add Goal Sheet -->
+          <button
+            hlmBtn
+            size="sm"
+            variant="outline"
+            class="h-8 text-xs gap-1.5"
+            (click)="createGoalDialogState.set('open')"
+            side="right"
+          >
+            <lucide-angular [img]="Plus" class="h-3.5 w-3.5" />
+            Add goal
+          </button>
+        </div>
+
+        <!-- Goals List -->
+        @if (goals().length > 0) {
+          <div class="flex flex-col gap-3">
+            @for (goal of goals(); track goal.id) {
+              <app-goal-item
+                [goal]="goal"
+                [isExpanded]="expandedGoalId === goal.id"
+                (toggleExpand)="toggleGoal(goal.id)"
+                [SubjectName]="subject().name"
+              />
+            }
+          </div>
+        } @else {
+          <!-- Empty Goals State -->
+          <div
+            class="flex flex-col items-center justify-center p-6 border border-dashed border-border rounded-lg bg-card text-center"
+          >
+            <p class="text-sm text-muted-foreground mb-3">No goals yet for this subject.</p>
+          </div>
+        }
+      </div>
+    }
+  }
+</hlm-card>
+
+<ng-template #subjectMenu>
+  <hlm-dropdown-menu>
+    <button hlmDropdownMenuItem class="w-full text-left" (click)="updateSubjectDialogState.set('open')">
+      Edit subject
+    </button>
+    <button hlmDropdownMenuItem class="text-destructive" (click)="onDeleteSubject(subject().id)">
+      Delete subject
+    </button>
+  </hlm-dropdown-menu>
+</ng-template>
+
+<app-goal-form-dialog
+  [state]="createGoalDialogState()"
+  (dialogStateChange)="createGoalDialogState.set($event)"
+  [SubjectName]="subject().name"
+>
+</app-goal-form-dialog>
+<app-subject-form-dialog
+  [state]="updateSubjectDialogState()"
+  (dialogStateChange)="updateSubjectDialogState.set($event)"
+  [subject]="subject()"
+></app-subject-form-dialog>

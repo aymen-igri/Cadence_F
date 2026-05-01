@@ -11,11 +11,17 @@ import { AuthService } from '../services/auth.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  const cloned = addToken(req, authService.getAccessToken());
+  const cloned = req.url.includes('/refreshToken')
+    ? req
+    : addToken(req, authService.getAccessToken());
 
   return next(cloned).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && authService.getRefreshToken()) {
+      if (
+        error.status === 401 &&
+        authService.getRefreshToken() &&
+        !req.url.includes('/refreshToken')
+      ) {
         return authService.refresh().pipe(
           switchMap((tokens) => {
             return next(addToken(req, tokens.accessToken));
@@ -26,7 +32,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           }),
         );
       }
-
       return throwError(() => error);
     }),
   );

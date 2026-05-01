@@ -1,0 +1,64 @@
+<hlm-dialog [state]="state()" (stateChanged)="onStateChange($event)">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-[425px]">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle>Generate my week</h3>
+      <p hlmDialogDescription>Select the goals you want to focus on and configure preferences.</p>
+    </hlm-dialog-header>
+
+    <div class="py-4 space-y-6">
+      <div class="space-y-3">
+        <h4 class="text-sm font-medium">Include Goals</h4>
+        <div class="space-y-2">
+          @for (goal of availableGoals(); track goal.id) {
+            <label hlmLabel class="flex items-center gap-2 font-normal">
+              <hlm-checkbox
+                [checked]="isSelected(goal.id)"
+                (changed)="toggleGoal(goal.id)"
+              ></hlm-checkbox>
+              {{ goal.goalTitle }}
+              <span class="text-muted-foreground text-xs">({{ goal.subjectName }})</span>
+            </label>
+          }
+          @if (availableGoals().length === 0) {
+            <p class="text-xs text-muted-foreground italic">No goals found.</p>
+          }
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label hlmLabel class="font-medium text-sm">Preferred Session Duration (mins)</label>
+        <input
+          hlmInput
+          type="number"
+          [(ngModel)]="sessionDuration"
+          class="w-full"
+          min="30"
+          max="240"
+          step="15"
+        />
+      </div>
+
+      <div class="space-y-2 rounded-md bg-muted/50 p-3 border border-border border-dashed">
+        <h4 class="text-sm font-medium flex justify-between">
+          Availability Summary
+          <button
+            class="text-xs text-primary hover:underline bg-transparent border-0"
+            (click)="openAvailability.emit(); close()"
+          >
+            Edit
+          </button>
+        </h4>
+        <p class="text-xs text-muted-foreground">
+          You have {{ availabilityService.slots().length }} time blocks defined for this week.
+        </p>
+      </div>
+    </div>
+
+    <hlm-dialog-footer>
+      <button hlmBtn variant="outline" (click)="close()">Cancel</button>
+      <button hlmBtn (click)="generatePlan()" [disabled]="selectedGoals.length === 0">
+        Generate
+      </button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

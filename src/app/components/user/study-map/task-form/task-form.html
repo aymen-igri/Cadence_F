@@ -1,0 +1,63 @@
+<form [formRoot]="taskForm">
+  <div class="grid gap-6">
+    <div class="grid gap-2.5">
+      <label hlmLabel for="task-title">Task title</label>
+      <input
+        hlmInput
+        id="task-title"
+        placeholder="e.g. Read Chapter 1"
+        [formField]="taskForm.title"
+      />
+      @if (taskForm.title().touched() && taskForm.title().invalid()) {
+        <p class="text-xs text-destructive">
+          @for (error of taskForm.title().errors(); track error) {
+            <p>{{ error.message }}</p>
+          }
+        </p>
+      }
+    </div>
+
+    <div class="grid gap-2.5">
+      <label hlmLabel for="task-description">Description</label>
+      <input
+        hlmInput
+        id="task-description"
+        placeholder="Optional details..."
+        [formField]="taskForm.description"
+      />
+      @if (taskForm.description().touched() && taskForm.description().invalid()) {
+        <p class="text-xs text-destructive">
+          @for (error of taskForm.description().errors(); track error) {
+            <p>{{ error.message }}</p>
+          }
+        </p>
+      }
+    </div>
+
+    <div class="grid gap-2.5">
+      <label hlmLabel for="task-duration">Task Status</label>
+      <select hlmInput id="task-duration" [formField]="taskForm.status">
+        <option value="PENDING">In Progress</option>
+        <option value="COMPLETED">Completed</option>
+      </select>
+      @if (taskForm.status().touched() && taskForm.status().invalid()) {
+        <p class="text-xs text-destructive">
+          @for (error of taskForm.status().errors(); track error) {
+            <p>{{ error.message }}</p>
+          }
+        </p>
+      }
+    </div>
+  </div>
+  <div hlmSheetFooter class="mt-2 flex flex-row items-center justify-end gap-3">
+    <button hlmBtn variant="outline" size="sm" hlmSheetClose>Cancel</button>
+    <button
+      hlmBtn
+      size="sm"
+      type="submit"
+      [disabled]="taskForm().submitting() || taskForm().invalid()"
+    >
+      Create task
+    </button>
+  </div>
+</form>

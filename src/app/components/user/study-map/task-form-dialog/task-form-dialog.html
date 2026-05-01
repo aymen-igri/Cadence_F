@@ -1,0 +1,75 @@
+<hlm-dialog [state]="state()" (stateChanged)="onStateChange($event)">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" style="width: 500px; max-width: 500px">
+    <hlm-dialog-header>
+      <h2 hlmSheetTitle class="text-lg">{{ task() ? 'Update task' : 'Create task' }}</h2>
+      <p hlmSheetDescription class="text-sm">
+        {{
+          task() ? 'Update the details of your task.' : 'Add a new task to your study map.'
+        }}
+      </p>
+    </hlm-dialog-header>
+    <form [formRoot]="taskForm">
+      <div class="py-4 space-y-4">
+        <div class="space-y-2">
+          <label hlmLabel>Task Title</label>
+          <input
+            hlmInput
+            [formField]="taskForm.title"
+            id="task-name"
+            placeholder="e.g. Master linear algebra"
+            class="w-full"
+          />
+          @if (taskForm.title().touched() && taskForm.title().invalid()) {
+            <div class="text-xs text-destructive">
+              @for (error of taskForm.title().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label hlmLabel for="task-description">Description</label>
+          <input
+            hlmInput
+            id="task-description"
+            placeholder="Optional short note"
+            [formField]="taskForm.description"
+          />
+          @if (taskForm.description().touched() && taskForm.description().invalid()) {
+            <div class="text-xs text-destructive">
+              @for (error of taskForm.description().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label hlmLabel for="task-duration">Task Status</label>
+          <select hlmInput id="task-duration" [formField]="taskForm.status">
+            <option value="PENDING">In Progress</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+          @if (taskForm.status().touched() && taskForm.status().invalid()) {
+            <p class="text-xs text-destructive">
+              @for (error of taskForm.status().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </p>
+          }
+        </div>
+      </div>
+      <hlm-dialog-footer>
+        <button hlmBtn variant="outline" (click)="closeDialog(ctx)">Cancel</button>
+        <button
+          hlmBtn
+          type="submit"
+          [disabled]="taskForm().submitting() || taskForm().invalid()"
+        >
+          {{ task() ? 'Update task' : 'Create task' }}
+        </button>
+      </hlm-dialog-footer>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

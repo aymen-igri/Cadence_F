@@ -10,6 +10,8 @@ import {
   lucideSettings,
   lucideLogOut,
   lucideUsers,
+  lucideMap,
+  lucideClock,
 } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmIcon } from '@spartan-ng/helm/icon';
@@ -83,6 +85,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       lucideGoal,
       lucideLogOut,
       lucideUsers,
+      lucideMap,
+      lucideClock,
     }),
   ],
 })
@@ -114,18 +118,23 @@ export class AppSidebar {
       icon: 'lucideInbox',
     },
     {
-      title: 'Subjects',
-      url: 'subjects',
-      icon: 'lucideBookOpen',
+      title: 'Study Map',
+      url: 'study-map',
+      icon: 'lucideMap',
     },
     {
-      title: 'Goals',
-      url: 'goals',
-      icon: 'lucideGoal',
+      title: 'Sessions',
+      url: 'sessions',
+      icon: 'lucideClock',
     },
     {
-      title: 'Availability',
-      url: 'availability',
+      title: 'Groups',
+      url:  'groups',
+      icon: 'lucideUsers',
+    },
+    {
+      title: 'Weekly Plan',
+      url: 'weekly-plan',
       icon: 'lucideCalendar',
     },
   ];

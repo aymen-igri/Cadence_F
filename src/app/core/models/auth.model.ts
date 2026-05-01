@@ -11,7 +11,7 @@ export interface AuthResponse {
 }
 
 export interface LoginRequest {
-  email: string;
+  identifier: string;
   password: string;
 }
 
@@ -21,4 +21,10 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
+  phone: string;
+  gender: 'MALE' | 'FEMALE';
+}
+
+export interface RegisterResponse {
+  
 }

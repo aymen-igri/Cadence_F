@@ -1,0 +1,130 @@
+<div class="space-y-8 mt-4">
+  <!-- Members List -->
+  <div class="space-y-4">
+    <h3 class="text-lg font-semibold">Members ({{ members().length }})</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (member of members(); track member.membershipId) {
+        <div
+          hlmCard
+          class="flex flex-row items-center p-4 gap-4 bg-card hover:bg-muted/30 transition-colors"
+        >
+          <div
+            class="bg-muted shrink-0 flex items-center justify-center rounded-full h-12 w-12 text-lg font-medium"
+          >
+            {{ getUserInitials(member.firstName, member.lastName) }}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <p class="font-medium truncate">{{ member.firstName }} {{ member.lastName }}</p>
+              <span
+                hlmBadge
+                [variant]="member.role === 'ADMIN' ? 'default' : 'secondary'"
+                class="text-[10px] px-1.5 py-0"
+              >
+                {{ member.role }}
+              </span>
+            </div>
+            <p class="text-xs text-muted-foreground mt-0.5">
+              Joined {{ member.joinedAt | date: 'mediumDate' }}
+            </p>
+          </div>
+
+          @if (
+            (currentUserRole() === 'ADMIN' || currentUserRole() === 'OWNER') &&
+            member.userId !== currentUserId()
+          ) {
+            <button hlmBtn variant="ghost" size="icon" [hlmDropdownMenuTrigger]="memberMenu">
+              <ng-icon hlm name="lucideMoreVertical" size="sm"></ng-icon>
+            </button>
+
+            <ng-template #memberMenu>
+              <hlm-dropdown-menu>
+                @if (member.role === 'MEMBER') {
+                  <button hlmDropdownMenuItem (click)="onPromoteClick(member.membershipId)">
+                    Promote to admin
+                  </button>
+                }
+                @if (member.role === 'ADMIN') {
+                  <button hlmDropdownMenuItem (click)="onDemoteClick(member.membershipId)">
+                    Demote to member
+                  </button>
+                }
+                <hlm-dropdown-menu-separator></hlm-dropdown-menu-separator>
+                <button
+                  hlmDropdownMenuItem
+                  class="text-destructive focus:bg-destructive/10"
+                  (click)="onRemoveClick(member.membershipId)"
+                >
+                  Remove from group
+                </button>
+              </hlm-dropdown-menu>
+            </ng-template>
+          }
+        </div>
+      } @empty {
+        <div class="col-span-full py-12 text-center border rounded-lg border-dashed">
+          <p class="text-muted-foreground">No members in this group yet.</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Pending Requests (Admin Only) -->
+  @if (isJoinRequestsLoading()) {
+    <div class="flex items-center justify-center min-h-[20vh]">
+      <p class="text-muted-foreground">Loading pending requests...</p>
+    </div>
+  } @else {
+    @if (currentUserRole() === 'ADMIN' || currentUserRole() === 'OWNER') {
+      <div class="space-y-4 pt-6 border-t border-border">
+        <h3 class="text-lg font-semibold">Pending Requests ({{ requests().length }})</h3>
+
+        <div class="grid grid-cols-1 md:grid gap-4">
+          @for (req of requests(); track req.id) {
+            <div
+              hlmCard
+              class="flex flex-row flex-wrap sm:flex-nowrap items-center p-4 gap-4 bg-muted/20 border-dashed"
+            >
+              <div
+                class="bg-card shrink-0 flex items-center justify-center rounded-full h-10 w-10 text-sm font-medium border border-border"
+              >
+                {{ req.firstName.charAt(0) }}{{ req.lastName.charAt(0) }}
+              </div>
+              <div class="flex-1 min-w-50">
+                <p class="font-medium truncate">{{ req.firstName }} {{ req.lastName }}</p>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                  Requested {{ req.requestedAt | date: 'shortDate' }}
+                </p>
+              </div>
+
+              <div class="flex flex-row gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                <button
+                  hlmBtn
+                  size="sm"
+                  variant="outline"
+                  class="flex-1 sm:flex-none"
+                  (click)="onDeclineClick(req.userId)"
+                >
+                  Decline
+                </button>
+                <button
+                  hlmBtn
+                  size="sm"
+                  class="flex-1 sm:flex-none"
+                  (click)="onAcceptClick(req.userId)"
+                >
+                  Accept
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <div class="col-span-full py-12 text-center border rounded-lg border-dashed">
+              <p class="text-muted-foreground">No pending join requests.</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

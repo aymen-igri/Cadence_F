@@ -2,18 +2,32 @@
   <div class="w-full max-w-sm">
     <!-- Card -->
     <div hlmCard class="border border-border shadow-none rounded-xl">
-      <div hlmCardContent class="pt-4 pb-4 px-4">
+      <div hlmCardContent class="pt-2 pb-4 px-4">
         <!-- Logo / Brand -->
-        <div class="flex flex-col items-center mb-4">
+        <div class="flex flex-col items-center mb-6">
           <app-logo size="md" />
           <p class="text-sm text-muted-foreground mt-2">Sign in to your account</p>
         </div>
         <!-- Form -->
-        <form class="flex flex-col gap-4">
+        <form class="flex flex-col gap-6" [formRoot]="loginForm" novalidate>
           <!-- Email -->
           <div class="flex flex-col gap-1.5">
-            <label hlmLabel for="email">Email</label>
-            <input hlmInput id="email" type="email" placeholder="you@example.com" class="w-full" />
+            <label hlmLabel for="email">Username or Email</label>
+            <input
+              hlmInput
+              id="identifier"
+              type="text"
+              [formField]="loginForm.identifier"
+              placeholder="Enter your username or email"
+              class="w-full"
+            />
+            @if (loginForm.identifier().touched() && loginForm.identifier().invalid()) {
+              <p class="text-xs text-destructive">
+                @for (error of loginForm.identifier().errors(); track error) {
+                  <p>{{ error.message }}</p>
+                }
+              </p>
+            }
           </div>
 
           <!-- Password -->
@@ -21,7 +35,7 @@
             <div class="flex items-center justify-between">
               <label hlmLabel for="password">Password</label>
               <a
-                href="#"
+                routerLink="#"
                 class="text-xs text-muted-foreground hover:text-secondary transition-colors"
               >
                 Forgot password?
@@ -32,6 +46,7 @@
                 hlmInput
                 id="password"
                 [type]="showPassword ? 'text' : 'password'"
+                [formField]="loginForm.password"
                 placeholder="••••••••"
                 class="w-full pr-10"
               />
@@ -43,19 +58,25 @@
                 <lucide-angular [img]="showPassword ? EyeOff : Eye" class="w-4 h-4" />
               </button>
             </div>
+            @if (loginForm.password().touched() && loginForm.password().invalid()) {
+              <p class="text-xs text-destructive">
+                @for (error of loginForm.password().errors(); track error) {
+                  <p>{{ error.message }}</p>
+                }
+              </p>
+            }
           </div>
 
           <!-- Submit -->
-          <button hlmBtn class="w-full mt-1">Sign in</button>
+          <button hlmBtn class="w-full mt-1" type="submit" [disabled]="loginForm().invalid() || loginForm().submitting()">
+            {{ loginForm().submitting() ? 'Loading...' : 'Sign in' }}
+          </button>
         </form>
 
         <!-- Footer -->
         <p class="text-center text-sm text-muted-foreground mt-6">
           Don't have an account?
-          <a
-            routerLink="/sign-up"
-            class="font-medium hover:underline underline-offset-4"
-          >
+          <a routerLink="/sign-up" class="font-medium hover:underline underline-offset-4">
             Sign up
           </a>
         </p>

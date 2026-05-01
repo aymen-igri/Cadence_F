@@ -9,6 +9,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       switch (error.status) {
+        case 0:
+          router.navigate(['/server-error']);
+          break;
         case 403:
           router.navigate(['/forbidden']);
           break;

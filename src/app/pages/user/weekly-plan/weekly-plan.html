@@ -1,0 +1,59 @@
+<div class="max-w-7xl mx-auto space-y-8 min-h-screen">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">Weekly Plan</h1>
+      <p class="text-sm text-muted-foreground mt-1">
+        Organize your study schedule into actionable blocks.
+      </p>
+    </div>
+    <button hlmBtn (click)="dialogState.set('open')" [disabled]="hasPlanForSelectedWeek()">
+      Generate my week
+    </button>
+  </div>
+
+  <!-- Availability -->
+  <app-weekly-plan-availability #availabilitySection></app-weekly-plan-availability>
+
+  <hlm-tabs [tab]="activeTab()" (tabChanged)="setActiveTab($event)">
+    <hlm-tabs-list class="w-full sm:w-auto mt-2 mb-6" aria-label="tabs">
+      <button hlmTabsTrigger="this-week">This week</button>
+      <button hlmTabsTrigger="next-week">Next week</button>
+    </hlm-tabs-list>
+
+    <div hlmTabsContent="this-week">
+      <div class="space-y-8 mt-2">
+        <app-weekly-summary [goals]="goals()"></app-weekly-summary>
+        <app-weekly-plan-sessions-list
+          [sessions]="thisWeekSessions()"
+          (editClick)="editSession($event)"
+          (deleteClick)="deleteSession($event)"
+          (generateClick)="dialogState.set('open')"
+        >
+        </app-weekly-plan-sessions-list>
+      </div>
+    </div>
+
+    <div hlmTabsContent="next-week">
+      <div class="space-y-8 mt-2">
+        <app-weekly-summary [goals]="goals()"></app-weekly-summary>
+        <app-weekly-plan-sessions-list
+          [sessions]="nextWeekSessions()"
+          (editClick)="editSession($event)"
+          (deleteClick)="deleteSession($event)"
+          (generateClick)="dialogState.set('open')"
+        >
+        </app-weekly-plan-sessions-list>
+      </div>
+    </div>
+  </hlm-tabs>
+
+  <app-generate-week-dialog
+    [state]="dialogState()"
+    (dialogStateChange)="dialogState.set($event)"
+    [availableGoals]="goals()"
+    (generate)="onGeneratePlan($event)"
+    (openAvailability)="openAvailability(availabilitySection)"
+  >
+  </app-generate-week-dialog>
+</div>

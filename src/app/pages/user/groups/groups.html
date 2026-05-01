@@ -1,0 +1,50 @@
+<div class="max-w-7xl mx-auto space-y-8 min-h-screen">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight text-foreground">Groups</h1>
+      <p class="text-sm text-muted-foreground mt-1">
+        Join groups with similar learning goals or create your own.
+      </p>
+    </div>
+    <button hlmBtn (click)="createGroupState.set('open')">Create group</button>
+  </div>
+
+  @if (isGroupsLoading()) {
+    <div class="flex items-center justify-center min-h-[50vh]">
+      <p class="text-muted-foreground">Loading groups...</p>
+    </div>
+  } @else {
+    <hlm-tabs [tab]="activeTab()" (tabChanged)="setActiveTab($event)">
+      <hlm-tabs-list class="w-full sm:w-auto mt-2 mb-6" aria-label="tabs">
+        <button hlmTabsTrigger="my-groups">My groups</button>
+        <button hlmTabsTrigger="discover">Discover</button>
+      </hlm-tabs-list>
+
+      <!-- My Groups Section -->
+      <div hlmTabsContent="my-groups">
+        <app-group-data-table
+          [groups]="myGroups()"
+          [isClickable]="true"
+        />
+      </div>
+
+      <!-- Discover Section -->
+      <div hlmTabsContent="discover">
+        <app-group-data-table
+          [groups]="discoverGroups()"
+          (joinClick)="joinGroup($event)"
+          (requestJoinClick)="requestToJoin($event)"
+          [isClickable]="false"
+        />
+      </div>
+    </hlm-tabs>
+  }
+
+  <!-- Create Group Dialog -->
+  <app-create-group-dialog
+    [state]="createGroupState()"
+    (dialogStateChange)="createGroupState.set($event)"
+  >
+  </app-create-group-dialog>
+</div>

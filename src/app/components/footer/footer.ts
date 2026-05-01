@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { HlmSeparatorImports } from '../../../components/ui/separator/src';
+import { HlmSeparatorImports } from '@spartan-ng/helm/separator';
 import { LogoComponent } from "../logo/Logo";
 
 @Component({

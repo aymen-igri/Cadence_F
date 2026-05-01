@@ -1,0 +1,111 @@
+<div class="space-y-6 mt-6">
+  <!-- Group Info Form -->
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Group Settings</h3>
+      <p hlmCardDescription>Update your group's details and preferences.</p>
+    </div>
+    <div hlmCardContent class="space-y-4" [formGroup]="settingsForm">
+      <div class="space-y-2">
+        <label hlmLabel>Group Name</label>
+        <input hlmInput formControlName="name" class="w-full" />
+      </div>
+
+      <div class="space-y-2">
+        <label hlmLabel>Description</label>
+        <textarea hlmInput formControlName="description" class="min-h-24 w-full"></textarea>
+      </div>
+
+      <div class="space-y-2">
+        <label hlmLabel>Type</label>
+        <select hlmInput formControlName="privacyLevel" class="w-full h-10 px-3 cursor-pointer">
+          <option value="PUBLIC">Public (Anyone can join)</option>
+          <option value="PRIVATE">Private (Requires approval)</option>
+        </select>
+      </div>
+    </div>
+    <div hlmCardFooter class="justify-end">
+      <button hlmBtn [disabled]="!isChanged() || settingsForm.invalid" (click)="saveSettings()">
+        Save Changes
+      </button>
+    </div>
+  </div>
+
+  <!-- Transfer Ownership -->
+  <div hlmCard>
+    <div hlmCardHeader>
+      <h3 hlmCardTitle>Transfer Ownership</h3>
+      <p hlmCardDescription>
+        Transfer your ownership rights to another member. You will become a regular member.
+      </p>
+    </div>
+    <div hlmCardContent class="space-y-4">
+      <div class="space-y-2">
+        <label hlmLabel>Select Member</label>
+        <select hlmInput [formControl]="selectedMemberCtrl" class="w-full h-10 px-3 cursor-pointer">
+          <option value="">-- Choose a member --</option>
+          @for (m of otherMembers(); track m.membershipId) {
+            <option [value]="m.userId">
+              {{ m.firstName }} {{ m.lastName }} ({{ m.role }})
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+    <div hlmCardFooter class="justify-start">
+      <button
+        hlmBtn
+        variant="outline"
+        [disabled]="!selectedMemberCtrl.value"
+        (click)="transferState.set('open')"
+      >
+        Transfer Ownership Rights
+      </button>
+    </div>
+  </div>
+
+  <!-- Danger Zone -->
+  <div hlmCard class="border-destructive/50">
+    <div hlmCardHeader>
+      <h3 hlmCardTitle class="text-destructive">Danger Zone</h3>
+      <p hlmCardDescription>Permanently delete this group and all its data.</p>
+    </div>
+    <div hlmCardFooter class="justify-start">
+      <button hlmBtn variant="destructive" (click)="deleteState.set('open')">Delete Group</button>
+    </div>
+  </div>
+
+  <!-- Transfer Admin Dialog -->
+  <hlm-dialog [state]="transferState()" (stateChanged)="transferState.set($event)">
+    <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-w-md">
+      <hlm-dialog-header>
+        <h3 hlmDialogTitle>Transfer Ownership Rights</h3>
+        <p hlmDialogDescription>
+          Are you sure you want to transfer your ownership rights? You will no longer be an owner of
+          this group.
+        </p>
+      </hlm-dialog-header>
+      <hlm-dialog-footer>
+        <button hlmBtn variant="outline" (click)="transferState.set('closed')">Cancel</button>
+        <button hlmBtn (click)="transferOwnership()">Confirm Transfer</button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+
+  <!-- Delete Group Dialog -->
+  <hlm-dialog [state]="deleteState()" (stateChanged)="deleteState.set($event)">
+    <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-w-md">
+      <hlm-dialog-header>
+        <h3 hlmDialogTitle>Delete Group</h3>
+        <p hlmDialogDescription>
+          This action cannot be undone. This will permanently delete the group, its feed, and remove
+          all members.
+        </p>
+      </hlm-dialog-header>
+      <hlm-dialog-footer>
+        <button hlmBtn variant="outline" (click)="deleteState.set('closed')">Cancel</button>
+        <button hlmBtn variant="destructive" (click)="confirmDelete()">Delete Group</button>
+      </hlm-dialog-footer>
+    </hlm-dialog-content>
+  </hlm-dialog>
+</div>

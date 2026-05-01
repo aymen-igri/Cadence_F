@@ -1,0 +1,67 @@
+<hlm-dialog [state]="state()" (stateChanged)="onStateChange($event)">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" style="width: 500px; max-width: 500px">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle>Create Group</h3>
+      <p hlmDialogDescription>Set up a new study group.</p>
+    </hlm-dialog-header>
+    <form [formRoot]="groupForm">
+      <div class="py-4 space-y-4">
+        <div class="space-y-2">
+          <label hlmLabel>Group Name</label>
+          <input
+            hlmInput
+            [formField]="groupForm.name"
+            placeholder="E.g. Angular Masters"
+            class="w-full"
+          />
+          @if (groupForm.name().touched() && groupForm.name().invalid()) {
+            <p class="text-xs text-destructive">
+              @for (error of groupForm.name().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </p>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label hlmLabel>Description</label>
+          <textarea
+            hlmInput
+            class="w-full min-h-25"
+            [formField]="groupForm.description"
+            placeholder="What is this group about?"
+          ></textarea>
+          @if (groupForm.description().touched() && groupForm.description().invalid()) {
+            <p class="text-xs text-destructive">
+              @for (error of groupForm.description().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </p>
+          }
+        </div>
+
+        <div class="space-y-2">
+          <label hlmLabel>Type</label>
+          <select hlmInput [formField]="groupForm.privacyLevel" class="w-full">
+            <option value="PUBLIC">Public (Anyone can join)</option>
+            <option value="PRIVATE">Private (Requires approval)</option>
+          </select>
+        </div>
+        @if (groupForm.privacyLevel().touched() && groupForm.privacyLevel().invalid()) {
+          <p class="text-xs text-destructive">
+            @for (error of groupForm.privacyLevel().errors(); track error) {
+              <p>{{ error.message }}</p>
+            }
+          </p>
+        }
+      </div>
+
+      <hlm-dialog-footer>
+        <button hlmBtn variant="outline" (click)="closeDialog(ctx)">Cancel</button>
+        <button hlmBtn type="submit" [disabled]="groupForm().submitting() || groupForm().invalid()">
+          Create
+        </button>
+      </hlm-dialog-footer>
+    </form>
+  </hlm-dialog-content>
+</hlm-dialog>

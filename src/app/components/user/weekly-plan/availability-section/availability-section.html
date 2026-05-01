@@ -1,0 +1,74 @@
+<hlm-accordion>
+  <hlm-accordion-item>
+    <h3>
+    <button hlmAccordionTrigger>
+      <div class="flex items-center gap-2">
+        <span>My availability</span>
+        <lucide-angular [img]="Edit2Icon" class="h-4 w-4 text-muted-foreground"></lucide-angular>
+      </div>
+    </button>
+    </h3>
+    <hlm-accordion-content>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4 pt-4 pb-2"
+      >
+        @for (day of days; track day.value; let i = $index) {
+          <div class="space-y-3 bg-muted/30 p-3 rounded-lg border border-border">
+            <h4 class="font-semibold text-sm text-foreground text-center">{{ day.label }}</h4>
+
+            <div class="space-y-2">
+              @for (slot of getSlotsForDay(day.value); track slot.id) {
+                <div
+                  class="flex items-center justify-between bg-card text-xs p-2 rounded border border-border shadow-sm"
+                >
+                  <span class="text-foreground">{{ slot.startTime }} - {{ slot.endTime }}</span>
+                  <button
+                    hlmBtn
+                    size="sm"
+                    variant="ghost"
+                    class="h-6 w-6 p-0 hover:text-destructive"
+                    (click)="deleteSlot(slot.id)"
+                  >
+                    <lucide-angular [img]="Trash2Icon" class="h-3 w-3"></lucide-angular>
+                  </button>
+                </div>
+              }
+            </div>
+
+            @if (addingSlotDay() === day.value) {
+              <div class="flex flex-col gap-2 bg-card p-2 rounded border border-border mt-2">
+                <input type="time" hlmInput class="h-8 text-xs px-2" [(ngModel)]="newStartTime" />
+                <input type="time" hlmInput class="h-8 text-xs px-2" [(ngModel)]="newEndTime" />
+                <div class="flex items-center gap-2 mt-1">
+                  <button hlmBtn size="sm" class="h-6 text-xs flex-1" (click)="saveSlot(day.value)">
+                    Save
+                  </button>
+                  <button
+                    hlmBtn
+                    size="sm"
+                    variant="ghost"
+                    class="h-6 text-xs flex-1"
+                    (click)="cancelAdd()"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <button
+                hlmBtn
+                variant="outline"
+                size="sm"
+                class="w-full h-8 text-xs mt-2 border-dashed border-border"
+                (click)="startAdding(day.value)"
+              >
+                <lucide-angular [img]="PlusIcon" class="h-3 w-3 mr-1"></lucide-angular>
+                Add slot
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </hlm-accordion-content>
+  </hlm-accordion-item>
+</hlm-accordion>

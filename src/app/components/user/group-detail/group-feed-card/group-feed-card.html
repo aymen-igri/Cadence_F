@@ -1,0 +1,84 @@
+<div hlmCard class="mb-4">
+  <div hlmCardHeader class="pb-2">
+    <div class="flex items-center gap-3">
+      <div
+        class="bg-muted flex items-center justify-center rounded-full h-10 w-10 text-sm font-medium"
+      >
+        {{ session().userInitials }}
+      </div>
+      <div>
+        <p class="text-sm font-medium">
+          {{ session().userName }}
+          <span class="text-muted-foreground font-normal">shared a session</span>
+        </p>
+        <p class="text-xs text-muted-foreground">
+          {{ session().sharedAt | date: 'mediumDate' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div hlmCardContent class="pb-3">
+    <div class="bg-muted/50 rounded-lg p-4 border border-border">
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <h4 class="font-semibold">{{ session().sessionTitle }}</h4>
+          <p class="text-sm text-muted-foreground">
+            {{ session().goalName }} &bull; {{ session().duration }} mins
+          </p>
+        </div>
+        <span hlmBadge variant="secondary">{{ session().status }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div hlmCardFooter class="flex flex-col items-stretch pt-0">
+    <button
+      hlmBtn
+      variant="ghost"
+      size="sm"
+      class="self-start text-xs mb-2"
+      (click)="toggleComments()"
+    >
+      {{ showComments() ? 'Hide Comments' : 'Show Comments (' + session().comments.length + ')' }}
+    </button>
+
+    @if (showComments()) {
+      <div class="w-full space-y-3 mt-2 border-t pt-3">
+        @for (comment of session().comments; track comment.id) {
+          <div class="flex gap-2">
+            <div
+              class="bg-primary/10 shrink-0 flex items-center justify-center rounded-full h-8 w-8 text-xs font-medium"
+            >
+              {{ comment.userInitials }}
+            </div>
+            <div class="bg-muted px-3 py-2 rounded-lg text-sm flex-1">
+              <p class="font-semibold text-xs mb-0.5">
+                {{ comment.userName }} &bull;
+                <span class="text-muted-foreground font-normal">{{
+                  comment.createdAt | date: 'shortTime'
+                }}</span>
+              </p>
+              <p>{{ comment.content }}</p>
+            </div>
+          </div>
+        } @empty {
+          <p class="text-xs text-muted-foreground italic">No comments yet. Be the first!</p>
+        }
+
+        <div class="flex gap-2 mt-3 w-full">
+          <input
+            hlmInput
+            placeholder="Write a comment..."
+            [(ngModel)]="newComment"
+            class="flex-1 h-9"
+            (keyup.enter)="submitComment()"
+          />
+          <button hlmBtn size="sm" (click)="submitComment()" [disabled]="!newComment().trim()">
+            Post
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</div>
