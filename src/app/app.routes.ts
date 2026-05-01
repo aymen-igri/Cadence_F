@@ -94,6 +94,21 @@ export const routes: Routes = [
         path: 'logout',
         loadComponent: () => import('./pages/user/logout/logout').then((m) => m.LogoutComponent),
       },
+      {
+        path: 'availability-plan',
+        loadComponent: () =>
+          import('./pages/user/availability-plan/availability-plan').then((m) => m.AvailibilityPlan),
+      },
+      {
+        path: 'availability-plan/list',
+        loadComponent: () =>
+          import('./pages/user/availability-list/availability-list').then((m) => m.AvailabilityListComponent),
+      },
+      {
+        path: 'availability-plan/:id',
+        loadComponent: () =>
+          import('./pages/user/availability-plan/availability-plan').then((m) => m.AvailibilityPlan),
+      }
     ],
   },
   {

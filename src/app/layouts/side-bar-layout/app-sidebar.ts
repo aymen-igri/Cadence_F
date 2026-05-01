@@ -12,6 +12,7 @@ import {
   lucideUsers,
   lucideMap,
   lucideClock,
+  lucideCheck,
 } from '@ng-icons/lucide';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { HlmIcon } from '@spartan-ng/helm/icon';
@@ -87,6 +88,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       lucideUsers,
       lucideMap,
       lucideClock,
+      lucideCheck,
     }),
   ],
 })
@@ -129,8 +131,13 @@ export class AppSidebar {
     },
     {
       title: 'Groups',
-      url:  'groups',
+      url: 'groups',
       icon: 'lucideUsers',
+    },
+    {
+      title: 'Availability Plan',
+      url: 'availability-plan/list',
+      icon: 'lucideCheck',
     },
     {
       title: 'Weekly Plan',

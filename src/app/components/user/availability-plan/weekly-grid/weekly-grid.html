@@ -1,0 +1,41 @@
+<div class="flex flex-col flex-1 p-6 overflow-auto select-none" (dragstart)="preventDrag($event)">
+  <!-- Day Headers -->
+  <div class="flex ml-16 mb-2">
+    @for (day of days; track day; let d = $index) {
+      <div class="flex-1 text-center font-medium text-sm text-muted-foreground pb-2">
+        {{ day }}
+      </div>
+    }
+  </div>
+
+  <div class="flex relative border-t border-l border-border ml-16">
+    <!-- Time Labels -->
+    <div class="w-16 flex flex-col border-r border-border absolute -left-16 top-0 bottom-0 z-10">
+      @for (time of timeLabels; track time; let r = $index) {
+        <div
+          class="h-8 flex items-start justify-end pr-2 text-xs text-muted-foreground"
+          [class.invisible]="r % 2 !== 0"
+        >
+          <!-- Hide half hours -->
+          <span class="-translate-y-1/2 bg-background px-1">{{ time }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Grid Body -->
+    <div class="flex flex-1 w-full relative">
+      @for (day of days; track day; let colIndex = $index) {
+        <div class="flex-1 border-r border-border flex flex-col">
+          @for (time of timeLabels; track time; let rowIndex = $index) {
+            <div
+              class="h-8 border-b border-border cursor-pointer transition-colors"
+              [class]="getCellClass(colIndex, rowIndex)"
+              (mousedown)="onMouseDown(colIndex, rowIndex, $event)"
+              (mouseenter)="onMouseEnter(colIndex, rowIndex)"
+            ></div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>
