@@ -13,11 +13,28 @@
   <div
     class="flex flex-col flex-1 bg-card text-card-foreground rounded-lg border border-border min-h-0"
   >
-    <app-plan-header (configChanged)="onConfigChanged($event)"> </app-plan-header>
+    <app-plan-header
+      [mode]="mode()"
+      [title]="planConfig().title"
+      [status]="planConfig().status"
+      (configChanged)="onConfigChanged($event)"
+    >
+    </app-plan-header>
 
-    <app-weekly-grid #weeklyGrid (gridUpdated)="onGridUpdated($event)"> </app-weekly-grid>
+    <app-weekly-grid
+      #weeklyGrid
+      [mode]="mode()"
+      [initialSlots]="initialSlots()"
+      (gridUpdated)="onGridUpdated($event)"
+    >
+    </app-weekly-grid>
 
-    <app-page-actions-bar (onReset)="weeklyGrid.resetGrid()" (onSave)="onSave()">
+    <app-page-actions-bar
+      [mode]="mode()"
+      (onEdit)="onEdit()"
+      (onReset)="onReset(); weeklyGrid.resetGrid()"
+      (onSave)="onSave()"
+    >
     </app-page-actions-bar>
   </div>
 </div>

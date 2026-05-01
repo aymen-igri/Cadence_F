@@ -1,10 +1,13 @@
-import { Component, HostListener, input, output } from '@angular/core';
-
-export interface SlotRange {
-  dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
-  start: string;
-  end: string;
-}
+import {
+  Component,
+  HostListener,
+  output,
+  input,
+  effect,
+  inject,
+  ChangeDetectorRef,
+} from '@angular/core';
+import { SlotRange } from '@app/core/models/availability.model';
 
 @Component({
   selector: 'app-weekly-grid',
@@ -12,6 +15,17 @@ export interface SlotRange {
   templateUrl: './weekly-grid.html',
 })
 export class WeeklyGridComponent {
+  mode = input<'create' | 'view' | 'edit'>('create');
+  initialSlots = input<SlotRange[]>([]);
+  private cdr = inject(ChangeDetectorRef); // <-- 1. Inject ChangeDetectorRef
+
+  constructor() {
+    effect(() => {
+      const slots = this.initialSlots();
+      this.hydrateGrid(slots);
+    });
+  }
+
   days: ('MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY')[] = [
     'MONDAY',
     'TUESDAY',
@@ -32,6 +46,39 @@ export class WeeklyGridComponent {
     .fill(false)
     .map(() => Array(24).fill(false));
 
+  hydrateGrid(slots: SlotRange[]) {
+    this.grid = Array(7)
+      .fill(false)
+      .map(() => Array(24).fill(false));
+
+    slots.forEach((slot) => {
+      // 2. Force Uppercase to avoid casing mismatches
+      const dayRef = slot.dayOfWeek.toUpperCase();
+      const col = this.days.indexOf(dayRef as any);
+
+      if (col !== -1) {
+        // 3. Slice the strings to just grab "HH:MM" in case the API includes ":SS"
+        const startStr = slot.start.substring(0, 5);
+        const endStr = slot.end.substring(0, 5);
+
+        const startRow = this.timeLabels.indexOf(startStr);
+        let endRow = this.timeLabels.indexOf(endStr);
+
+        if (endRow === -1 && endStr === '20:00') endRow = 24;
+        const actualEndRow = endRow !== -1 ? endRow - 1 : 23;
+
+        if (startRow !== -1 && actualEndRow >= startRow) {
+          for (let r = startRow; r <= actualEndRow; r++) {
+            this.grid[col][r] = true;
+          }
+        }
+      }
+    });
+
+    // 4. Force angular to re-check the grid visualization
+    this.cdr.detectChanges();
+  }
+
   isDragging = false;
   dragMode: 'select' | 'deselect' | null = null;
   dragStartCell: { col: number; row: number } | null = null;
@@ -44,7 +91,7 @@ export class WeeklyGridComponent {
   }
 
   onMouseDown(col: number, row: number, event: MouseEvent) {
-    if (event.button !== 0) return;
+    if (this.mode() === 'view' || event.button !== 0) return;
     this.isDragging = true;
     this.dragStartCell = { col, row };
     this.currentHoverCell = { col, row };

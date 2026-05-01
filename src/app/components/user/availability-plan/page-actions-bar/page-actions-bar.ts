@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 
 @Component({
@@ -8,6 +8,9 @@ import { HlmButtonImports } from '@spartan-ng/helm/button';
   imports: [HlmButtonImports],
 })
 export class PageActionsBarComponent {
+  mode = input<'create' | 'view' | 'edit'>('create');
+
   onReset = output<void>();
   onSave = output<void>();
+  onEdit = output<void>();
 }

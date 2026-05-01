@@ -11,7 +11,7 @@ import { Plan } from '@app/core/models/availability.model';
   imports: [RouterLink, HlmCardImports, HlmBadgeImports, DatePipe],
   template: `
     <a
-      [routerLink]="['/availability', plan().id]"
+      [routerLink]="['/user/availability-plan', plan().id]"
       class="block transition-transform hover:scale-[1.02] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl ring-offset-background"
     >
       <div hlmCard>

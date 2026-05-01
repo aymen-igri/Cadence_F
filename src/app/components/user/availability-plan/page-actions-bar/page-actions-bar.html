@@ -1,19 +1,30 @@
 <div class="flex items-center justify-end gap-4 p-6 border-t border-border mt-4">
-  <button
-    hlmBtn
-    (click)="onReset.emit()"
-    variant="outline"
-    class="inline-flex items-center justify-center"
-  >
-    Reset
-  </button>
+  @if (mode() === 'view') {
+    <button
+      hlmBtn
+      (click)="onEdit.emit()"
+      variant="default"
+      class="inline-flex items-center justify-center"
+    >
+      Edit Plan
+    </button>
+  } @else {
+    <button
+      hlmBtn
+      (click)="onReset.emit()"
+      variant="outline"
+      class="inline-flex items-center justify-center"
+    >
+      {{ mode() === 'edit' ? 'Cancel' : 'Reset' }}
+    </button>
 
-  <button
-    hlmBtn
-    (click)="onSave.emit()"
-    variant="default"
-    class="inline-flex items-center justify-center"
-  >
-    Save Plan
-  </button>
+    <button
+      hlmBtn
+      (click)="onSave.emit()"
+      variant="default"
+      class="inline-flex items-center justify-center"
+    >
+      Save Plan
+    </button>
+  }
 </div>
