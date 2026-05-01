@@ -1,9 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { PlanCardComponent } from '@app/components/user/availability-list/plan-card';
 import { Plan } from '@app/core/models/availability.model';
+import { AvailabilityPlanService } from '@app/core/services/availability-plan.service';
 
 @Component({
   selector: 'app-availability-list',
@@ -12,19 +13,11 @@ import { Plan } from '@app/core/models/availability.model';
   templateUrl: './availability-list.html',
 })
 export class AvailabilityListComponent {
-  isLoading = signal(false);
-  plans = signal<Plan[]>([
-    {
-      id: '1',
-      title: 'Spring Semester 2026',
-      availabilityStatus: 'ACTIVE',
-      createdAt: new Date('2026-01-15T10:00:00Z').toISOString(),
-    },
-    {
-      id: '2',
-      title: 'Winter Break',
-      availabilityStatus: 'DISABLED',
-      createdAt: new Date('2025-12-01T14:30:00Z').toISOString(),
-    },
-  ]);
+  private availabilityService = inject(AvailabilityPlanService);
+  isLoading = this.availabilityService.allAvailabilityPlans.isLoading;
+  readonly plans = this.availabilityService.allAvailabilityPlans.data;
+  
+  ngOnInit() {
+    this.availabilityService.loadAllAvailabilityPlans().subscribe();
+  }
 }

@@ -12,6 +12,7 @@ export interface slot {
   end: string;
   createdAt: string;
 }
+export type SlotRange = Omit<slot, 'id' | 'createdAt'>;
 
 export interface AvailabilityPlan {
   plan: Plan;

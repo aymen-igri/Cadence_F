@@ -1,13 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { PlanHeaderComponent } from '../../../components/user/availability-plan/plan-header/plan-header';
 import {
-  WeeklyGridComponent,
-  SlotRange,
+  WeeklyGridComponent
 } from '../../../components/user/availability-plan/weekly-grid/weekly-grid';
 import { PageActionsBarComponent } from '../../../components/user/availability-plan/page-actions-bar/page-actions-bar';
+import { createMutation } from '@app/core/utils/mutation.helper';
+import { toast } from 'ngx-sonner';
+import { CreateAvailabilityPlan, SlotRange } from '@app/core/models/availability.model';
+import { AvailabilityPlanService } from '@app/core/services/availability-plan.service';
 
 @Component({
   selector: 'app-availability-plan',
@@ -23,6 +26,8 @@ import { PageActionsBarComponent } from '../../../components/user/availability-p
   ],
 })
 export class AvailibilityPlan {
+  private availabilityService = inject(AvailabilityPlanService);
+  readonly router = inject(Router);
   planConfig = {
     title: '',
     status: 'ACTIVE' as 'ACTIVE' | 'DISABLED',
@@ -44,10 +49,30 @@ export class AvailibilityPlan {
     // or re-bind grid state via inputs.
   }
 
+  readonly availabilityCreateMutation = createMutation({
+    mutationFn: (data: CreateAvailabilityPlan) => {
+      return this.availabilityService.createAvailabilityPlan(data);
+    },
+    onSuccess: () => {
+      toast.success('Plan saved successfully');
+      this.router.navigate(['/user/availability-plan/list']);
+    },
+    onError: (err) => {
+      toast.error('Error saving plan:', { description: err });
+    },
+  });
+
   onSave() {
     console.log('Saving Plan:', {
       plan: this.planConfig,
       slots: this.slots,
+    });
+    this.availabilityCreateMutation.mutate({
+      availabilityPlan: {
+        title: this.planConfig.title,
+        planStatus: this.planConfig.status,
+      },
+      slotsReq: this.slots,
     });
   }
 }

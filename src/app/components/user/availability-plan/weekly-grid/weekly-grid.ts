@@ -1,4 +1,4 @@
-import { Component, HostListener, output } from '@angular/core';
+import { Component, HostListener, input, output } from '@angular/core';
 
 export interface SlotRange {
   dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';

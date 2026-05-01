@@ -19,6 +19,6 @@ export class PlanHeaderComponent {
   }
 
   emitChange() {
-    this.configChanged.emit({ title: this.title, status: this.status });
+    this.configChanged.emit({ title: this.title?.trim() || '', status: this.status });
   }
 }

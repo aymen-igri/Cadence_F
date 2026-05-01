@@ -1,13 +1,30 @@
 <div class="flex items-center justify-between p-6 border-b border-border">
-  <div class="flex flex-col gap-1">
-    <label for="plan-title" class="text-sm font-medium text-foreground">Plan Title</label>
+  <div class="flex flex-col gap-1 w-full max-w-sm">
+    <label for="plan-title" class="text-sm font-medium text-foreground"
+      >Plan Title <span class="text-destructive">*</span></label
+    >
     <input
       id="plan-title"
+      name="planTitle"
       type="text"
       [(ngModel)]="title"
+      (ngModelChange)="emitChange()"
+      required
+      minlength="3"
+      #titleInput="ngModel"
       placeholder="e.g., Summer Schedule"
       class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      [class.border-destructive]="titleInput.invalid && (titleInput.dirty || titleInput.touched)"
     />
+    @if (titleInput.invalid && (titleInput.dirty || titleInput.touched)) {
+      <span class="text-xs text-destructive">
+        @if (titleInput.errors?.['required']) {
+          Title is required.
+        } @else if (titleInput.errors?.['minlength']) {
+          Title must be at least 3 characters.
+        }
+      </span>
+    }
   </div>
 
   <div class="flex items-center gap-2">
