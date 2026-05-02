@@ -34,14 +34,12 @@ export class SessionDialogComponent {
     weeklySession: {
       title: '',
       startTime: '',
-      status: 'PENDING',
     },
     subSessions: [
       {
         dayOfWeek: 'MONDAY',
         startTime: '',
         endTime: '',
-        status: 'PENDING',
         subjectId: '',
       },
     ],
@@ -62,7 +60,6 @@ export class SessionDialogComponent {
           weeklySession: {
             title: existing.weeklySession.title,
             startTime: existing.weeklySession.startTime,
-            status: existing.weeklySession.sessionStatus,
           },
           subSessions: existing.subSessions.map((sub) => ({
             dayOfWeek: sub.dayOfWeek,
@@ -103,14 +100,12 @@ export class SessionDialogComponent {
     this.sessionModel,
     (schema) => {
       required(schema.weeklySession.startTime, { message: 'Week session start time is required' });
-      required(schema.weeklySession.status, { message: 'Week session status is required' });
       required(schema.weeklySession.title, { message: 'Week session title is required' });
       minLength(schema.subSessions, 1, { message: 'At least one sub session is required' });
       applyEach(schema.subSessions, (subSession) => {
         required(subSession.dayOfWeek, { message: 'Day of week is required' });
         required(subSession.startTime, { message: 'Sub session start time is required' });
         required(subSession.endTime, { message: 'Sub session end time is required' });
-        required(subSession.status, { message: 'Sub session status is required' });
         required(subSession.subjectId, { message: 'Subject is required' });
       });
     },

@@ -30,51 +30,25 @@
             </div>
           }
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div class="space-y-2">
-            <label hlmLabel>Start Date</label>
-            <input
-              hlmInput
-              type="datetime-local"
-              [formField]="sessionForm.weeklySession.startTime"
-              id="start-time"
-              class="w-full"
-            />
-            @if (
-              sessionForm.weeklySession.startTime().touched() &&
-              sessionForm.weeklySession.startTime().invalid()
-            ) {
-              <div class="text-xs text-destructive">
-                @for (error of sessionForm.weeklySession.startTime().errors(); track error) {
-                  <p>{{ error.message }}</p>
-                }
-              </div>
-            }
-          </div>
-
-          <div class="space-y-2">
-            <label hlmLabel for="weekly-session-status">Weekly Session Status</label>
-            <select
-              id="weekly-session-status"
-              class="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm text-foreground"
-              [formField]="sessionForm.weeklySession.status"
-            >
-              <option value="PENDING">Pending</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="INCOMPLETED">Incompleted</option>
-              <option value="CLOSED">Closed</option>
-            </select>
-            @if (
-              sessionForm.weeklySession.status().touched() &&
-              sessionForm.weeklySession.status().invalid()
-            ) {
-              <p class="text-xs text-destructive">
-                @for (error of sessionForm.weeklySession.status().errors(); track error) {
-                  <p>{{ error.message }}</p>
-                }
-              </p>
-            }
-          </div>
+        <div class="space-y-2">
+          <label hlmLabel>Start Date</label>
+          <input
+            hlmInput
+            type="datetime-local"
+            [formField]="sessionForm.weeklySession.startTime"
+            id="start-time"
+            class="w-full"
+          />
+          @if (
+            sessionForm.weeklySession.startTime().touched() &&
+            sessionForm.weeklySession.startTime().invalid()
+          ) {
+            <div class="text-xs text-destructive">
+              @for (error of sessionForm.weeklySession.startTime().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </div>
+          }
         </div>
 
         <div class="space-y-4">

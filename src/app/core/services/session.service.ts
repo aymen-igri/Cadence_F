@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import {
   CreateSessionRequest,
   CreateSessionResponse,
+  CreateSubSessionResponse,
   UpdateSessionRequest,
 } from '../models/session.model';
 import { createQuery } from '../utils/query.helper';
@@ -47,5 +48,33 @@ export class SessionService {
         );
       }),
     );
+  }
+
+  public updateSubSessionStatus(
+    weeklySessionId: string,
+    subSessionId: string,
+    status: 'PENDING' | 'COMPLETED',
+  ) {
+    return this.http
+      .patch<CreateSubSessionResponse>(
+        `${this.url}/${weeklySessionId}/sub-sessions/${subSessionId}/status`,
+        { status },
+      )
+      .pipe(
+        tap((updatedSession) => {
+          this.allSessions.mutate((sessions) =>
+            sessions.map((session) =>
+              session.weeklySession.id === weeklySessionId
+                ? {
+                    ...session,
+                    subSessions: session.subSessions.map((subSession) =>
+                      subSession.id === subSessionId ? updatedSession : subSession,
+                    ),
+                  }
+                : session,
+            ),
+          );
+        }),
+      );
   }
 }

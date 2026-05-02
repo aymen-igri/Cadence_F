@@ -1,9 +1,6 @@
 import { Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  CreateSessionResponse,
-  CreateSubSessionResponse,
-} from '@app/core/models/session.model';
+import { CreateSessionResponse, CreateSubSessionResponse } from '@app/core/models/session.model';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmAccordionImports } from '@spartan-ng/helm/accordion';
@@ -25,7 +22,7 @@ import { SessionService } from '@app/core/services/session.service';
 import { AlertService } from '@app/components/shared/alert/alert.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
-import { SessionDialogComponent } from "../session-dialog/session-dialog";
+import { SessionDialogComponent } from '../session-dialog/session-dialog';
 
 @Component({
   selector: 'app-sessions-list',
@@ -38,8 +35,8 @@ import { SessionDialogComponent } from "../session-dialog/session-dialog";
     HlmButtonImports,
     HlmAccordionImports,
     HlmDropdownMenuImports,
-    SessionDialogComponent
-],
+    SessionDialogComponent,
+  ],
   templateUrl: './sessions-list.html',
 })
 export class SessionsListComponent {
@@ -77,6 +74,29 @@ export class SessionsListComponent {
     },
   });
 
+  readonly updateSubSessionStatus = createMutation({
+    mutationFn: ({
+      weeklySessionId,
+      subSessionId,
+      status,
+    }: {
+      weeklySessionId: string;
+      subSessionId: string;
+      status: 'PENDING' | 'COMPLETED';
+    }) => this.sessionSerivce.updateSubSessionStatus(weeklySessionId, subSessionId, status),
+    onSuccess: () => {
+      toast.success('Session updated', {
+        description: 'The session status has been updated.',
+      });
+    },
+    onError: (error) => {
+      toast.error('Failed to update session', {
+        description: error,
+      });
+      console.error('Failed to update session :', error);
+    },
+  });
+
   getBadgeVariant(status: string): any {
     switch (status) {
       case 'COMPLETED':
@@ -94,16 +114,37 @@ export class SessionsListComponent {
 
   onActionClick(
     event: Event,
-    subSession: CreateSubSessionResponse,
-    action: 'start' | 'complete' | 'view',
+    subSessionId: string,
+    weeklySessionId: string,
+    action: 'COMPLETED' | 'PENDING',
   ) {
-    event.stopPropagation(); // Prevent card click
-    if (action === 'start') {
-      this.startSession.emit(subSession.id);
-    } else if (action === 'complete') {
-      this.completeSession.emit(subSession.id);
-    } else if (action === 'view') {
-      this.sessionClick.emit(subSession.id);
+    event.stopPropagation();
+    if (action === 'COMPLETED') {
+      this.alertService.show({
+        description: 'Are you sure you want to mark this session as completed?',
+        variant: 'destructive',
+        actionLabel: 'Mark as Completed',
+        action: () => {
+          this.updateSubSessionStatus.mutate({
+            weeklySessionId,
+            subSessionId,
+            status: 'COMPLETED',
+          });
+        },
+      });
+    } else if (action === 'PENDING') {
+      this.alertService.show({
+        description: 'Are you sure you want to mark this session as pending?',
+        variant: 'destructive',
+        actionLabel: 'Mark as Pending',
+        action: () => {
+          this.updateSubSessionStatus.mutate({
+            weeklySessionId,
+            subSessionId,
+            status: 'PENDING',
+          });
+        },
+      });
     }
   }
 

@@ -2,7 +2,6 @@ import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HlmTabsImports } from '@spartan-ng/helm/tabs';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { AvailabilitySectionComponent } from '@app/components/user/weekly-plan/availability-section/availability-section';
 import { WeeklySummaryComponent } from '@app/components/user/weekly-plan/weekly-summary/weekly-summary';
 import { WeeklyPlanSessionsListComponent } from '@app/components/user/weekly-plan/sessions-list/sessions-list';
 import { GenerateWeekDialogComponent } from '@app/components/user/weekly-plan/generate-week-dialog/generate-week-dialog';
@@ -16,7 +15,6 @@ import { GoalProgressInfo } from '@app/core/models/weekly-plan.model';
     CommonModule,
     HlmTabsImports,
     HlmButtonImports,
-    AvailabilitySectionComponent,
     WeeklySummaryComponent,
     WeeklyPlanSessionsListComponent,
     GenerateWeekDialogComponent,

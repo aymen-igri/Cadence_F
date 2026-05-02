@@ -4,12 +4,7 @@
 
   <div class="mt-6">
     @if (viewMode === 'calendar') {
-      <app-sessions-calendar
-        [sessions]="calendarSessions()"
-        (slotClick)="onSlotClick($event)"
-        (sessionClick)="onSessionClick($event)"
-      >
-      </app-sessions-calendar>
+      <app-sessions-calendar [sessions]="sessions()"> </app-sessions-calendar>
     } @else {
       <app-sessions-list
         [sessions]="sessions()"

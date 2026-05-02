@@ -1,3 +1,76 @@
-<div class="bg-card border border-border rounded-lg shadow-sm p-4 h-175 overflow-auto">
-  <full-calendar [options]="calendarOptions"></full-calendar>
+<div class="flex flex-col space-y-4">
+  <!-- Navigation Header -->
+  <div class="flex items-center justify-between px-4 py-2 bg-card border border-border rounded-lg">
+    <button hlmBtn variant="outline" size="sm" (click)="previousWeek()">
+      <lucide-angular [img]="ChevronLeft" class="h-4 w-4 mr-2"></lucide-angular> Previous
+    </button>
+    <div class="text-sm font-semibold flex items-center">
+      {{ weekDays()[0].date | date:'MMM d' }} - {{ weekDays()[6].date | date:'MMM d, y' }}
+    </div>
+    <button hlmBtn variant="outline" size="sm" (click)="nextWeek()">
+      Next <lucide-angular [img]="ChevronRight" class="h-4 w-4 ml-2"></lucide-angular>
+    </button>
+  </div>
+
+  <!-- Empty State View -->
+  @if (!matchingSession()) {
+    <div class="text-center py-20 bg-card rounded-lg border border-dashed border-border min-h-125 flex flex-col items-center justify-center">
+      <lucide-angular [img]="CalendarOff" class="h-10 w-10 text-muted-foreground mx-auto mb-4"></lucide-angular>
+      <h3 class="text-lg font-medium text-foreground">No Session Planned</h3>
+      <p class="text-sm text-muted-foreground mt-1">There are no study sessions scheduled for this week.</p>
+    </div>
+  } @else {
+    <!-- Calendar Grid -->
+    <div class="bg-card w-full border border-border rounded-lg flex flex-col flex-1 overflow-x-auto select-none min-w-175">
+      
+      <!-- Day Headers (8 Columns total: 1 for times, 7 for days) -->
+      <div class="grid grid-cols-[60px_repeat(7,1fr)] border-b border-border bg-muted/40">
+        <div class="p-2 border-r border-border"></div> <!-- Empty top-left cell -->
+        @for (day of weekDays(); track day.dayOfWeek) {
+          <div class="p-2 text-center border-r border-border last:border-r-0">
+            <p class="text-xs text-muted-foreground font-medium uppercase tracking-wider">{{ day.dayName }}</p>
+            <p class="text-xl font-bold mt-0.5 text-foreground">{{ day.date | date:'d' }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Scrollable Body (1 hour = 60px) -->
+      <div class="grid grid-cols-[60px_repeat(7,1fr)] relative" style="height: 720px;">
+        
+        <!-- Y-Axis Timeline -->
+        <div class="flex flex-col border-r border-border absolute left-0 top-0 bottom-0 w-15 bg-card z-10">
+          @for (time of timeSlots; track time) {
+            <div class="h-15 flex items-start justify-center text-xs text-muted-foreground relative">
+              <span class="-translate-y-1/2 bg-card px-1 font-mono">{{ time }}</span>
+            </div>
+          }
+        </div>
+
+        <!-- Body Columns wrapper matching the 8 column grid -->
+        <div class="col-start-2 col-end-9 grid grid-cols-7">
+          @for (day of weekDays(); track day.dayOfWeek; let colIndex = $index) {
+            <div class="border-r border-border last:border-r-0 relative w-full h-180">
+              
+              <!-- Draw faint horizontal grid lines dynamically -->
+              @for (time of timeSlots; track time) {
+                <div class="absolute w-full border-t border-border/50" [style.top]="getStyle(time, time).top"></div>
+              }
+
+              <!-- Absolutely positioned Sub Sessions -->
+              @for (subSession of subSessionsByDay()[day.dayOfWeek]; track subSession.id) {
+                <div
+                  class="absolute left-1 right-1 rounded-md p-2 flex flex-col overflow-hidden border shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
+                  [ngClass]="getColorClass(subSession.subjectId)"
+                  [ngStyle]="getStyle(subSession.startTime, subSession.endTime)"
+                >
+                  <p class="text-xs font-bold leading-tight truncate drop-shadow-sm">{{ subSession.subjectName || 'Study Session' }}</p>
+                  <p class="text-[10px] opacity-90 drop-shadow-sm">{{ subSession.startTime }} - {{ subSession.endTime }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>

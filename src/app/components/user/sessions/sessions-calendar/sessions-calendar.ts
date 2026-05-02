@@ -1,174 +1,117 @@
-import { Component, effect, output, input } from '@angular/core';
+import { Component, computed, input, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventClickArg, EventContentArg, EventInput } from '@fullcalendar/core';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
-import { CreateSubSessionResponse } from '@app/core/models/session.model';
-
-type CalendarStatus = CreateSubSessionResponse['status'];
-
-export interface SessionCalendarEvent {
-  id: string;
-  title: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  subjectName?: string;
-  status: CalendarStatus;
-}
-
-interface SessionEventExtendedProps {
-  subjectName: string;
-  status: CalendarStatus;
-  badgeClass: string;
-}
-
-function normalizeCalendarTime(value: string): string {
-  const [hours = '00', minutes = '00', seconds = '00'] = (value || '').split(':');
-  return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
-}
+import { CreateSessionResponse, CreateSubSessionResponse } from '@app/core/models/session.model';
+import {
+  getMonday,
+  getWeekDays,
+  getTimeSlots,
+  computeBlockStyles,
+  getSubjectColor,
+} from './calendar.utils';
+import { LucideAngularModule, ChevronLeft, ChevronRight, CalendarOff } from 'lucide-angular';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
 
 @Component({
   selector: 'app-sessions-calendar',
   standalone: true,
-  imports: [CommonModule, FullCalendarModule],
+  imports: [CommonModule, LucideAngularModule, HlmButtonImports],
   templateUrl: './session-calendar.html',
-  styles: [
-    `
-      /* Minimal FullCalendar overrides for Spartan matching */
-      ::ng-deep .fc-theme-standard td,
-      ::ng-deep .fc-theme-standard th {
-        border-color: hsl(var(--border));
-      }
-      ::ng-deep .fc-theme-standard .fc-scrollgrid {
-        border-color: hsl(var(--border));
-      }
-      ::ng-deep .fc .fc-col-header-cell-cushion {
-        color: hsl(var(--foreground));
-        font-weight: 500;
-        padding: 8px 4px;
-      }
-      ::ng-deep .fc .fc-timegrid-slot-label-cushion {
-        color: hsl(var(--muted-foreground));
-      }
-      ::ng-deep .fc .fc-timegrid-now-indicator-line {
-        border-color: hsl(var(--primary));
-      }
-      ::ng-deep .fc .fc-timegrid-now-indicator-arrow {
-        border-color: hsl(var(--primary));
-        background-color: hsl(var(--primary));
-      }
-      ::ng-deep .fc-event {
-        border: none !important;
-        background: none !important;
-      }
-    `,
-  ],
 })
 export class SessionsCalendarComponent {
-  sessions = input<SessionCalendarEvent[]>([]);
-  slotClick = output<{ dateStr: string; timeStr: string }>();
-  sessionClick = output<string>();
+  sessions = input<CreateSessionResponse[]>([]);
 
-  calendarOptions: CalendarOptions = {
-    plugins: [timeGridPlugin, interactionPlugin],
-    initialView: 'timeGridWeek',
-    headerToolbar: {
-      left: 'prev,next today',
-      center: 'title',
-      right: '',
-    },
-    slotMinTime: '06:00:00',
-    slotMaxTime: '23:00:00',
-    allDaySlot: false,
-    editable: false,
-    selectable: true,
-    height: '100%',
-    events: [],
-    dateClick: this.handleDateClick.bind(this),
-    eventClick: this.handleEventClick.bind(this),
-    eventContent: this.renderEventContent.bind(this),
-  };
+  // Local state purely for navigation tracking
+  currentWeekStart = signal<Date>(new Date()); // Will be overriden if there are sessions
 
   constructor() {
-    effect(() => {
-      this.sessions();
-      this.updateEvents();
+    effect(
+      () => {
+        const allSessions = this.sessions();
+        if (allSessions && allSessions.length > 0) {
+          const firstSessionStr = allSessions[0].weeklySession.startTime;
+          if (firstSessionStr) {
+            const d = new Date(firstSessionStr);
+            d.setHours(0, 0, 0, 0);
+            this.currentWeekStart.set(d);
+          }
+        }
+      },
+      { allowSignalWrites: true },
+    );
+  }
+
+  readonly ChevronLeft = ChevronLeft;
+  readonly ChevronRight = ChevronRight;
+  readonly CalendarOff = CalendarOff;
+
+  weekDays = computed(() => getWeekDays(this.currentWeekStart()));
+  timeSlots = getTimeSlots();
+
+  /**
+   * Tries to find a session where the weeklySession.startTime
+   * falls into the currently viewed week
+   */
+  matchingSession = computed(() => {
+    const targetTime = this.currentWeekStart().getTime();
+    return this.sessions().find((s) => {
+      // Parses weekly start timestamp to find its exact match
+      if (!s.weeklySession.startTime) return false;
+      const sessionDate = new Date(s.weeklySession.startTime);
+      // For simplicity, we just use the exact start time, but you might want to normalize to midnight
+      const normalizedSessionDate = new Date(
+        sessionDate.getFullYear(),
+        sessionDate.getMonth(),
+        sessionDate.getDate(),
+      );
+      const normalizedTargetDate = new Date(
+        this.currentWeekStart().getFullYear(),
+        this.currentWeekStart().getMonth(),
+        this.currentWeekStart().getDate(),
+      );
+      return normalizedSessionDate.getTime() === normalizedTargetDate.getTime();
     });
-  }
+  });
 
-  updateEvents() {
-    const badgeClassByStatus: Record<CalendarStatus, string> = {
-      PENDING: 'bg-secondary text-secondary-foreground',
-      INCOMPLETED: 'bg-destructive text-destructive-foreground',
-      COMPLETED: 'bg-green-500 text-white',
-      CLOSED: 'bg-muted text-muted-foreground',
+  /** Group SubSessions by Day cleanly */
+  subSessionsByDay = computed(() => {
+    const session = this.matchingSession();
+    const grouped: Record<string, CreateSubSessionResponse[]> = {
+      MONDAY: [],
+      TUESDAY: [],
+      WEDNESDAY: [],
+      THURSDAY: [],
+      FRIDAY: [],
+      SATURDAY: [],
+      SUNDAY: [],
     };
 
-    const events: EventInput[] = this.sessions().map((s) => {
-      const badgeClass = badgeClassByStatus[s.status];
-      const extendedProps: SessionEventExtendedProps = {
-        subjectName: s.subjectName || 'No Subject',
-        status: s.status,
-        badgeClass,
-      };
+    if (session) {
+      session.subSessions.forEach((sub) => {
+        if (grouped[sub.dayOfWeek]) {
+          grouped[sub.dayOfWeek].push(sub);
+        }
+      });
+    }
+    return grouped;
+  });
 
-      const startDateTime = `${s.date}T${normalizeCalendarTime(s.startTime)}`;
-      const endDateTime = `${s.date}T${normalizeCalendarTime(s.endTime)}`;
-
-      return {
-        id: s.id,
-        title: s.title,
-        start: startDateTime,
-        end: endDateTime,
-        extendedProps,
-      };
-    });
-
-    const nextInitialDate =
-      events.length > 0 && typeof events[0].start === 'string'
-        ? events[0].start.split('T')[0]
-        : this.calendarOptions.initialDate;
-
-    this.calendarOptions = {
-      ...this.calendarOptions,
-      events,
-      initialDate: nextInitialDate,
-    };
+  getStyle(start: string, end: string) {
+    return computeBlockStyles(start, end);
   }
 
-  handleDateClick(arg: DateClickArg) {
-    const dateStr = arg.dateStr.split('T')[0];
-    const timeStr = arg.dateStr.split('T')[1]?.substring(0, 5) || '12:00';
-    this.slotClick.emit({ dateStr, timeStr });
+  getColorClass(subjectId: string) {
+    return getSubjectColor(subjectId);
   }
 
-  handleEventClick(arg: EventClickArg) {
-    this.sessionClick.emit(arg.event.id);
+  previousWeek() {
+    const newWeek = new Date(this.currentWeekStart());
+    newWeek.setDate(newWeek.getDate() - 7);
+    this.currentWeekStart.set(newWeek);
   }
 
-  renderEventContent(arg: EventContentArg) {
-    const props = arg.event.extendedProps as SessionEventExtendedProps;
-    const badgeClass = props.badgeClass;
-    const status = props.status;
-    const subjectName = props.subjectName;
-
-    return {
-      html:
-        '<div class="h-full w-full p-2 flex flex-col gap-1 rounded-md border-l-4 border-l-primary bg-card/90 shadow-sm border border-border overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors">' +
-        '<div class="font-semibold text-xs text-foreground truncate">' +
-        arg.event.title +
-        '</div>' +
-        '<div class="text-[10px] text-muted-foreground truncate">' +
-        subjectName +
-        '</div>' +
-        '<div class="mt-auto self-start px-1.5 py-0.5 rounded-sm text-[9px] font-medium uppercase tracking-wider ' +
-        badgeClass +
-        '">' +
-        status +
-        '</div>' +
-        '</div>',
-    };
+  nextWeek() {
+    const newWeek = new Date(this.currentWeekStart());
+    newWeek.setDate(newWeek.getDate() + 7);
+    this.currentWeekStart.set(newWeek);
   }
 }
