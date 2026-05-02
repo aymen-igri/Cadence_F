@@ -29,8 +29,6 @@ export class GenerateWeekDialogComponent {
   availableGoals = input.required<GoalProgressInfo[]>();
 
   generate = output<{ selectedGoalIds: string[]; sessionDuration: number }>();
-  openAvailability = output<void>();
-
   state = input<'open' | 'closed'>('closed');
   dialogStateChange = output<'open' | 'closed'>();
 

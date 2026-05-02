@@ -7,26 +7,29 @@ export function getMonday(date: Date): Date {
   return result;
 }
 
-export function getWeekDays(monday: Date): { dayName: string; date: Date; dayOfWeek: string }[] {
-  const daysString = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+export function getWeekDays(
+  anchorDate: Date,
+): { dayName: string; date: Date; dayOfWeek: string }[] {
+  const daysString = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dayOfWeekNames = [
+    'SUNDAY',
     'MONDAY',
     'TUESDAY',
     'WEDNESDAY',
     'THURSDAY',
     'FRIDAY',
     'SATURDAY',
-    'SUNDAY',
   ];
   const weekDays = [];
 
   for (let i = 0; i < 7; i++) {
-    const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
+    const d = new Date(anchorDate);
+    d.setDate(anchorDate.getDate() + i);
+    const dayIndex = d.getDay();
     weekDays.push({
-      dayName: daysString[i],
+      dayName: daysString[dayIndex],
       date: d,
-      dayOfWeek: dayOfWeekNames[i],
+      dayOfWeek: dayOfWeekNames[dayIndex],
     });
   }
   return weekDays;

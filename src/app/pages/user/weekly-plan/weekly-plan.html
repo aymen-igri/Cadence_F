@@ -12,9 +12,6 @@
     </button>
   </div>
 
-  <!-- Availability -->
-  <app-weekly-plan-availability #availabilitySection></app-weekly-plan-availability>
-
   <hlm-tabs [tab]="activeTab()" (tabChanged)="setActiveTab($event)">
     <hlm-tabs-list class="w-full sm:w-auto mt-2 mb-6" aria-label="tabs">
       <button hlmTabsTrigger="this-week">This week</button>
@@ -53,7 +50,6 @@
     (dialogStateChange)="dialogState.set($event)"
     [availableGoals]="goals()"
     (generate)="onGeneratePlan($event)"
-    (openAvailability)="openAvailability(availabilitySection)"
   >
   </app-generate-week-dialog>
 </div>
