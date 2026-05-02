@@ -138,45 +138,49 @@
                             <span>{{ sub.startTime }} - {{ sub.endTime }}</span>
                           </div>
                         </div>
-
-                        <div class="flex items-center gap-2 self-end sm:self-auto">
-                          @if (sub.status === 'PENDING') {
-                            <button
-                              hlmBtn
-                              size="sm"
-                              class="h-8 gap-2 bg-green-600 hover:bg-green-700 text-white"
-                              (click)="
-                                onActionClick(
-                                  $event,
-                                  sub.id,
-                                  sessionRes.weeklySession.id,
-                                  'COMPLETED'
-                                )
-                              "
-                            >
-                              <lucide-angular [img]="CheckCircle2" class="h-4 w-4"></lucide-angular>
-                              Mark as Completed
-                            </button>
-                          } @else if (sub.status === 'COMPLETED') {
-                            <button
-                              hlmBtn
-                              size="sm"
-                              variant="outline"
-                              class="h-8 gap-2"
-                              (click)="
-                                onActionClick(
-                                  $event,
-                                  sub.id,
-                                  sessionRes.weeklySession.id,
-                                  'PENDING'
-                                )
-                              "
-                            >
-                              <lucide-angular [img]="PlayCircle" class="h-4 w-4"></lucide-angular>
-                              Mark as Pending
-                            </button>
-                          }
-                        </div>
+                        @if (sessionRes.weeklySession.sessionStatus === 'PENDING') {
+                          <div class="flex items-center gap-2 self-end sm:self-auto">
+                            @if (sub.status === 'PENDING') {
+                              <button
+                                hlmBtn
+                                size="sm"
+                                class="h-8 gap-2 bg-green-600 hover:bg-green-700 text-white"
+                                (click)="
+                                  onActionClick(
+                                    $event,
+                                    sub.id,
+                                    sessionRes.weeklySession.id,
+                                    'COMPLETED'
+                                  )
+                                "
+                              >
+                                <lucide-angular
+                                  [img]="CheckCircle2"
+                                  class="h-4 w-4"
+                                ></lucide-angular>
+                                Mark as Completed
+                              </button>
+                            } @else if (sub.status === 'COMPLETED') {
+                              <button
+                                hlmBtn
+                                size="sm"
+                                variant="outline"
+                                class="h-8 gap-2"
+                                (click)="
+                                  onActionClick(
+                                    $event,
+                                    sub.id,
+                                    sessionRes.weeklySession.id,
+                                    'PENDING'
+                                  )
+                                "
+                              >
+                                <lucide-angular [img]="PlayCircle" class="h-4 w-4"></lucide-angular>
+                                Mark as Pending
+                              </button>
+                            }
+                          </div>
+                        }
                       </div>
                     }
                   </div>
