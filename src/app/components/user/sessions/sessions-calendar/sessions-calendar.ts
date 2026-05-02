@@ -10,11 +10,19 @@ import {
 } from './calendar.utils';
 import { LucideAngularModule, ChevronLeft, ChevronRight, CalendarOff } from 'lucide-angular';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { HlmHoverCardImports } from '@spartan-ng/helm/hover-card';
+import { BrnHoverCardImports } from '@spartan-ng/brain/hover-card';
 
 @Component({
   selector: 'app-sessions-calendar',
   standalone: true,
-  imports: [CommonModule, LucideAngularModule, HlmButtonImports],
+  imports: [
+    CommonModule,
+    LucideAngularModule,
+    HlmButtonImports,
+    HlmHoverCardImports,
+    BrnHoverCardImports,
+  ],
   templateUrl: './session-calendar.html',
 })
 export class SessionsCalendarComponent {
@@ -95,12 +103,27 @@ export class SessionsCalendarComponent {
     return grouped;
   });
 
+  statusIndicatorClass(status: string): string {
+    switch (status) {
+      case 'PENDING':
+        return 'ring-2 ring-yellow-200';
+      case 'COMPLETED':
+        return 'ring-2 ring-green-200';
+      case 'INCOMPLETED':
+        return 'ring-2 ring-red-200';
+      case 'CLOSED':
+        return 'ring-2 ring-gray-200';
+      default:
+        return '';
+    }
+  }
+
   getStyle(start: string, end: string) {
     return computeBlockStyles(start, end);
   }
 
-  getColorClass(subjectId: string) {
-    return getSubjectColor(subjectId);
+  getColorClass(status: string) {
+    return getSubjectColor(status);
   }
 
   previousWeek() {

@@ -65,22 +65,18 @@ export function computeBlockStyles(
   return { top: `${top}px`, height: `${height}px` };
 }
 
-export function getSubjectColor(subjectId: string): string {
+export function getSubjectColor(status: string): string {
   // Deterministic colors leveraging Spartan UI tailwind properties mapped safely
-  const colors = [
-    'bg-[var(--chart-1)]/20 text-[var(--chart-1)] border-[var(--chart-1)]/50',
-    'bg-[var(--chart-2)]/20 text-[var(--chart-2)] border-[var(--chart-2)]/50',
-    'bg-[var(--chart-3)]/20 text-[var(--chart-3)] border-[var(--chart-3)]/50',
-    'bg-[var(--chart-4)]/20 text-[var(--chart-4)] border-[var(--chart-4)]/50',
-    'bg-[var(--chart-5)]/20 text-[var(--chart-5)] border-[var(--chart-5)]/50',
-    'bg-primary/20 text-primary border-primary/50',
-    'bg-secondary/80 text-secondary-foreground border-secondary/50',
-  ];
-
-  if (!subjectId) return colors[0];
-  let hash = 0;
-  for (let i = 0; i < subjectId.length; i++) {
-    hash = subjectId.charCodeAt(i) + ((hash << 5) - hash);
+  switch (status) {
+    case 'PENDING':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'COMPLETED':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'INCOMPLETED':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'CLOSED':
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+    default:
+      return '';
   }
-  return colors[Math.abs(hash) % colors.length];
 }
