@@ -144,33 +144,36 @@
                             <button
                               hlmBtn
                               size="sm"
-                              variant="outline"
-                              class="h-8 gap-2"
-                              (click)="onActionClick($event, sub, 'start')"
-                            >
-                              <lucide-angular [img]="PlayCircle" class="h-4 w-4"></lucide-angular>
-                              Start
-                            </button>
-                          } @else if (sub.status === 'INCOMPLETED') {
-                            <button
-                              hlmBtn
-                              size="sm"
                               class="h-8 gap-2 bg-green-600 hover:bg-green-700 text-white"
-                              (click)="onActionClick($event, sub, 'complete')"
+                              (click)="
+                                onActionClick(
+                                  $event,
+                                  sub.id,
+                                  sessionRes.weeklySession.id,
+                                  'COMPLETED'
+                                )
+                              "
                             >
                               <lucide-angular [img]="CheckCircle2" class="h-4 w-4"></lucide-angular>
-                              Complete
+                              Mark as Completed
                             </button>
-                          } @else {
+                          } @else if (sub.status === 'COMPLETED') {
                             <button
                               hlmBtn
                               size="sm"
-                              variant="ghost"
-                              class="h-8 w-8 p-0"
-                              (click)="onActionClick($event, sub, 'view')"
+                              variant="outline"
+                              class="h-8 gap-2"
+                              (click)="
+                                onActionClick(
+                                  $event,
+                                  sub.id,
+                                  sessionRes.weeklySession.id,
+                                  'PENDING'
+                                )
+                              "
                             >
-                              <lucide-angular [img]="Clock" class="h-4 w-4"></lucide-angular>
-                              <span class="sr-only">View</span>
+                              <lucide-angular [img]="PlayCircle" class="h-4 w-4"></lucide-angular>
+                              Mark as Pending
                             </button>
                           }
                         </div>

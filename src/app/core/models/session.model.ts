@@ -36,13 +36,11 @@ export interface CreateSubSessionResponse {
 export interface CreateWeeklySessionRequest {
   title: string;
   startTime: string;
-  status: 'PENDING' | 'COMPLETED' | 'INCOMPLETED' | 'CLOSED';
 }
 export interface CreateSubSessionRequest {
   dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
   startTime: string;
   endTime: string;
-  status: 'PENDING' | 'COMPLETED' | 'INCOMPLETED' | 'CLOSED';
   subjectId: string;
 }
 export interface CreateSessionRequest {
