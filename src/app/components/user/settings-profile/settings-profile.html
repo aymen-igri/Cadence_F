@@ -1,0 +1,65 @@
+<form [formRoot]="profileForm" class="space-y-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <!-- First Name -->
+    <div class="space-y-2">
+      <label hlmLabel for="firstName">First Name</label>
+      <input
+        hlmInput
+        id="firstName"
+        [formField]="profileForm.firstName"
+        placeholder="Enter your first name"
+      />
+      @if (profileForm.firstName().touched() && profileForm.firstName().invalid()) {
+        <p class="text-xs text-destructive">
+          @for (error of profileForm.firstName().errors(); track error) {
+            <p>{{ error.message }}</p>
+          }
+        </p>
+      }
+    </div>
+
+    <!-- Last Name -->
+    <div class="space-y-2">
+      <label hlmLabel for="lastName">Last Name</label>
+      <input hlmInput id="lastName" [formField]="profileForm.lastName" placeholder="Enter your last name" />
+      @if (profileForm.lastName().touched() && profileForm.lastName().invalid()) {
+        <p class="text-xs text-destructive">
+          @for (error of profileForm.lastName().errors(); track error) {
+            <p>{{ error.message }}</p>
+          }
+        </p>
+      }
+    </div>
+
+    <!-- Phone -->
+    <div class="space-y-2">
+      <label hlmLabel for="phone">Phone Number</label>
+      <input
+        hlmInput
+        id="phone"
+        [formField]="profileForm.phone"
+        type="tel"
+        placeholder="+1 (555) 000-0000"
+      />
+    </div>
+
+    <!-- Gender -->
+    <div class="space-y-2">
+      <label hlmLabel for="gender">Gender</label>
+      <brn-select id="gender" [formField]="profileForm.gender" placeholder="Select a gender">
+        <hlm-select-trigger>
+          <hlm-select-value />
+        </hlm-select-trigger>
+        <hlm-select-content>
+          <hlm-option value="MALE">Male</hlm-option>
+          <hlm-option value="FEMALE">Female</hlm-option>
+        </hlm-select-content>
+      </brn-select>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2">
+    <button hlmBtn variant="outline" type="button">Cancel</button>
+    <button hlmBtn type="submit" [disabled]="profileForm().invalid() || profileForm().submitting()">Save Changes</button>
+  </div>
+</form>

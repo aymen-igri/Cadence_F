@@ -10,3 +10,6 @@ export interface User {
   gender: 'MALE' | 'FEMALE';
   role: Role;
 }
+
+
+export type UserProfile = Omit<User, 'id' | 'username' | 'email' | 'role'>;

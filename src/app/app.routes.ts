@@ -40,18 +40,18 @@ export const routes: Routes = [
     component: SignUp,
   },
   {
-    path: "auth/mfa",
+    path: 'auth/mfa',
     canMatch: [mfaGuard],
     children: [
       {
-        path: "type",
+        path: 'type',
         component: MfaType,
       },
       {
-        path: "verify",
+        path: 'verify',
         component: MfaVerify,
-      }
-    ]
+      },
+    ],
   },
   {
     path: 'forbidden',
@@ -114,18 +114,29 @@ export const routes: Routes = [
       {
         path: 'availability-plan',
         loadComponent: () =>
-          import('./pages/user/availability-plan/availability-plan').then((m) => m.AvailibilityPlan),
+          import('./pages/user/availability-plan/availability-plan').then(
+            (m) => m.AvailibilityPlan,
+          ),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('./pages/user/settings/settings').then((m) => m.SettingsComponent),
       },
       {
         path: 'availability-plan/list',
         loadComponent: () =>
-          import('./pages/user/availability-list/availability-list').then((m) => m.AvailabilityListComponent),
+          import('./pages/user/availability-list/availability-list').then(
+            (m) => m.AvailabilityListComponent,
+          ),
       },
       {
         path: 'availability-plan/:id',
         loadComponent: () =>
-          import('./pages/user/availability-plan/availability-plan').then((m) => m.AvailibilityPlan),
-      }
+          import('./pages/user/availability-plan/availability-plan').then(
+            (m) => m.AvailibilityPlan,
+          ),
+      },
     ],
   },
   {

@@ -1,0 +1,30 @@
+<div class="space-y-4">
+  @for (method of mfaMethods; track method.id) {
+    <div
+      hlmCard
+      class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 gap-4"
+    >
+      <div class="flex items-center gap-4">
+        <div class="bg-muted p-3 rounded-full">
+          <lucide-icon [name]="method.icon" class="w-6 h-6"></lucide-icon>
+        </div>
+        <div>
+          <h3 hlmCardTitle class="text-base">{{ method.name }}</h3>
+          <p hlmCardDescription class="text-sm text-muted-foreground">{{ method.description }}</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 w-full sm:w-auto mt-4 sm:mt-0">
+        @if (method.active) {
+          <span hlmBadge variant="default" class="bg-green-500 hover:bg-green-600">Active</span>
+          <button hlmBtn variant="outline" size="sm" (click)="setupMethod(method.id)">
+            Configure
+          </button>
+        } @else {
+          <span hlmBadge variant="secondary">Not Set</span>
+          <button hlmBtn size="sm" (click)="setupMethod(method.id)">Set Up</button>
+        }
+      </div>
+    </div>
+  }
+</div>
