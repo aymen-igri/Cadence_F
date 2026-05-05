@@ -28,3 +28,28 @@
     </div>
   }
 </div>
+
+<!-- Modal Dialog -->
+<hlm-dialog [state]="isDialogOpen() ? 'open' : 'closed'">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-w-[425px]">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle>Set Up Authenticator App</h3>
+      <p hlmDialogDescription>
+        Scan the QR code with your authenticator app or enter the secret key manually.
+      </p>
+    </hlm-dialog-header>
+
+    @if (selectedMethodId()) {
+      <app-mfa-setup-modal
+        [methodId]="selectedMethodId()!"
+        (closed)="closeModal()"
+        (confirmed)="onModalConfirmed()"
+      ></app-mfa-setup-modal>
+    }
+
+    <hlm-dialog-footer class="gap-3 mt-6">
+      <button hlmBtn variant="outline" (click)="closeModal()">Cancel</button>
+      <button hlmBtn (click)="onModalConfirmed()">Confirm & Continue</button>
+    </hlm-dialog-footer>
+  </hlm-dialog-content>
+</hlm-dialog>

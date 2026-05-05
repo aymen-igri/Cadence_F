@@ -49,7 +49,8 @@
       "@spartan-ng/helm/radio-group": ["./src/components/ui/radio-group/src/index.ts"],
       "@spartan-ng/helm/typography": ["./src/components/ui/typography/src/index.ts"],
       "@spartan-ng/helm/hover-card": ["./src/components/ui/hover-card/src/index.ts"],
-      "@spartan-ng/helm/input-otp": ["./src/components/ui/input-otp/src/index.ts"]
+      "@spartan-ng/helm/input-otp": ["./src/components/ui/input-otp/src/index.ts"],
+      "@spartan-ng/helm/avatar": ["./src/components/ui/avatar/src/index.ts"]
     }
   },
   "angularCompilerOptions": {

@@ -1,17 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
+import { HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { LucideAngularModule, Mail, Smartphone } from 'lucide-angular';
+import { MfaSetupModalComponent } from '../mfa-setup-modal/mfa-setup-modal';
 
 @Component({
   selector: 'app-settings-mfa',
-  imports: [...HlmButtonImports, ...HlmCardImports, ...HlmBadgeImports, LucideAngularModule],
+  imports: [
+    ...HlmButtonImports,
+    ...HlmCardImports,
+    ...HlmBadgeImports,
+    ...HlmDialogImports,
+    LucideAngularModule,
+    MfaSetupModalComponent,
+  ],
   templateUrl: './settings-mfa.html',
 })
 export class SettingsMfaComponent {
   readonly Mail = Mail;
   readonly Smartphone = Smartphone;
+
+  isDialogOpen = signal<boolean>(false);
+  selectedMethodId = signal<string | null>(null);
 
   mfaMethods = [
     {
@@ -31,7 +43,17 @@ export class SettingsMfaComponent {
   ];
 
   setupMethod(methodId: string) {
-    console.log('Setup MFA method:', methodId);
-    // To be implemented
+    this.selectedMethodId.set(methodId);
+    this.isDialogOpen.set(true);
+  }
+
+  closeModal() {
+    this.isDialogOpen.set(false);
+    this.selectedMethodId.set(null);
+  }
+
+  onModalConfirmed() {
+    console.log('MFA setup confirmed for:', this.selectedMethodId());
+    this.closeModal();
   }
 }

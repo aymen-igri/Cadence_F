@@ -25,6 +25,7 @@
     "@stomp/rx-stomp": "^2.3.0",
     "@stomp/stompjs": "^7.3.0",
     "@tanstack/angular-table": "^8.21.3",
+    "angularx-qrcode": "^21.0.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide": "^0.577.0",
