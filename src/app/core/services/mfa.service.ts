@@ -33,4 +33,12 @@ export class MfaService {
        })
      );
    }
+
+   generateAppSecret() {
+    return this.http.get<{ secret: string, qrUrl: string }>(`${this.url}/app/setUp`);
+   }
+
+   confirmSetup(code: string) {
+    return this.http.post(`${this.url}/app/confirm`, { code });
+   }
 }

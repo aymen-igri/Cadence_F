@@ -28,3 +28,73 @@
     </div>
   }
 </div>
+
+<!-- Modal Dialog -->
+<hlm-dialog [state]="isDialogOpen() ? 'open' : 'closed'">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-w-[425px]">
+    @if (dialogStep() === 'setup') {
+      <hlm-dialog-header>
+        <h3 hlmDialogTitle>Set Up Authenticator App</h3>
+        <p hlmDialogDescription>
+          Scan the QR code with your authenticator app or enter the secret key manually.
+        </p>
+      </hlm-dialog-header>
+
+      @if (selectedMethodId()) {
+        <app-mfa-setup-modal
+          [methodId]="selectedMethodId()!"
+          (closed)="closeModal()"
+          (confirmed)="onModalConfirmed()"
+        ></app-mfa-setup-modal>
+      }
+
+      <hlm-dialog-footer class="gap-3 mt-6">
+        <button hlmBtn variant="outline" (click)="closeModal()">Cancel</button>
+        <button hlmBtn (click)="onModalConfirmed()">Confirm & Continue</button>
+      </hlm-dialog-footer>
+    } @else {
+      <hlm-dialog-header>
+        <h3 hlmDialogTitle>Verify Your Code</h3>
+        <p hlmDialogDescription>Enter the 6-digit code from your authenticator app.</p>
+      </hlm-dialog-header>
+
+      <div class="flex flex-col items-center justify-center space-y-6 mt-4">
+        <div class="relative">
+          <brn-input-otp
+            hlmInputOtp
+            [maxLength]="6"
+            [ngModel]="otpValue()"
+            (ngModelChange)="onOtpComplete($event)"
+            [disabled]="isVerifying()"
+          >
+            <div hlmInputOtpGroup>
+              <hlm-input-otp-slot [index]="0"></hlm-input-otp-slot>
+              <hlm-input-otp-slot [index]="1"></hlm-input-otp-slot>
+              <hlm-input-otp-slot [index]="2"></hlm-input-otp-slot>
+            </div>
+            <hlm-input-otp-separator></hlm-input-otp-separator>
+            <div hlmInputOtpGroup>
+              <hlm-input-otp-slot [index]="3"></hlm-input-otp-slot>
+              <hlm-input-otp-slot [index]="4"></hlm-input-otp-slot>
+              <hlm-input-otp-slot [index]="5"></hlm-input-otp-slot>
+            </div>
+          </brn-input-otp>
+          
+          @if (isVerifying()) {
+            <div class="absolute -bottom-8 left-0 right-0 flex items-center justify-center gap-2 text-sm text-primary animate-pulse">
+              <span class="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+              Verifying code...
+            </div>
+          }
+        </div>
+      </div>
+
+      <hlm-dialog-footer class="justify-between mt-10">
+        <button hlmBtn variant="ghost" (click)="backToSetup()" [disabled]="isVerifying()">
+          <lucide-icon name="arrow-left" class="mr-2 h-4 w-4"></lucide-icon>
+          Back to QR Code
+        </button>
+      </hlm-dialog-footer>
+    }
+  </hlm-dialog-content>
+</hlm-dialog>

@@ -8,6 +8,8 @@ import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { BrnSelectImports } from '@spartan-ng/brain/select';
 import { User, UserProfile } from '@app/core/models/user.model';
 import { toast } from 'ngx-sonner';
+import { HlmAvatarImports } from '@spartan-ng/helm/avatar';
+
 
 @Component({
   selector: 'app-settings-profile',
@@ -17,6 +19,7 @@ import { toast } from 'ngx-sonner';
     ...HlmLabelImports,
     ...HlmCardImports,
     ...HlmSelectImports,
+    ...HlmAvatarImports,
     BrnSelectImports,
     FormField,
     FormRoot,

@@ -1,20 +1,26 @@
 <form [formRoot]="profileForm" class="space-y-6">
+
+  <!-- Avatar -->
+  <div class="flex items-center justify-center md:items-start gap-4">
+    <hlm-avatar class="w-40 h-40">
+      <img hlmAvatarImage src='/assets/avatar.png' alt='spartan logo. Resembling a spartanic shield' />
+      <span hlmAvatarFallback class="text-5xl">
+        {{ profileForm.firstName().value().charAt(0) + profileForm.lastName().value().charAt(0) }}
+      </span>
+    </hlm-avatar>
+  </div>
+
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <!-- First Name -->
     <div class="space-y-2">
       <label hlmLabel for="firstName">First Name</label>
-      <input
-        hlmInput
-        id="firstName"
-        [formField]="profileForm.firstName"
-        placeholder="Enter your first name"
-      />
+      <input hlmInput id="firstName" [formField]="profileForm.firstName" placeholder="Enter your first name" />
       @if (profileForm.firstName().touched() && profileForm.firstName().invalid()) {
-        <p class="text-xs text-destructive">
-          @for (error of profileForm.firstName().errors(); track error) {
-            <p>{{ error.message }}</p>
-          }
-        </p>
+      <p class="text-xs text-destructive">
+        @for (error of profileForm.firstName().errors(); track error) {
+      <p>{{ error.message }}</p>
+      }
+      </p>
       }
     </div>
 
@@ -23,24 +29,18 @@
       <label hlmLabel for="lastName">Last Name</label>
       <input hlmInput id="lastName" [formField]="profileForm.lastName" placeholder="Enter your last name" />
       @if (profileForm.lastName().touched() && profileForm.lastName().invalid()) {
-        <p class="text-xs text-destructive">
-          @for (error of profileForm.lastName().errors(); track error) {
-            <p>{{ error.message }}</p>
-          }
-        </p>
+      <p class="text-xs text-destructive">
+        @for (error of profileForm.lastName().errors(); track error) {
+      <p>{{ error.message }}</p>
+      }
+      </p>
       }
     </div>
 
     <!-- Phone -->
     <div class="space-y-2">
       <label hlmLabel for="phone">Phone Number</label>
-      <input
-        hlmInput
-        id="phone"
-        [formField]="profileForm.phone"
-        type="tel"
-        placeholder="+1 (555) 000-0000"
-      />
+      <input hlmInput id="phone" [formField]="profileForm.phone" type="tel" placeholder="+1 (555) 000-0000" />
     </div>
 
     <!-- Gender -->
@@ -60,6 +60,7 @@
 
   <div class="flex justify-end gap-2">
     <button hlmBtn variant="outline" type="button">Cancel</button>
-    <button hlmBtn type="submit" [disabled]="profileForm().invalid() || profileForm().submitting()">Save Changes</button>
+    <button hlmBtn type="submit" [disabled]="profileForm().invalid() || profileForm().submitting()">Save
+      Changes</button>
   </div>
 </form>
