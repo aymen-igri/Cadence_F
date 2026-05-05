@@ -15,6 +15,7 @@ import {
   MoreVertical,
   Edit,
   Trash2,
+  Calendar,
 } from 'lucide-angular';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmDropdownMenuImports } from '@spartan-ng/helm/dropdown-menu';
@@ -23,6 +24,7 @@ import { AlertService } from '@app/components/shared/alert/alert.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
 import { SessionDialogComponent } from '../session-dialog/session-dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sessions-list',
@@ -48,6 +50,7 @@ export class SessionsListComponent {
   startSession = output<string>();
   completeSession = output<string>();
   updateSubjectDialogState = signal<'closed' | 'open'>('closed');
+  private router = inject(Router);
 
   protected Clock = Clock;
   protected FileText = FileText;
@@ -58,6 +61,11 @@ export class SessionsListComponent {
   protected MoreVertical = MoreVertical;
   protected Edit = Edit;
   protected Trash2 = Trash2;
+  protected Calendar = Calendar;
+
+  navigateToCalendar(sessionId: string) {
+    this.router.navigate(['/user/sessions/calendar', sessionId]);
+  }
 
   readonly deleteSession = createMutation({
     mutationFn: (sessionId: string) => this.sessionSerivce.deleteSession(sessionId),

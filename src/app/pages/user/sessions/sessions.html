@@ -1,11 +1,8 @@
 <div class="space-y-6 max-w-7xl mx-auto min-h-screen">
-  <app-sessions-header [viewMode]="viewMode" (viewModeChange)="viewMode = $event">
+  <app-sessions-header>
   </app-sessions-header>
 
   <div class="mt-6">
-    @if (viewMode === 'calendar') {
-      <app-sessions-calendar [sessions]="sessions()"> </app-sessions-calendar>
-    } @else {
       <app-sessions-list
         [sessions]="sessions()"
         [isLoadingSesions]="isLoadingSesions()"
@@ -14,6 +11,5 @@
         (completeSession)="onCompleteSession($event)"
       >
       </app-sessions-list>
-    }
   </div>
 </div>

@@ -11,8 +11,6 @@ import { SessionDialogComponent } from "../session-dialog/session-dialog";
   templateUrl: './sessions-header.html',
 })
 export class SessionsHeaderComponent {
-  viewMode = input<'calendar' | 'list'>('list');
-  viewModeChange = output<'calendar' | 'list'>();
   createSessionDialogState = signal<'closed' | 'open'>('closed');
 
   protected CalendarIcon = Calendar;

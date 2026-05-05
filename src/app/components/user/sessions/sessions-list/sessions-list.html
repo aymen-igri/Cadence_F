@@ -66,6 +66,15 @@
               <hlm-dropdown-menu>
                 <button
                   hlmDropdownMenuItem
+                  class="gap-2 whitespace-nowrap"
+                  (click)="navigateToCalendar(sessionRes.weeklySession.id)"
+                >
+                  <lucide-angular [img]="Calendar" class="h-4 w-4"></lucide-angular>
+                  Calendar View
+                </button>
+                <hlm-dropdown-menu-separator></hlm-dropdown-menu-separator>
+                <button
+                  hlmDropdownMenuItem
                   class="gap-2"
                   (click)="updateSubjectDialogState.set('open')"
                 >
