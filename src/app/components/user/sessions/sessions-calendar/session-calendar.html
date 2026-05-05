@@ -1,32 +1,23 @@
 <div class="flex flex-col space-y-4">
-  <!-- Navigation Header -->
-  <div class="flex items-center justify-between px-4 py-2 bg-card border border-border rounded-lg">
-    <button hlmBtn variant="outline" size="sm" (click)="previousWeek()">
-      <lucide-angular [img]="ChevronLeft" class="h-4 w-4 mr-2"></lucide-angular> Previous
-    </button>
-    <div class="text-sm font-semibold flex items-center">
-      {{ weekDays()[0].date | date: 'MMM d' }} - {{ weekDays()[6].date | date: 'MMM d, y' }}
-    </div>
-    <button hlmBtn variant="outline" size="sm" (click)="nextWeek()">
-      Next <lucide-angular [img]="ChevronRight" class="h-4 w-4 ml-2"></lucide-angular>
-    </button>
-  </div>
-
   <!-- Empty State View -->
-  @if (!matchingSession()) {
+  @if (!session() || weekDays().length === 0) {
     <div
       class="text-center py-20 bg-card rounded-lg border border-dashed border-border min-h-125 flex flex-col items-center justify-center"
     >
-      <lucide-angular
-        [img]="CalendarOff"
-        class="h-10 w-10 text-muted-foreground mx-auto mb-4"
-      ></lucide-angular>
+      <ng-icon name="calendarOff" class="h-10 w-10 text-muted-foreground mx-auto mb-4"></ng-icon>
       <h3 class="text-lg font-medium text-foreground">No Session Planned</h3>
       <p class="text-sm text-muted-foreground mt-1">
         There are no study sessions scheduled for this week.
       </p>
     </div>
   } @else {
+    <!-- Navigation Header -->
+    <div class="flex items-center justify-center px-4 py-2 bg-card border border-border rounded-lg">
+      <div class="text-sm font-semibold flex items-center">
+        {{ weekDays()[0].date | date: 'MMM d' }} - {{ weekDays()[6].date | date: 'MMM d, y' }}
+      </div>
+    </div>
+
     <!-- Calendar Grid -->
     <div
       class="bg-card w-full border border-border rounded-lg flex flex-col flex-1 overflow-x-auto select-none min-w-175"

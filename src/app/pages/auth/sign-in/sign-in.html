@@ -55,7 +55,7 @@
                 (click)="togglePassword()"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <lucide-angular [img]="showPassword ? EyeOff : Eye" class="w-4 h-4" />
+                <ng-icon [name]="showPassword ? 'eyeOff' : 'eye'" class="w-4 h-4"></ng-icon>
               </button>
             </div>
             @if (loginForm.password().touched() && loginForm.password().invalid()) {
@@ -68,7 +68,12 @@
           </div>
 
           <!-- Submit -->
-          <button hlmBtn class="w-full mt-1" type="submit" [disabled]="loginForm().invalid() || loginForm().submitting()">
+          <button
+            hlmBtn
+            class="w-full mt-1"
+            type="submit"
+            [disabled]="loginForm().invalid() || loginForm().submitting()"
+          >
             {{ loginForm().submitting() ? 'Loading...' : 'Sign in' }}
           </button>
         </form>

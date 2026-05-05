@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { LucideAngularModule, Mail, Smartphone, ShieldCheck } from 'lucide-angular';
+import { NgIconsModule } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { MfaMethod } from '@app/core/models/mfa-type.model';
@@ -13,15 +13,12 @@ import { createMutation } from '@app/core/utils/mutation.helper';
 @Component({
   selector: 'app-mfa-type',
   standalone: true,
-  imports: [LucideAngularModule, ...HlmButtonImports, ...HlmCardImports, LogoComponent],
+  imports: [NgIconsModule, ...HlmButtonImports, ...HlmCardImports, LogoComponent],
   templateUrl: './mfa-type.html',
 })
 export class MfaType {
   private mfaService = inject(MfaService);
   private router = inject(Router);
-  readonly Mail = Mail;
-  readonly Smartphone = Smartphone;
-  readonly ShieldCheck = ShieldCheck;
 
   readonly triggerEmailCodeMutation = createMutation({
     mutationFn: () => this.mfaService.triggerEmailCode(),

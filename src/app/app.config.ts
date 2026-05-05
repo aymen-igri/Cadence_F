@@ -8,6 +8,34 @@ import { errorInterceptor } from '@app/core/interceptors/error.interceptor';
 import { loadingInterceptor } from '@app/core/interceptors/loading.interceptor';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { cacheInterceptor } from '@app/core/interceptors/cache.interceptor';
+import { provideIcons } from '@ng-icons/core';
+import {
+  lucideServerCrash,
+  lucideEye,
+  lucideEyeOff,
+  lucideBookOpen,
+  lucideTriangle,
+  lucideMail,
+  lucideSmartphone,
+  lucideShieldCheck,
+  lucideArrowLeft,
+  lucideKeyRound,
+  lucidePlus,
+  lucideChevronLeft,
+  lucideChevronRight,
+  lucideCalendarOff,
+  lucideSparkles,
+  lucideInbox,
+  lucideMoreVertical,
+  lucideAlertTriangle,
+  lucideCalendarClock,
+  lucideMessageCircle,
+  lucideUsers,
+  lucideTarget,
+  lucideClock,
+  lucideCheckCheck,
+  lucideAlertCircle,
+} from '@ng-icons/lucide';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,6 +50,35 @@ export const appConfig: ApplicationConfig = {
       sidebarKeyboardShortcut: 'b',
       mobileBreakpoint: '768px',
     }),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor, cacheInterceptor])),
+    provideHttpClient(
+      withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor, cacheInterceptor]),
+    ),
+    provideIcons({
+      serverCrash: lucideServerCrash,
+      eye: lucideEye,
+      eyeOff: lucideEyeOff,
+      bookOpen: lucideBookOpen,
+      triangle: lucideTriangle,
+      mail: lucideMail,
+      smartphone: lucideSmartphone,
+      shieldCheck: lucideShieldCheck,
+      arrowLeft: lucideArrowLeft,
+      keyRound: lucideKeyRound,
+      plus: lucidePlus,
+      chevronLeft: lucideChevronLeft,
+      chevronRight: lucideChevronRight,
+      calendarOff: lucideCalendarOff,
+      sparkles: lucideSparkles,
+      inbox: lucideInbox,
+      moreVertical: lucideMoreVertical,
+      alertTriangle: lucideAlertTriangle,
+      calendarClock: lucideCalendarClock,
+      messageCircle: lucideMessageCircle,
+      users: lucideUsers,
+      target: lucideTarget,
+      clock: lucideClock,
+      checkCheck: lucideCheckCheck,
+      alertCircle: lucideAlertCircle,
+    }),
   ],
 };

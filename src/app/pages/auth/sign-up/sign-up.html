@@ -142,7 +142,7 @@
                 (click)="togglePassword()"
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <lucide-angular [img]="showPassword ? EyeOff : Eye" class="w-4 h-4" />
+                <ng-icon [name]="showPassword ? 'eyeOff' : 'eye'" class="w-4 h-4" />
               </button>
             </div>
             @if (SignUpForm.password().touched() && SignUpForm.password().invalid()) {

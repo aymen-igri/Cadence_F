@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
-import { LucideAngularModule, Inbox } from 'lucide-angular';
+import { NgIconsModule } from '@ng-icons/core';
 
 @Component({
   selector: 'app-inbox-empty-state',
-  imports: [LucideAngularModule],
+  imports: [NgIconsModule],
   templateUrl: './inbox-empty-state.html',
 })
-export class InboxEmptyState {
-  readonly Inbox = Inbox;
-}
+export class InboxEmptyState {}

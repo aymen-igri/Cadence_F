@@ -1,10 +1,11 @@
-import { Component, inject, signal } from "@angular/core";import { Router, RouterLink } from '@angular/router';
-import { LucideAngularModule, ArrowLeft, KeyRound } from 'lucide-angular';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { NgIconsModule } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
-import { MfaService } from "@app/core/services/mfa.service";
-import { toast } from "ngx-sonner";
-import { finalize } from "rxjs";
+import { MfaService } from '@app/core/services/mfa.service';
+import { toast } from 'ngx-sonner';
+import { finalize } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HlmInputOtpImports } from '@spartan-ng/helm/input-otp';
@@ -16,19 +17,18 @@ import { BrnInputOtpImports } from '@spartan-ng/brain/input-otp';
   imports: [
     CommonModule,
     FormsModule,
-    LucideAngularModule,
+    NgIconsModule,
     RouterLink,
     ...HlmButtonImports,
     ...HlmCardImports,
     ...HlmInputOtpImports,
-    ...BrnInputOtpImports
+    ...BrnInputOtpImports,
   ],
   templateUrl: './mfa-verify.html',
 })
 export class MfaVerify {
   private mfaService = inject(MfaService);
   private router = inject(Router);
-  readonly ArrowLeft = ArrowLeft; readonly KeyRound = KeyRound;
 
   isLoading = signal(false);
   otpValue = signal('');
@@ -44,7 +44,8 @@ export class MfaVerify {
   verify(code: string) {
     if (code.length < 6) return;
     this.isLoading.set(true);
-    this.mfaService.verifyOtp(code)
+    this.mfaService
+      .verifyOtp(code)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
         next: () => {
@@ -59,8 +60,8 @@ export class MfaVerify {
   }
 
   public get instructionMessage(): string {
-    return this.selectedMethod() === 'EMAIL' 
-      ? 'Enter the 6-digit code sent to your email.' 
+    return this.selectedMethod() === 'EMAIL'
+      ? 'Enter the 6-digit code sent to your email.'
       : 'Enter the 6-digit code from your Authenticator app.';
   }
 }

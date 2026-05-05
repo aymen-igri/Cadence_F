@@ -16,8 +16,8 @@
               <p class="text-xs text-muted-foreground mt-0.5">{{ deadline.goal }}</p>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-              <lucide-angular
-                [img]="deadline.urgent ? AlertCircle : Clock"
+              <ng-icon
+                [name]="deadline.icon"
                 class="w-3 h-3"
                 [class]="deadline.urgent ? 'text-destructive' : 'text-muted-foreground'"
               />

@@ -1,9 +1,6 @@
 import { Component, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SessionsHeaderComponent } from '@app/components/user/sessions/sessions-header/sessions-header';
-import {
-  SessionsCalendarComponent,
-} from '@app/components/user/sessions/sessions-calendar/sessions-calendar';
 import { SessionsListComponent } from '@app/components/user/sessions/sessions-list/sessions-list';
 import { SessionService } from '@app/core/services/session.service';
 
@@ -13,13 +10,11 @@ import { SessionService } from '@app/core/services/session.service';
   imports: [
     CommonModule,
     SessionsHeaderComponent,
-    SessionsCalendarComponent,
     SessionsListComponent,
   ],
   templateUrl: './sessions.html',
 })
 export class SessionsComponent implements OnInit {
-  viewMode: 'calendar' | 'list' = 'list';
   sessionService = inject(SessionService);
 
   sessions = this.sessionService.allSessions.data;

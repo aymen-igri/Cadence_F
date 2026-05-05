@@ -1,0 +1,27 @@
+<div class="space-y-6 max-w-7xl mx-auto min-h-screen">
+  @if (isLoading()) {
+    <div class="flex flex-col items-center justify-center min-h-100 space-y-4">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <p class="text-muted-foreground">Loading session details...</p>
+    </div>
+  } @else if (sessionDetails()) {
+    <div class="flex flex-col space-y-2 mb-6">
+      <h1 class="text-3xl font-bold tracking-tight">
+        {{ sessionDetails()?.weeklySession?.title || 'Study Session' }}
+      </h1>
+      <p class="text-muted-foreground flex items-center">
+        <span class="mr-2">Starts:</span>
+        <span class="font-medium text-foreground">
+          {{ sessionDetails()?.weeklySession?.startTime | date: 'fullDate' }}
+        </span>
+      </p>
+    </div>
+
+    <!-- Calendar Component -->
+    <app-sessions-calendar [session]="sessionDetails()!"></app-sessions-calendar>
+  } @else {
+    <div class="text-center py-20 text-muted-foreground">
+      Failed to load session details or no session found.
+    </div>
+  }
+</div>

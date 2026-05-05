@@ -126,6 +126,13 @@ export const routes: Routes = [
             (m) => m.AvailibilityPlan,
           ),
       },
+      {
+        path: 'sessions/calendar/:id',
+        loadComponent: () =>
+          import('./pages/user/session-calendar/session-calendar').then(
+            (m) => m.SessionCalendarComponent,
+          ),
+      }
     ],
   },
   {

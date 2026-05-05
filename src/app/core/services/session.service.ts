@@ -17,6 +17,7 @@ export class SessionService {
   private readonly url = `${environment.apiUrl}/session`;
   readonly allSessions = createQuery<CreateSessionResponse[]>([]);
   readonly allGeneratedSessions = createQuery<CreateSessionResponse[]>([]);
+  readonly sessionDetails = createQuery<CreateSessionResponse | null>(null);
 
   public createSession(payload: CreateSessionRequest) {
     return this.http.post<CreateSessionResponse>(`${this.url}/create`, payload).pipe(
@@ -103,6 +104,12 @@ export class SessionService {
           sessions.filter((session) => session.weeklySession.id !== sessionId),
         );
       }),
+    );
+  }
+
+  public loadSessionDetails(sessionId: string) {
+    return this.sessionDetails.load(
+      this.http.get<CreateSessionResponse>(`${this.url}/details/${sessionId}`),
     );
   }
 }
