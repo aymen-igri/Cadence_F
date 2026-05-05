@@ -90,6 +90,18 @@ export class MfaSetupModalComponent implements OnInit {
       });
   }
 
+  confirmCode(code: string) {
+    this.mfaService.confirmSetup(code).subscribe({
+      next: () => {
+        toast.success('MFA setup confirmed successfully');
+        this.confirmed.emit();
+      },
+      error: () => {
+        toast.error('Invalid code. Please try again.');
+      }
+    });
+  }
+
   copySecret() {
     navigator.clipboard.writeText(this.secretKey());
     toast.success('Secret key copied to clipboard');
