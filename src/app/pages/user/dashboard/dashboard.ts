@@ -5,7 +5,7 @@ import { GoalsProgress } from '@app/components/user/dashboard/goals-progress/goa
 import { GroupActivity } from '@app/components/user/dashboard/group-activity/group-activity';
 import { UpcomingDeadlines } from '@app/components/user/dashboard/upcoming-deadlines/upcoming-deadlines';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { LucideAngularModule, Sparkles } from 'lucide-angular';
+import { NgIconsModule } from '@ng-icons/core';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,11 +15,9 @@ import { LucideAngularModule, Sparkles } from 'lucide-angular';
     GoalsProgress,
     GroupActivity,
     UpcomingDeadlines,
-    LucideAngularModule,
+    NgIconsModule,
     ...HlmButtonImports,
   ],
   templateUrl: './dashboard.html',
 })
-export class Dashboard {
-  readonly Sparkles = Sparkles;
-}
+export class Dashboard {}

@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { LucideAngularModule, Eye, EyeOff, BookOpen } from 'lucide-angular';
+import { NgIconsModule } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
@@ -17,7 +17,7 @@ import { extractErrorMessage } from '@app/core/utils/error.util';
 @Component({
   selector: 'app-sign-in',
   imports: [
-    LucideAngularModule,
+    NgIconsModule,
     ...HlmButtonImports,
     ...HlmInputImports,
     ...HlmLabelImports,
@@ -32,9 +32,6 @@ import { extractErrorMessage } from '@app/core/utils/error.util';
 })
 export class SignIn {
   loginModel = signal<LoginRequest>({ identifier: '', password: '' });
-  readonly Eye = Eye;
-  readonly EyeOff = EyeOff;
-  readonly BookOpen = BookOpen;
 
   showPassword = false;
   private authService = inject(AuthService);
@@ -58,8 +55,8 @@ export class SignIn {
             });
 
             console.log(response);
-            
-            if (response.mfaTokens && response.user?.role === "ROLE_PRE_AUTH") {
+
+            if (response.mfaTokens && response.user?.role === 'ROLE_PRE_AUTH') {
               this.mfaService.temporaryMfaToken.set(response.mfaTokens);
               this.router.navigate(['/auth/mfa/type']); // redirection spot for mfa verification
             } else {

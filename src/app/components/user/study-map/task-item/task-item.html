@@ -26,7 +26,7 @@
           size="icon"
           class="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          <lucide-angular [img]="MoreVertical" class="h-4 w-4" />
+          <ng-icon name="moreVertical" class="h-4 w-4" />
         </button>
       </div>
     </div>
@@ -35,7 +35,9 @@
   <ng-template #taskMenu>
     <hlm-dropdown-menu>
       <button hlmDropdownMenuItem (click)="updateTaskDialogState.set('open')">Edit task</button>
-      <button hlmDropdownMenuItem class="text-destructive" (click)="onDeleteTask(task().id)">Delete task</button>
+      <button hlmDropdownMenuItem class="text-destructive" (click)="onDeleteTask(task().id)">
+        Delete task
+      </button>
     </hlm-dropdown-menu>
   </ng-template>
 

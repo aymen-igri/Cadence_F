@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { LucideAngularModule, Eye, EyeOff } from 'lucide-angular';
+import { NgIconsModule } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
@@ -17,7 +17,7 @@ import { extractErrorMessage } from '@app/core/utils/error.util';
   selector: 'app-sign-up',
   imports: [
     RouterLink,
-    LucideAngularModule,
+    NgIconsModule,
     ...HlmButtonImports,
     ...HlmInputImports,
     ...HlmLabelImports,
@@ -38,8 +38,6 @@ export class SignUp {
     gender: 'MALE',
     username: '',
   });
-  readonly Eye = Eye;
-  readonly EyeOff = EyeOff;
   private authService = inject(AuthService);
   private router = inject(Router);
 

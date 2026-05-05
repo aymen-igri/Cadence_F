@@ -1,14 +1,13 @@
 <div class="flex items-center justify-center min-h-screen bg-background p-4">
   <div hlmCard class="w-full max-w-md border border-border rounded-xl p-6 sm:p-8 space-y-6">
-    
     <!-- Header -->
     <div class="relative flex flex-col items-center space-y-2 text-center">
       <button hlmBtn variant="ghost" class="absolute left-0 top-0 p-2" routerLink="/auth/mfa/type">
-        <lucide-angular [img]="ArrowLeft" class="w-5 h-5 text-slate-400 hover:text-white"></lucide-angular>
+        <ng-icon name="arrowLeft" class="w-5 h-5 text-slate-400 hover:text-white"></ng-icon>
       </button>
 
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 mb-2 mt-1">
-        <lucide-angular [img]="KeyRound" class="h-6 w-6 text-blue-400"></lucide-angular>
+        <ng-icon name="keyRound" class="h-6 w-6 text-blue-400"></ng-icon>
       </div>
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Enter Code</h1>
       <p class="text-sm text-slate-400">{{ instructionMessage }}</p>
@@ -16,7 +15,12 @@
 
     <!-- OTP Input -->
     <div class="flex flex-col items-center justify-center space-y-8 mt-6">
-      <brn-input-otp hlmInputOtp [maxLength]="6" [ngModel]="otpValue()" (ngModelChange)="onOtpComplete($event)">
+      <brn-input-otp
+        hlmInputOtp
+        [maxLength]="6"
+        [ngModel]="otpValue()"
+        (ngModelChange)="onOtpComplete($event)"
+      >
         <div hlmInputOtpGroup>
           <hlm-input-otp-slot [index]="0"></hlm-input-otp-slot>
           <hlm-input-otp-slot [index]="1"></hlm-input-otp-slot>
@@ -30,12 +34,15 @@
         </div>
       </brn-input-otp>
 
-      <button hlmBtn variant="default" class="w-full h-12 !bg-primary hover:!bg-slate-800 text-white font-medium transition-colors" 
-              [disabled]="otpValue().length < 6 || isLoading()" 
-              (click)="verify(otpValue())">
+      <button
+        hlmBtn
+        variant="default"
+        class="w-full h-12 bg-primary! hover:bg-slate-800! text-white font-medium transition-colors"
+        [disabled]="otpValue().length < 6 || isLoading()"
+        (click)="verify(otpValue())"
+      >
         {{ isLoading() ? 'Verifying...' : 'Verify Code' }}
       </button>
     </div>
-
   </div>
 </div>

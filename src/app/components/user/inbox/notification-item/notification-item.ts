@@ -1,21 +1,13 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgIconsModule } from '@ng-icons/core';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
-import {
-  LucideAngularModule,
-  Bell,
-  CalendarClock,
-  MessageCircle,
-  AlertTriangle,
-  Users,
-  BookOpen,
-} from 'lucide-angular';
 import { Notification } from '@app/core/models/notification.model';
 
 @Component({
   selector: 'app-notification-item',
-  imports: [CommonModule, LucideAngularModule, ...HlmCardImports, ...HlmButtonImports],
+  imports: [CommonModule, NgIconsModule, ...HlmCardImports, ...HlmButtonImports],
   templateUrl: './notification-item.html',
 })
 export class NotificationItem {
@@ -26,17 +18,17 @@ export class NotificationItem {
     const type = this.item().type;
     switch (type) {
       case 'DEADLINE':
-        return AlertTriangle;
+        return 'alertTriangle';
       case 'SCHEDULE':
-        return CalendarClock;
+        return 'calendarClock';
       case 'MESSAGE':
-        return MessageCircle;
+        return 'messageCircle';
       case 'GROUP':
-        return Users;
+        return 'users';
       case 'ACADEMIC':
-        return BookOpen;
+        return 'bookOpen';
       default:
-        return Bell;
+        return 'bell';
     }
   }
 

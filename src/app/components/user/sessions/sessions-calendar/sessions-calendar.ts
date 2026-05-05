@@ -1,14 +1,8 @@
 import { Component, computed, input, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CreateSessionResponse, CreateSubSessionResponse } from '@app/core/models/session.model';
-import {
-  getMonday,
-  getWeekDays,
-  getTimeSlots,
-  computeBlockStyles,
-  getSubjectColor,
-} from './calendar.utils';
-import { LucideAngularModule, ChevronLeft, ChevronRight, CalendarOff } from 'lucide-angular';
+import { getWeekDays, getTimeSlots, computeBlockStyles, getSubjectColor } from './calendar.utils';
+import { NgIconsModule } from '@ng-icons/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmHoverCardImports } from '@spartan-ng/helm/hover-card';
 import { BrnHoverCardImports } from '@spartan-ng/brain/hover-card';
@@ -18,7 +12,7 @@ import { BrnHoverCardImports } from '@spartan-ng/brain/hover-card';
   standalone: true,
   imports: [
     CommonModule,
-    LucideAngularModule,
+    NgIconsModule,
     HlmButtonImports,
     HlmHoverCardImports,
     BrnHoverCardImports,
@@ -47,10 +41,6 @@ export class SessionsCalendarComponent {
       { allowSignalWrites: true },
     );
   }
-
-  readonly ChevronLeft = ChevronLeft;
-  readonly ChevronRight = ChevronRight;
-  readonly CalendarOff = CalendarOff;
 
   weekDays = computed(() => getWeekDays(this.currentWeekStart()));
   timeSlots = getTimeSlots();
