@@ -1,22 +1,12 @@
 import { Routes } from '@angular/router';
-import { Home } from '@app/pages/home/home';
-import { SignIn } from '@app/pages/auth/sign-in/sign-in';
-import { SignUp } from '@app/pages/auth/sign-up/sign-up';
-import { Forbidden } from '@app/pages/forbidden/forbidden';
-import { NotFound } from '@app/pages/not-found/not-found';
-import { MainLayout } from '@app/layouts/main-layout/main-layout';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
-import { ServerErrorPage } from './pages/server-error/server-error';
-import { GroupService } from './core/services/group.service';
 import { mfaGuard } from './core/guards/mfa.guard';
-import { MfaType } from './pages/auth/mfa/mfa-type/mfa-type';
-import { MfaVerify } from './pages/auth/mfa/mfa-verify/mfa-verify';
 
 export const routes: Routes = [
   {
     path: '',
-    component: MainLayout,
+    loadComponent: () => import('./layouts/main-layout/main-layout').then((m) => m.MainLayout),
     children: [
       {
         path: '',
@@ -25,19 +15,19 @@ export const routes: Routes = [
       },
       {
         path: 'home',
-        component: Home,
+        loadComponent: () => import('./pages/home/home').then((m) => m.Home),
       },
     ],
   },
   {
     path: 'sign-in',
     canMatch: [guestGuard],
-    component: SignIn,
+    loadComponent: () => import('./pages/auth/sign-in/sign-in').then((m) => m.SignIn),
   },
   {
     path: 'sign-up',
     canMatch: [guestGuard],
-    component: SignUp,
+    loadComponent: () => import('./pages/auth/sign-up/sign-up').then((m) => m.SignUp),
   },
   {
     path: 'auth/mfa',
@@ -45,25 +35,26 @@ export const routes: Routes = [
     children: [
       {
         path: 'type',
-        component: MfaType,
+        loadComponent: () => import('./pages/auth/mfa/mfa-type/mfa-type').then((m) => m.MfaType),
       },
       {
         path: 'verify',
-        component: MfaVerify,
+        loadComponent: () =>
+          import('./pages/auth/mfa/mfa-verify/mfa-verify').then((m) => m.MfaVerify),
       },
     ],
   },
   {
     path: 'forbidden',
-    component: Forbidden,
+    loadComponent: () => import('./pages/forbidden/forbidden').then((m) => m.Forbidden),
   },
   {
     path: 'not-found',
-    component: NotFound,
+    loadComponent: () => import('./pages/not-found/not-found').then((m) => m.NotFound),
   },
   {
     path: 'server-error',
-    component: ServerErrorPage,
+    loadComponent: () => import('./pages/server-error/server-error').then((m) => m.ServerErrorPage),
   },
   {
     path: 'user',
@@ -94,13 +85,11 @@ export const routes: Routes = [
       {
         path: 'groups',
         loadComponent: () => import('./pages/user/groups/groups').then((m) => m.GroupsComponent),
-        providers: [GroupService],
       },
       {
         path: 'groups/:id',
         loadComponent: () =>
           import('./pages/user/group-detail/group-detail').then((m) => m.GroupDetailComponent),
-        providers: [GroupService],
       },
       {
         path: 'study-map',

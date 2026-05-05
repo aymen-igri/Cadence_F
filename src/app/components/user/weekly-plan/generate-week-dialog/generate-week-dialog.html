@@ -1,64 +1,211 @@
 <hlm-dialog [state]="state()" (stateChanged)="onStateChange($event)">
-  <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-[425px]">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-w-150">
     <hlm-dialog-header>
       <h3 hlmDialogTitle>Generate my week</h3>
-      <p hlmDialogDescription>Select the goals you want to focus on and configure preferences.</p>
+      <p hlmDialogDescription>Select your goals from subjects and configure your preferences.</p>
     </hlm-dialog-header>
 
-    <div class="py-4 space-y-6">
-      <div class="space-y-3">
-        <h4 class="text-sm font-medium">Include Goals</h4>
+    <form [formRoot]="sessionForm" class="flex flex-col h-full max-h-[70vh]">
+      <div class="overflow-y-auto flex-1 py-4 px-4 space-y-6">
+        <!-- Title Field -->
         <div class="space-y-2">
-          @for (goal of availableGoals(); track goal.id) {
-            <label hlmLabel class="flex items-center gap-2 font-normal">
-              <hlm-checkbox
-                [checked]="isSelected(goal.id)"
-                (changed)="toggleGoal(goal.id)"
-              ></hlm-checkbox>
-              {{ goal.goalTitle }}
-              <span class="text-muted-foreground text-xs">({{ goal.subjectName }})</span>
-            </label>
+          <label hlmLabel class="font-medium text-sm">Title</label>
+          <input
+            hlmInput
+            type="text"
+            [formField]="sessionForm.title"
+            id="title"
+            placeholder="e.g. Weekly study plan"
+            class="w-full"
+          />
+          @if (sessionForm.title().touched() && sessionForm.title().invalid()) {
+            <div class="text-xs text-destructive">
+              @for (error of sessionForm.title().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </div>
           }
-          @if (availableGoals().length === 0) {
-            <p class="text-xs text-muted-foreground italic">No goals found.</p>
+        </div>
+
+        <div class="space-y-2">
+          <label hlmLabel class="font-medium text-sm">Week Start Date</label>
+          <input
+            hlmInput
+            type="datetime-local"
+            [formField]="sessionForm.weekStartDate"
+            id="weekStartDate"
+            placeholder="e.g. 2023-10-01"
+            class="w-full"
+          />
+          @if (sessionForm.weekStartDate().touched() && sessionForm.weekStartDate().invalid()) {
+            <div class="text-xs text-destructive">
+              @for (error of sessionForm.weekStartDate().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </div>
           }
+        </div>
+
+        <!-- Subject + Goals Pairs (Repeatable) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-sm font-medium">Include Goals</h4>
+          </div>
+
+          <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
+            @for (pair of sessionForm.subjectGoalPairs; track $index) {
+              <div class="relative rounded-lg border p-4 space-y-4 bg-muted/20">
+                <!-- Subject Select -->
+                <div class="space-y-2">
+                  <label hlmLabel class="text-sm">Subject</label>
+                  <select
+                    class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+                    [formField]="pair.subjectId"
+                  >
+                    <option value="">Select a subject...</option>
+                    @for (subject of getAvailableSubjectsForPair($index); track subject.id) {
+                      <option [value]="subject.id">{{ subject.name }}</option>
+                    }
+                  </select>
+                  @if (pair.subjectId().touched() && pair.subjectId().invalid()) {
+                    <div class="text-xs text-destructive">
+                      @for (error of pair.subjectId().errors(); track error) {
+                        <p>{{ error.message }}</p>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <!-- Goals Multi-Select -->
+                @if (getSubjectIdFromPair($index) !== '') {
+                  <div class="space-y-2">
+                    <label hlmLabel class="text-sm">Goals</label>
+                    <div class="space-y-2 p-3 border border-border rounded-md bg-background">
+                      @if (getGoalsForSubject(getSubjectIdFromPair($index)).length === 0) {
+                        <p class="text-xs text-muted-foreground italic">
+                          No goals found for this subject.
+                        </p>
+                      }
+                      @for (
+                        goal of getGoalsForSubject(getSubjectIdFromPair($index));
+                        track goal.id
+                      ) {
+                        <label hlmLabel class="flex items-center gap-2 font-normal cursor-pointer">
+                          <input
+                            type="checkbox"
+                            [checked]="isGoalSelected($index, goal.id)"
+                            (change)="toggleGoal($index, goal.id)"
+                            class="rounded"
+                          />
+                          {{ goal.title }}
+                          <span class="text-muted-foreground text-xs"
+                            >({{ goal.targetHoursPerWeek }}h/week)</span
+                          >
+                        </label>
+                      }
+                    </div>
+                    @if (pair.selectedGoalIds().touched() && pair.selectedGoalIds().invalid()) {
+                      <div class="text-xs text-destructive">
+                        @for (error of pair.selectedGoalIds().errors(); track error) {
+                          <p>{{ error.message }}</p>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Remove Button -->
+                @if (sessionForm.subjectGoalPairs.length > 1) {
+                  <button
+                    type="button"
+                    hlmBtn
+                    size="sm"
+                    variant="ghost"
+                    class="h-8 px-2 text-destructive hover:bg-destructive/10"
+                    (click)="removeSubjectGoalPair($index)"
+                  >
+                    Remove Subject
+                  </button>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Add More Subjects Button -->
+          <button
+            type="button"
+            hlmBtn
+            variant="outline"
+            class="w-full border-dashed"
+            (click)="addSubjectGoalPair()"
+          >
+            + Add another subject
+          </button>
+
+          @if (
+            sessionForm.subjectGoalPairs().touched() && sessionForm.subjectGoalPairs().invalid()
+          ) {
+            <div class="text-xs text-destructive">
+              @for (error of sessionForm.subjectGoalPairs().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Availability Plan Select -->
+        <div class="space-y-2">
+          <label hlmLabel class="font-medium text-sm">Availability Plan</label>
+          <select
+            class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+            [formField]="sessionForm.availabilityPlanID"
+          >
+            <option value="">Select an availability plan...</option>
+            @for (plan of availabilityPlans(); track plan.id) {
+              <option [value]="plan.id">{{ plan.title }}</option>
+            }
+          </select>
+          @if (
+            sessionForm.availabilityPlanID().touched() && sessionForm.availabilityPlanID().invalid()
+          ) {
+            <div class="text-xs text-destructive">
+              @for (error of sessionForm.availabilityPlanID().errors(); track error) {
+                <p>{{ error.message }}</p>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Use Priority Checkbox -->
+        <div
+          class="flex items-center gap-3 rounded-md bg-muted/50 p-3 border border-border border-dashed"
+        >
+          <input
+            type="checkbox"
+            id="usePriority"
+            [checked]="sessionForm.usePriority()"
+            (change)="$event.target.checked ? sessionModel.update(m => ({ ...m, usePriority: true })) : sessionModel.update(m => ({ ...m, usePriority: false }))"
+            class="rounded"
+          />
+          <label hlmLabel for="usePriority" class="font-normal cursor-pointer">
+            <span class="font-medium text-sm">Use Priority</span>
+            <p class="text-xs text-muted-foreground">
+              Consider goal priority when generating your session plan.
+            </p>
+          </label>
         </div>
       </div>
 
-      <div class="space-y-2">
-        <label hlmLabel class="font-medium text-sm">Preferred Session Duration (mins)</label>
-        <input
-          hlmInput
-          type="number"
-          [(ngModel)]="sessionDuration"
-          class="w-full"
-          min="30"
-          max="240"
-          step="15"
-        />
-      </div>
-
-      <div class="space-y-2 rounded-md bg-muted/50 p-3 border border-border border-dashed">
-        <h4 class="text-sm font-medium flex justify-between">
-          Availability Summary
-          <button
-            class="text-xs text-primary hover:underline bg-transparent border-0"
-            (click)="close()"
-          >
-            Edit
-          </button>
-        </h4>
-        <p class="text-xs text-muted-foreground">
-          You have {{ availabilityService.slots().length }} time blocks defined for this week.
-        </p>
-      </div>
-    </div>
-
-    <hlm-dialog-footer>
-      <button hlmBtn variant="outline" (click)="close()">Cancel</button>
-      <button hlmBtn (click)="generatePlan()" [disabled]="selectedGoals.length === 0">
-        Generate
-      </button>
-    </hlm-dialog-footer>
+      <hlm-dialog-footer class="shrink-0 mt-auto border-t border-border pt-4 px-4">
+        <button hlmBtn variant="outline" (click)="close()">Cancel</button>
+        <button
+          hlmBtn
+          type="submit"
+          [disabled]="sessionForm().invalid() || sessionForm().submitting()"
+        >
+          Generate
+        </button>
+      </hlm-dialog-footer>
+    </form>
   </hlm-dialog-content>
 </hlm-dialog>

@@ -5,6 +5,7 @@ import {
   CreateSessionRequest,
   CreateSessionResponse,
   CreateSubSessionResponse,
+  GenerateSessionRequest,
   UpdateSessionRequest,
 } from '../models/session.model';
 import { createQuery } from '../utils/query.helper';
@@ -15,6 +16,7 @@ export class SessionService {
   private http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/session`;
   readonly allSessions = createQuery<CreateSessionResponse[]>([]);
+  readonly allGeneratedSessions = createQuery<CreateSessionResponse[]>([]);
 
   public createSession(payload: CreateSessionRequest) {
     return this.http.post<CreateSessionResponse>(`${this.url}/create`, payload).pipe(
@@ -25,7 +27,15 @@ export class SessionService {
   }
 
   public loadAllSessions() {
-    return this.allSessions.load(this.http.get<CreateSessionResponse[]>(`${this.url}/all`));
+    return this.allSessions.load(
+      this.http.get<CreateSessionResponse[]>(`${this.url}/all/PUBLISHED`),
+    );
+  }
+
+  public loadAllGeneratedSessions() {
+    return this.allGeneratedSessions.load(
+      this.http.get<CreateSessionResponse[]>(`${this.url}/all/DRAFT`),
+    );
   }
 
   public updateSession(sessionId: string, payload: UpdateSessionRequest) {
@@ -76,5 +86,23 @@ export class SessionService {
           );
         }),
       );
+  }
+
+  public generateWeeklyPlan(payload: GenerateSessionRequest) {
+    return this.http.post<CreateSessionResponse>(`${this.url}/generate`, payload).pipe(
+      tap((newSession) => {
+        this.allGeneratedSessions.mutate((sessions) => [...sessions, newSession]);
+      }),
+    );
+  }
+
+  public approveSession(sessionId: string) {
+    return this.http.patch(`${this.url}/approve/${sessionId}`, {}).pipe(
+      tap(() => {
+        this.allGeneratedSessions.mutate((sessions) =>
+          sessions.filter((session) => session.weeklySession.id !== sessionId),
+        );
+      }),
+    );
   }
 }

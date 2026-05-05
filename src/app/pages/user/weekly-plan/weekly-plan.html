@@ -7,49 +7,66 @@
         Organize your study schedule into actionable blocks.
       </p>
     </div>
-    <button hlmBtn (click)="dialogState.set('open')" [disabled]="hasPlanForSelectedWeek()">
-      Generate my week
-    </button>
+    <button hlmBtn (click)="dialogState.set('open')">Generate my week</button>
   </div>
 
-  <hlm-tabs [tab]="activeTab()" (tabChanged)="setActiveTab($event)">
-    <hlm-tabs-list class="w-full sm:w-auto mt-2 mb-6" aria-label="tabs">
-      <button hlmTabsTrigger="this-week">This week</button>
-      <button hlmTabsTrigger="next-week">Next week</button>
-    </hlm-tabs-list>
-
-    <div hlmTabsContent="this-week">
-      <div class="space-y-8 mt-2">
-        <app-weekly-summary [goals]="goals()"></app-weekly-summary>
-        <app-weekly-plan-sessions-list
-          [sessions]="thisWeekSessions()"
-          (editClick)="editSession($event)"
-          (deleteClick)="deleteSession($event)"
-          (generateClick)="dialogState.set('open')"
-        >
-        </app-weekly-plan-sessions-list>
-      </div>
+  <section hlmCard class="border-border/70 shadow-sm">
+    <div hlmCardHeader class="space-y-1">
+      <h2 hlmCardTitle>How Weekly Session Generation Works</h2>
+      <p hlmCardDescription>
+        Use this page to auto-generate study sessions from your existing goals and availability
+        template.
+      </p>
     </div>
 
-    <div hlmTabsContent="next-week">
-      <div class="space-y-8 mt-2">
-        <app-weekly-summary [goals]="goals()"></app-weekly-summary>
-        <app-weekly-plan-sessions-list
-          [sessions]="nextWeekSessions()"
-          (editClick)="editSession($event)"
-          (deleteClick)="deleteSession($event)"
-          (generateClick)="dialogState.set('open')"
-        >
-        </app-weekly-plan-sessions-list>
+    <div hlmCardContent class="space-y-6">
+      <div class="space-y-3">
+        <h3 class="text-sm font-semibold text-foreground">Before you generate</h3>
+        <ul class="space-y-2 text-sm text-muted-foreground list-disc pl-5">
+          <li>Create your goals inside your subject(s).</li>
+          <li>
+            Set up your availability plan template so the generator can place sessions in valid time
+            slots.
+          </li>
+        </ul>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-sm font-semibold text-foreground">What happens next</h3>
+        <ul class="space-y-2 text-sm text-muted-foreground list-disc pl-5">
+          <li>
+            The generator creates a weekly plan with session and sub-session slots based on your
+            availability.
+          </li>
+          <li>You review the generated sub-sessions and keep only the ones that work for you.</li>
+          <li>
+            When you save, selected items become normal sessions and appear in your Sessions list
+            page.
+          </li>
+        </ul>
       </div>
     </div>
-  </hlm-tabs>
+  </section>
 
-  <app-generate-week-dialog
-    [state]="dialogState()"
-    (dialogStateChange)="dialogState.set($event)"
-    [availableGoals]="goals()"
-    (generate)="onGeneratePlan($event)"
-  >
+  <div class="mt-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-foreground">Generated Session Drafts</h2>
+        <p class="text-sm text-muted-foreground mt-1">
+          Review and approve generated sessions below. Once approved, they will appear in your
+          <a routerLink="/user/sessions" class="font-medium text-primary hover:underline"
+            >active sessions</a
+          >.
+        </p>
+      </div>
+    </div>
+    <app-generated-sessions-list
+      [sessions]="allGeneratedSession()"
+      [isLoadingSesions]="isLoadingSesions()"
+    >
+    </app-generated-sessions-list>
+  </div>
+
+  <app-generate-week-dialog [state]="dialogState()" (dialogStateChange)="dialogState.set($event)">
   </app-generate-week-dialog>
 </div>

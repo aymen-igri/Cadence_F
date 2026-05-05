@@ -7,6 +7,7 @@ import { authInterceptor } from '@app/core/interceptors/auth.interceptor';
 import { errorInterceptor } from '@app/core/interceptors/error.interceptor';
 import { loadingInterceptor } from '@app/core/interceptors/loading.interceptor';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { cacheInterceptor } from '@app/core/interceptors/cache.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,6 @@ export const appConfig: ApplicationConfig = {
       sidebarKeyboardShortcut: 'b',
       mobileBreakpoint: '768px',
     }),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor, cacheInterceptor])),
   ],
 };

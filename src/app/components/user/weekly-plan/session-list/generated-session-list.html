@@ -1,0 +1,145 @@
+<div class="space-y-4">
+  @if (sessions().length === 0) {
+    <div class="text-center py-12 bg-muted/30 rounded-lg border border-dashed border-border">
+      <lucide-angular
+        [img]="Clock"
+        class="h-10 w-10 text-muted-foreground mx-auto mb-4"
+      ></lucide-angular>
+      <h3 class="text-lg font-medium text-foreground">No sessions scheduled</h3>
+      <p class="text-sm text-muted-foreground mt-1">Get started by adding a new study session.</p>
+    </div>
+  } @else {
+    @if (isLoadingSesions()) {
+      <div class="text-center py-12">
+        <span class="loading loading-spinner loading-lg"></span>
+        <p class="text-sm text-muted-foreground mt-2">Loading sessions...</p>
+      </div>
+    } @else {
+      @for (sessionRes of sessions(); track sessionRes.weeklySession.id) {
+        <div hlmCard class="p-4 flex flex-col gap-4">
+          <!-- Parent Weekly Session Header -->
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-start gap-4 flex-1 w-full">
+              <div
+                class="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0"
+              >
+                <lucide-angular [img]="Clock" class="h-5 w-5"></lucide-angular>
+              </div>
+              <div class="space-y-1 w-full">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="font-semibold text-foreground">
+                    {{ sessionRes.weeklySession.title }}
+                  </h4>
+                  <span
+                    hlmBadge
+                    [variant]="getBadgeVariant(sessionRes.weeklySession.sessionStatus)"
+                    class="text-[10px] px-2 py-0 h-5"
+                  >
+                    DRAFT
+                  </span>
+                </div>
+                <div
+                  class="flex flex-col sm:flex-row sm:items-center gap-y-1 gap-x-4 text-xs text-muted-foreground"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <lucide-angular [img]="Clock" class="h-3.5 w-3.5"></lucide-angular>
+                    <span
+                      >Starts: {{ sessionRes.weeklySession.startTime | date: 'mediumDate' }}</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              hlmBtn
+              variant="ghost"
+              size="icon"
+              class="h-8 w-8 self-end sm:self-auto"
+              [hlmDropdownMenuTrigger]="weeklySessionMenu"
+              aria-label="Open weekly session actions"
+            >
+              <lucide-angular [img]="MoreVertical" class="h-4 w-4"></lucide-angular>
+            </button>
+
+            <ng-template #weeklySessionMenu>
+              <hlm-dropdown-menu>
+                <button
+                  hlmDropdownMenuItem
+                  class="gap-2"
+                  (click)="onApproveSession(sessionRes.weeklySession.id)"
+                >
+                  <lucide-angular [img]="CheckCircle2" class="h-4 w-4"></lucide-angular>
+                  Approve
+                </button>
+                <hlm-dropdown-menu-separator></hlm-dropdown-menu-separator>
+                <button
+                  hlmDropdownMenuItem
+                  variant="destructive"
+                  class="gap-2"
+                  (click)="onDeleteGeneratedSession(sessionRes.weeklySession.id)"
+                >
+                  <lucide-angular [img]="Trash2" class="h-4 w-4"></lucide-angular>
+                  Delete
+                </button>
+              </hlm-dropdown-menu>
+            </ng-template>
+          </div>
+
+          <!-- Accordion for Sub-sessions -->
+          @if (sessionRes.subSessions && sessionRes.subSessions.length > 0) {
+            <hlm-accordion type="multiple">
+              <hlm-accordion-item class="border-b-0 border-t pt-2 mt-2">
+                <h3 class="flex flex-1">
+                  <button
+                    hlmAccordionTrigger
+                    class="py-2 hover:bg-muted/50 hover:no-underline px-2 -mx-2 rounded-md transition-colors"
+                  >
+                    <span class="text-sm font-medium text-muted-foreground w-full text-left">
+                      View Sub-sessions ({{ sessionRes.subSessions.length }})
+                    </span>
+                    <lucide-angular
+                      hlmAccordionIcon
+                      [img]="ChevronDown"
+                      class="h-4 w-4 text-muted-foreground transition-transform duration-200"
+                    ></lucide-angular>
+                  </button>
+                </h3>
+                <hlm-accordion-content class="overflow-hidden">
+                  <div class="pt-4 pb-2 space-y-3">
+                    @for (sub of sessionRes.subSessions; track sub.id) {
+                      <div
+                        class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 gap-4 border rounded-md bg-muted/20"
+                      >
+                        <div class="flex flex-col gap-1">
+                          <div class="flex items-center gap-2">
+                            <span class="font-medium text-sm text-foreground">{{
+                              sub.subjectName || 'Unknown Subject'
+                            }}</span>
+                            <span
+                              hlmBadge
+                              [variant]="getBadgeVariant(sub.status)"
+                              class="text-[10px] px-2 py-0 h-4"
+                            >
+                              {{ sub.status }}
+                            </span>
+                          </div>
+                          <div class="flex items-center gap-3 text-xs text-muted-foreground">
+                            <span class="font-semibold text-primary/80">{{
+                              sub.dayOfWeek | titlecase
+                            }}</span>
+                            <span>{{ sub.startTime }} - {{ sub.endTime }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </hlm-accordion-content>
+              </hlm-accordion-item>
+            </hlm-accordion>
+          }
+        </div>
+      }
+    }
+  }
+</div>

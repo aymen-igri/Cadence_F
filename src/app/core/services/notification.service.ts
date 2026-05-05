@@ -1,20 +1,21 @@
-import { Injectable, inject, linkedSignal } from '@angular/core';
+import { Injectable, inject, linkedSignal, OnDestroy } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
-import { tap } from 'rxjs';
-import { Client, StompSubscription } from '@stomp/stompjs';
+import { tap, takeUntil } from 'rxjs';
+import { RxStomp } from '@stomp/rx-stomp';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { Notification } from '../models/notification.model';
+import { Subject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class NotificationService {
+export class NotificationService implements OnDestroy {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
 
   private readonly apiUrl = `${environment.apiUrl}/notifications`;
 
-  private stompClient: Client | null = null;
-  private notificationSubscription: StompSubscription | null = null;
+  private rxStomp: RxStomp = new RxStomp();
+  private destroy$ = new Subject<void>();
 
   readonly notificationsResource = httpResource<Notification[]>(() => {
     return {
@@ -52,7 +53,8 @@ export class NotificationService {
 
     const wsUrl = environment.apiUrl.replace(/^http/, 'ws') + '/ws';
 
-    this.stompClient = new Client({
+    // Configure the RxStomp client
+    this.rxStomp.configure({
       brokerURL: wsUrl,
       connectHeaders: {
         Authorization: `Bearer ${token}`,
@@ -62,29 +64,49 @@ export class NotificationService {
       heartbeatOutgoing: 4000,
     });
 
-    this.stompClient.onConnect = () => {
-      this.notificationSubscription = this.stompClient!.subscribe(
-        '/user/queue/notifications',
-        (message) => {
+    // Activate connection
+    this.rxStomp.activate();
+
+    // Handle connection success and subscribe to notifications
+    this.rxStomp.connected$
+      .pipe(
+        tap(() => {
+          this.subscribeToNotifications();
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        error: (err) => console.error('Connection error:', err),
+      });
+  }
+
+  private subscribeToNotifications(): void {
+    this.rxStomp
+      .watch('/user/queue/notifications')
+      .pipe(
+        tap((message) => {
           if (!message.body) return;
 
           const newNotification: Notification = JSON.parse(message.body);
           this.notifications.update((list) => [newNotification, ...list]);
-        },
-      );
-    };
-
-    this.stompClient.activate();
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        error: (err) => console.error('Subscription error:', err),
+      });
   }
 
   disconnect(): void {
-    this.notificationSubscription?.unsubscribe();
-    this.notificationSubscription = null;
+    this.destroy$.next();
+    this.destroy$.complete();
 
-    if (this.stompClient?.active) {
-      this.stompClient.deactivate();
+    if (this.rxStomp.active) {
+      this.rxStomp.deactivate();
     }
+  }
 
-    this.stompClient = null;
+  ngOnDestroy(): void {
+    this.disconnect();
   }
 }

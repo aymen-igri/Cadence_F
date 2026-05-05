@@ -1,8 +1,9 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { AuthService } from './auth.service';
-import { Client, Message } from '@stomp/stompjs';
+import { RxStomp } from '@stomp/rx-stomp';
 import { GroupMessageResponse, SendGroupMessageRequest } from '../models/chat.model';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
@@ -17,11 +18,11 @@ export interface ChatMessage {
 @Injectable({
   providedIn: 'root',
 })
-export class ChatService {
+export class ChatService implements OnDestroy {
   private authService = inject(AuthService);
   private http = inject(HttpClient);
-  private stompClient: Client | null = null;
-  private currentSubscription: any = null;
+  private rxStomp: RxStomp = new RxStomp();
+  private destroy$ = new Subject<void>();
   private readonly apiUrl = `${environment.apiUrl}/groups`;
 
   private messagesSubject = new BehaviorSubject<GroupMessageResponse[]>([]);
@@ -56,52 +57,57 @@ export class ChatService {
   connectAndSubscribe(groupId: string): void {
     const token = this.authService.getAccessToken();
     if (!token) return;
+
     const wsUrl = environment.apiUrl.replace(/^http/, 'ws') + '/ws';
-    // 1. Configure the STOMP Client
-    this.stompClient = new Client({
+
+    // Configure the RxStomp client
+    this.rxStomp.configure({
       brokerURL: wsUrl,
       connectHeaders: {
-        Authorization: `Bearer ${token}`, // Critical for your backend Interceptor
+        Authorization: `Bearer ${token}`,
       },
-      debug: (str) => {
-        console.log(str); // Useful for development
+      debug: (str: string) => {
+        console.log(str);
       },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
     });
 
-    // 2. On Successful Connection
-    this.stompClient.onConnect = (frame) => {
-      console.log('STOMP Connected: ', frame);
+    // Activate connection
+    this.rxStomp.activate();
 
-      // Clean up any old subscription if we changed groups
-      if (this.currentSubscription) {
-        this.currentSubscription.unsubscribe();
-      }
-
-      // 3. Subscribe to the Group's specific topic
-      const topicPath = `/topic/groups/${groupId}`;
-      this.currentSubscription = this.stompClient!.subscribe(topicPath, (message: Message) => {
-        // This fires when ANY user (including us) sends a message and the backend broadcasts it
-        if (message.body) {
-          const newMsg: GroupMessageResponse = JSON.parse(message.body);
-          this.handleIncomingMessage(newMsg);
-        }
+    // Handle connection success and subscribe to group chat
+    this.rxStomp.connected$
+      .pipe(
+        tap(() => {
+          console.log('STOMP Connected');
+          this.subscribeToGroupChat(groupId);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        error: (err) => console.error('Connection error:', err),
       });
-    };
+  }
 
-    this.stompClient.onStompError = (frame) => {
-      console.error('Broker reported error: ' + frame.headers['message']);
-      console.error('Additional details: ' + frame.body);
-    };
+  private subscribeToGroupChat(groupId: string): void {
+    const topicPath = `/topic/groups/${groupId}`;
 
-    // 4. Handle underlying WebSocket transport errors (e.g., server down, network drop)
-    this.stompClient.onWebSocketError = (event) => {
-      console.error('WebSocket connection error:', event);
-    };
-
-    this.stompClient.activate();
+    this.rxStomp
+      .watch(topicPath)
+      .pipe(
+        tap((message) => {
+          if (message.body) {
+            const newMsg: GroupMessageResponse = JSON.parse(message.body);
+            this.handleIncomingMessage(newMsg);
+          }
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        error: (err) => console.error('Subscription error:', err),
+      });
   }
   private handleIncomingMessage(message: GroupMessageResponse): void {
     const currentMessages = this.messagesSubject.getValue();
@@ -117,14 +123,16 @@ export class ChatService {
    * MUST be called when leaving the chat component
    */
   disconnect(): void {
-    if (this.currentSubscription) {
-      this.currentSubscription.unsubscribe();
-      this.currentSubscription = null;
-    }
-    if (this.stompClient && this.stompClient.active) {
-      this.stompClient.deactivate();
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.rxStomp.active) {
+      this.rxStomp.deactivate();
     }
     // Clear the chat state
     this.messagesSubject.next([]);
+  }
+
+  ngOnDestroy(): void {
+    this.disconnect();
   }
 }

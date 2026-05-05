@@ -1,6 +1,6 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CreateSessionResponse, CreateSubSessionResponse } from '@app/core/models/session.model';
+import { CreateSessionResponse } from '@app/core/models/session.model';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmAccordionImports } from '@spartan-ng/helm/accordion';
@@ -22,10 +22,9 @@ import { SessionService } from '@app/core/services/session.service';
 import { AlertService } from '@app/components/shared/alert/alert.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
-import { SessionDialogComponent } from '../session-dialog/session-dialog';
 
 @Component({
-  selector: 'app-sessions-list',
+  selector: 'app-generated-sessions-list',
   standalone: true,
   imports: [
     CommonModule,
@@ -35,19 +34,14 @@ import { SessionDialogComponent } from '../session-dialog/session-dialog';
     HlmButtonImports,
     HlmAccordionImports,
     HlmDropdownMenuImports,
-    SessionDialogComponent,
   ],
-  templateUrl: './sessions-list.html',
+  templateUrl: './generated-session-list.html',
 })
-export class SessionsListComponent {
-  private sessionSerivce = inject(SessionService);
+export class GeneratedSessionsListComponent {
+  private sessionService = inject(SessionService);
   private alertService = inject(AlertService);
-  sessions = input<CreateSessionResponse[]>([]);
+  sessions = input.required<CreateSessionResponse[]>();
   isLoadingSesions = input.required<boolean>();
-  sessionClick = output<string>();
-  startSession = output<string>();
-  completeSession = output<string>();
-  updateSubjectDialogState = signal<'closed' | 'open'>('closed');
 
   protected Clock = Clock;
   protected FileText = FileText;
@@ -60,7 +54,7 @@ export class SessionsListComponent {
   protected Trash2 = Trash2;
 
   readonly deleteSession = createMutation({
-    mutationFn: (sessionId: string) => this.sessionSerivce.deleteSession(sessionId),
+    mutationFn: (sessionId: string) => this.sessionService.deleteSession(sessionId),
     onSuccess: () => {
       toast.success('Session deleted', {
         description: 'The session has been removed from your study map.',
@@ -74,26 +68,18 @@ export class SessionsListComponent {
     },
   });
 
-  readonly updateSubSessionStatus = createMutation({
-    mutationFn: ({
-      weeklySessionId,
-      subSessionId,
-      status,
-    }: {
-      weeklySessionId: string;
-      subSessionId: string;
-      status: 'PENDING' | 'COMPLETED';
-    }) => this.sessionSerivce.updateSubSessionStatus(weeklySessionId, subSessionId, status),
+  readonly approveSessionMutation = createMutation({
+    mutationFn: (sessionId: string) => this.sessionService.approveSession(sessionId),
     onSuccess: () => {
-      toast.success('Session updated', {
-        description: 'The session status has been updated.',
+      toast.success('Session approved', {
+        description: 'The session has been approved.',
       });
     },
     onError: (error) => {
-      toast.error('Failed to update session', {
+      toast.error('Failed to approve session', {
         description: error,
       });
-      console.error('Failed to update session :', error);
+      console.error('Failed to approve session :', error);
     },
   });
 
@@ -112,49 +98,24 @@ export class SessionsListComponent {
     }
   }
 
-  onActionClick(
-    event: Event,
-    subSessionId: string,
-    weeklySessionId: string,
-    action: 'COMPLETED' | 'PENDING',
-  ) {
-    event.stopPropagation();
-    if (action === 'COMPLETED') {
-      this.alertService.show({
-        description: 'Are you sure you want to mark this session as completed?',
-        variant: 'destructive',
-        actionLabel: 'Mark as Completed',
-        action: () => {
-          this.updateSubSessionStatus.mutate({
-            weeklySessionId,
-            subSessionId,
-            status: 'COMPLETED',
-          });
-        },
-      });
-    } else if (action === 'PENDING') {
-      this.alertService.show({
-        description: 'Are you sure you want to mark this session as pending?',
-        variant: 'destructive',
-        actionLabel: 'Mark as Pending',
-        action: () => {
-          this.updateSubSessionStatus.mutate({
-            weeklySessionId,
-            subSessionId,
-            status: 'PENDING',
-          });
-        },
-      });
-    }
-  }
-
-  onDeleteSession(sessionId: string) {
+  onDeleteGeneratedSession(sessionId: string) {
     this.alertService.show({
       description: 'Are you sure you want to delete this session?',
       variant: 'destructive',
       actionLabel: 'Delete',
       action: () => {
         this.deleteSession.mutate(sessionId);
+      },
+    });
+  }
+
+  onApproveSession(sessionId: string) {
+    this.alertService.show({
+      description: 'Are you sure you want to approve this session?',
+      variant: 'default',
+      actionLabel: 'Approve',
+      action: () => {
+        this.approveSessionMutation.mutate(sessionId);
       },
     });
   }
