@@ -12,6 +12,7 @@ import { MfaSetupModalComponent } from '../mfa-setup-modal/mfa-setup-modal';
 import { MfaService } from '@app/core/services/mfa.service';
 import { finalize } from 'rxjs';
 import { toast } from 'ngx-sonner';
+import { User } from '@app/core/models/user.model';
 
 @Component({
   selector: 'app-settings-mfa',
@@ -31,7 +32,7 @@ import { toast } from 'ngx-sonner';
 })
 export class SettingsMfaComponent {
   private mfaService = inject(MfaService);
-  user = input.required<any>();
+  user = input.required<User>();
 
   readonly Mail = Mail;
   readonly Smartphone = Smartphone;

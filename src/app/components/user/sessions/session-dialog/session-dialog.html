@@ -110,22 +110,28 @@
 
                   <div class="space-y-2">
                     <label hlmLabel>Start Time</label>
-                    <input
-                      hlmInput
-                      type="time"
+                    <select
                       [formField]="subSession.startTime"
-                      class="w-full bg-background"
-                    />
+                      class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+                    >
+                    <option value="">Select a time...</option>
+                    @for (t of timeSlots; track t) {
+                      <option [value]="t">{{ t }}</option>
+                    }
+                    </select>
                   </div>
 
                   <div class="space-y-2">
                     <label hlmLabel>End Time</label>
-                    <input
-                      hlmInput
-                      type="time"
+                    <select
                       [formField]="subSession.endTime"
-                      class="w-full bg-background"
-                    />
+                      class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+                    >
+                    <option value="">Select a time...</option>
+                    @for (t of timeSlots; track t) {
+                      <option [value]="t">{{ t }}</option>
+                    }
+                    </select>
                   </div>
                 </div>
               </div>

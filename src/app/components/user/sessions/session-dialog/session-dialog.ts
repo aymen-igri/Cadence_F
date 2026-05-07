@@ -14,6 +14,7 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { toast } from 'ngx-sonner';
 
+
 @Component({
   selector: 'app-session-dialog',
   templateUrl: './session-dialog.html',
@@ -29,6 +30,33 @@ import { toast } from 'ngx-sonner';
 export class SessionDialogComponent {
   private subjectService = inject(SubjectService);
   private sessionService = inject(SessionService);
+  readonly timeSlots = [
+    '08:00',
+    '08:30',
+    '09:00',
+    '09:30',
+    '10:00',
+    '10:30',
+    '11:00',
+    '11:30',
+    '12:00',
+    '12:30',
+    '13:00',
+    '13:30',
+    '14:00',
+    '14:30',
+    '15:00',
+    '15:30',
+    '16:00',
+    '16:30',
+    '17:00',
+    '17:30',
+    '18:00',
+    '18:30',
+    '19:00',
+    '19:30',
+    '20:00',
+  ];
   session = input<CreateSessionResponse>();
   sessionModel = signal<CreateSessionRequest>({
     weeklySession: {
@@ -63,8 +91,8 @@ export class SessionDialogComponent {
           },
           subSessions: existing.subSessions.map((sub) => ({
             dayOfWeek: sub.dayOfWeek,
-            startTime: sub.startTime,
-            endTime: sub.endTime,
+            startTime: sub.startTime ? String(sub.startTime).slice(0, 5) : '',
+            endTime: sub.endTime ? String(sub.endTime).slice(0, 5) : '',
             status: sub.status,
             subjectId: sub.subjectId,
           })),
