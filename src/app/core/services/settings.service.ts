@@ -12,4 +12,14 @@ export class SettingsService {
         console.log(responce);
         return responce;
     }
+
+    updateUserProfile(data: Partial<{ firstName: string; lastName: string; phone: string; gender: string }>) {
+        return this.http.patch(`${this.userUtl}/update`, data);
+    }
+
+    uploadProfilePic(file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.patch(`${this.userUtl}/changePFP`, formData);
+    }
 }

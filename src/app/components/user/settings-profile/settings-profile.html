@@ -1,11 +1,11 @@
 <form [formRoot]="profileForm" class="space-y-6">
 
   <!-- Avatar -->
-  <div class="flex items-center justify-center md:items-start gap-4">
-    <hlm-avatar class="w-40 h-40">
-      <img hlmAvatarImage src='/assets/avatar.png' alt='spartan logo. Resembling a spartanic shield' />
-      <span hlmAvatarFallback class="text-5xl">
-        {{ profileForm.firstName().value().charAt(0) + profileForm.lastName().value().charAt(0) }}
+  <div class="flex flex-col md:flex-row items-center justify-center md:items-start gap-6">
+    <hlm-avatar class="w-40 h-40 cursor-pointer hover:opacity-80 transition-opacity" (click)="isAvatarDialogOpen.set(true)">
+      <img hlmAvatarImage [src]="profileForm.profilePic?.()?.value() ?? ''" alt='spartan logo. Resembling a spartanic shield' />
+      <span hlmAvatarFallback class="text-5xl uppercase">
+        {{ profileForm.firstName().value().charAt(0) }}{{ profileForm.lastName().value().charAt(0) }}
       </span>
     </hlm-avatar>
   </div>
@@ -64,3 +64,36 @@
       Changes</button>
   </div>
 </form>
+
+<!-- Avatar Upload Dialog -->
+<hlm-dialog [state]="isAvatarDialogOpen() ? 'open' : 'closed'" (closed)="isAvatarDialogOpen.set(false)">
+  <hlm-dialog-content *hlmDialogPortal="let ctx" class="sm:max-w-[425px]">
+    <hlm-dialog-header>
+      <h3 hlmDialogTitle>Update Profile Picture</h3>
+      <p hlmDialogDescription>Choose a new picture for your profile. Recommended size is 256x256px.</p>
+    </hlm-dialog-header>
+
+    <div class="flex flex-col items-center justify-center py-6 gap-4">
+      <hlm-avatar class="w-32 h-32">
+        <img hlmAvatarImage [src]="profileForm.profilePic?.()?.value() ?? ''" alt='Current profile picture' />
+        <span hlmAvatarFallback class="text-4xl uppercase">
+          {{ profileForm.firstName().value().charAt(0) }}{{ profileForm.lastName().value().charAt(0) }}
+        </span>
+      </hlm-avatar>
+      
+      <div class="mt-4 w-full">
+        <input 
+          type="file" 
+          #fileInput 
+          class="hidden" 
+          accept="image/*" 
+          (change)="onFileSelected($event)" 
+        />
+        <button hlmBtn class="w-full" type="button" (click)="fileInput.click()">
+          <ng-icon hlm name="lucideUpload" class="mr-2 h-4 w-4"></ng-icon>
+          Select Image
+        </button>
+      </div>
+    </div>
+  </hlm-dialog-content>
+</hlm-dialog>

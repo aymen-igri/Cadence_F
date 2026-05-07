@@ -9,6 +9,8 @@ export interface User {
   phone: string;
   gender: 'MALE' | 'FEMALE';
   role: Role;
+  profilePic?: string;
+  isTotpEnabled?: boolean;
 }
 
 
