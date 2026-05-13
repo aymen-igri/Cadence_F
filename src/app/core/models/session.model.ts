@@ -20,7 +20,8 @@ export interface AppSession {
 export interface CreateWeeklySessionResponse {
   id: string;
   title: string;
-  startTime: string;
+  weekNumber: number;
+  weekYear: number;
   sessionStatus: 'PENDING' | 'COMPLETED' | 'INCOMPLETED' | 'CLOSED';
 }
 
@@ -35,7 +36,9 @@ export interface CreateSubSessionResponse {
 }
 export interface CreateWeeklySessionRequest {
   title: string;
-  startTime: string;
+  // ISO week year and week number (e.g. 2026, 21)
+  weekYear: number;
+  weekNumber: number;
 }
 export interface CreateSubSessionRequest {
   dayOfWeek: 'MONDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY';
@@ -79,7 +82,7 @@ export interface GenerateSessionRequest {
 export interface ShareSessionRequest {
   sessionId: string;
   groupId: string;
-  permission : 'VIEW_ONLY' | 'EDIT';
+  permission: 'VIEW_ONLY' | 'EDIT';
 }
 
 export interface SharedSession {

@@ -24,11 +24,23 @@ export class SessionsCalendarComponent {
 
   weekDays = computed(() => {
     const activeSession = this.session();
-    if (!activeSession?.weeklySession?.startTime) {
+    if (!activeSession?.weeklySession?.weekYear || !activeSession?.weeklySession?.weekNumber) {
       return [];
     }
-    const anchorDate = new Date(activeSession.weeklySession.startTime);
+
+    const { weekYear, weekNumber } = activeSession.weeklySession;
+
+    // Find Jan 4 of the given year, which is always in week 1
+    const jan4 = new Date(weekYear, 0, 4);
+    // Find Monday of the week containing Jan 4
+    const day = jan4.getDay();
+    const diffToMonday = jan4.getDate() - day + (day === 0 ? -6 : 1);
+    const startOfFirstWeek = new Date(weekYear, 0, diffToMonday);
+
+    const anchorDate = new Date(startOfFirstWeek);
+    anchorDate.setDate(anchorDate.getDate() + (weekNumber - 1) * 7);
     anchorDate.setHours(0, 0, 0, 0); // ensure start of day
+
     return getWeekDays(anchorDate);
   });
 

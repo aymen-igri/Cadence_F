@@ -31,24 +31,64 @@
           }
         </div>
         <div class="space-y-2">
-          <label hlmLabel>Start Date</label>
-          <input
-            hlmInput
-            type="datetime-local"
-            [formField]="sessionForm.weeklySession.startTime"
-            id="start-time"
-            class="w-full"
-          />
+          <label hlmLabel>Week</label>
+          <div class="flex items-center gap-3">
+            <div class="text-sm font-medium">{{ displayWeekLabel() || 'Select a week' }}</div>
+            <div class="text-xs text-muted-foreground">(click a week below)</div>
+          </div>
+
+          <!-- no hidden fields needed, signal model triggers validation -->
+
           @if (
-            sessionForm.weeklySession.startTime().touched() &&
-            sessionForm.weeklySession.startTime().invalid()
+            sessionForm.weeklySession.weekNumber().touched() &&
+            sessionForm.weeklySession.weekNumber().invalid()
           ) {
             <div class="text-xs text-destructive">
-              @for (error of sessionForm.weeklySession.startTime().errors(); track error) {
+              @for (error of sessionForm.weeklySession.weekNumber().errors(); track error) {
                 <p>{{ error.message }}</p>
               }
             </div>
           }
+
+          <div class="mt-2 border rounded-md p-2">
+            <div class="flex items-center justify-between px-2 mb-2">
+              <button type="button" hlmBtn size="sm" variant="ghost" (click)="prevMonth()">
+                ◀
+              </button>
+              <div class="text-sm font-medium">
+                {{ currentMonth().toLocaleString(undefined, { month: 'long', year: 'numeric' }) }}
+              </div>
+              <button type="button" hlmBtn size="sm" variant="ghost" (click)="nextMonth()">
+                ▶
+              </button>
+            </div>
+
+            <div class="space-y-1">
+              @for (weekStart of weeksForMonth(currentMonth()); track weekStart) {
+                <div
+                  class="flex items-center justify-between rounded-md p-2 cursor-pointer hover:bg-muted/10"
+                  [class.opacity-50]="isPastWeek(weekStart)"
+                  [class.bg-muted/20]="
+                    selectedWeekStart()?.toDateString() === weekStart.toDateString()
+                  "
+                  (click)="selectWeek(weekStart)"
+                >
+                  <div class="text-sm">{{ getWeekYearAndNumber(weekStart).label }}</div>
+                  <div class="flex items-center gap-2">
+                    @if (isPlannedWeek(weekStart)) {
+                      <span
+                        class="h-2 w-2 rounded-full bg-emerald-500"
+                        title="Already planned"
+                      ></span>
+                    }
+                    @if (isPastWeek(weekStart)) {
+                      <div class="text-xs text-muted-foreground">Past</div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
         </div>
 
         <div class="space-y-4">
@@ -114,10 +154,10 @@
                       [formField]="subSession.startTime"
                       class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                     >
-                    <option value="">Select a time...</option>
-                    @for (t of timeSlots; track t) {
-                      <option [value]="t">{{ t }}</option>
-                    }
+                      <option value="">Select a time...</option>
+                      @for (t of timeSlots; track t) {
+                        <option [value]="t">{{ t }}</option>
+                      }
                     </select>
                   </div>
 
@@ -127,10 +167,10 @@
                       [formField]="subSession.endTime"
                       class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                     >
-                    <option value="">Select a time...</option>
-                    @for (t of timeSlots; track t) {
-                      <option [value]="t">{{ t }}</option>
-                    }
+                      <option value="">Select a time...</option>
+                      @for (t of timeSlots; track t) {
+                        <option [value]="t">{{ t }}</option>
+                      }
                     </select>
                   </div>
                 </div>
