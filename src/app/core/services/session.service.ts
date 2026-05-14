@@ -6,6 +6,7 @@ import {
   CreateSessionResponse,
   CreateSubSessionResponse,
   GenerateSessionRequest,
+  MissedSubSession,
   SharedSession,
   ShareSessionRequest,
   UpdateSessionRequest,
@@ -21,6 +22,7 @@ export class SessionService {
   readonly allGeneratedSessions = createQuery<CreateSessionResponse[]>([]);
   readonly sessionDetails = createQuery<CreateSessionResponse | null>(null);
   readonly sharedSessions = createQuery<SharedSession[]>([]);
+  readonly missedSubSessions = createQuery<MissedSubSession[]>([]);
 
   public createSession(payload: CreateSessionRequest) {
     return this.http.post<CreateSessionResponse>(`${this.url}/create`, payload).pipe(
@@ -138,5 +140,11 @@ export class SessionService {
     return this.sharedSessions.load(
       this.http.get<SharedSession[]>(`${this.url}/shared/${groupId}`),
     );
+  }
+
+  public loadMissingSubSession(sessionId: string) {
+    return this.missedSubSessions.load(
+      this.http.get<MissedSubSession[]>(`${this.url}/${sessionId}/missed`),
+    )
   }
 }

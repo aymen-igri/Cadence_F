@@ -1,21 +1,3 @@
-export interface AppSession {
-  id: string;
-  title: string;
-  date: string; // YYYY-MM-DD
-  startTime: string; // HH:mm
-  endTime: string; // HH:mm
-
-  // Relations
-  subjectId?: string;
-  subjectName?: string;
-  goalId?: string;
-  goalName?: string;
-  taskId?: string;
-  taskName?: string;
-
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'MISSED';
-  type: 'FOCUS' | 'REVIEW' | 'PRACTICE' | 'BREAK' | 'MANUAL' | 'GENERATED';
-}
 
 export interface CreateWeeklySessionResponse {
   id: string;
@@ -36,7 +18,6 @@ export interface CreateSubSessionResponse {
 }
 export interface CreateWeeklySessionRequest {
   title: string;
-  // ISO week year and week number (e.g. 2026, 21)
   weekYear: number;
   weekNumber: number;
 }
@@ -95,3 +76,5 @@ export interface SharedSession {
   sharedByUserId: string;
   sharedByUsername: string;
 }
+
+export type MissedSubSession = Omit<CreateSubSessionResponse, 'status'>;
