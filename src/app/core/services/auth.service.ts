@@ -64,6 +64,10 @@ export class AuthService {
     return this.http.post(`${this.url}/auth/reset-password`, { token, newPassword }, { responseType: 'text' });
   }
 
+  updatePassword(payload: { oldPassword: string; newPassword: string; code?: string; type?: string }) {
+    return this.http.patch(`${this.url}/users/update-password`, payload, { responseType: 'text' });
+  }
+
   refresh() {
     const refreshToken = this.getRefreshToken();
     return this.http

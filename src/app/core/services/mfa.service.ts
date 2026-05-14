@@ -22,6 +22,13 @@ export class MfaService {
     return this.http.post<{ message: string }>(`${this.url}/email/trigger`, {}, { headers });
   }
 
+  triggerEmailCodeForPasswordChange() {
+    // Uses the current user's access token (authenticated context)
+    const accessToken = this.authService.getAccessToken();
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${accessToken}`);
+    return this.http.post<{ message: string }>(`${this.url}/email/trigger`, {}, { headers });
+  }
+
   verifyOtp(code: string) {
      const headers = new HttpHeaders().set('Authorization', `Bearer ${this.temporaryMfaToken()}`);
      const methodValue = this.selectedMethod() === 'EMAIL' ? 'EMAIL' : 'APP';
