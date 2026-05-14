@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { applyEach, form, FormField, FormRoot, minLength, required } from '@angular/forms/signals';
 import {
   CreateSessionRequest,
@@ -188,46 +188,47 @@ export class SessionDialogComponent {
     },
   );
 
-  // --- Week picker state & helpers ---
   currentMonth = signal(new Date());
   selectedWeekStart = signal<Date | null>(null);
   displayWeekLabel = signal('');
 
-  // plannedWeeks set derived from existing sessions
   plannedWeeks = this.sessionService.allSessions.data;
 
-  // compute weeks for currentMonth: array of Date (monday start)
-  weeksForMonth(month: Date) {
+  monthWeeks = computed(() => {
+    const month = this.currentMonth();
     const year = month.getFullYear();
     const m = month.getMonth();
     const firstOfMonth = new Date(year, m, 1);
+
     // get monday of the week that contains the 1st
     const day = firstOfMonth.getDay();
     const diffToMonday = (day === 0 ? -6 : 1) - day;
     const start = new Date(firstOfMonth);
     start.setDate(firstOfMonth.getDate() + diffToMonday);
+
     const weeks: Date[] = [];
     let cursor = new Date(start);
-    while (cursor.getMonth() <= m || cursor.getMonth() === m - 1) {
+    const nextMonth = m === 11 ? 0 : m + 1;
+
+    while (weeks.length < 8) {
+      if (weeks.length > 0 && cursor.getMonth() === nextMonth) {
+        break;
+      }
       weeks.push(new Date(cursor));
       cursor.setDate(cursor.getDate() + 7);
-      // safety break
-      if (weeks.length > 8) break;
     }
-    return weeks;
-  }
 
-  // ISO week number + year and weekStart (monday) and label
+    return weeks;
+  });
+
   getWeekYearAndNumber(date: Date) {
     const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-    // ISO week date weeks start on Monday, week 1 is the week with the first Thursday
     const day = d.getUTCDay() || 7;
     d.setUTCDate(d.getUTCDate() + 4 - day);
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
     const weekYear = d.getUTCFullYear();
 
-    // monday start of this ISO week relative to original date
     const local = new Date(date);
     const ld = local.getDay() || 7;
     const monday = new Date(local);
@@ -240,11 +241,9 @@ export class SessionDialogComponent {
 
   isPastWeek(weekStart: Date) {
     const today = new Date();
-    // determine start of current ISO week (monday)
     const td = today.getDay() || 7;
     const currentMonday = new Date(today);
     currentMonday.setDate(today.getDate() - (td - 1));
-    // if weekStart < currentMonday => past
     return weekStart.setHours(0, 0, 0, 0) < currentMonday.setHours(0, 0, 0, 0);
   }
 
@@ -272,7 +271,6 @@ export class SessionDialogComponent {
   selectWeek(weekStart: Date) {
     if (this.isPastWeek(weekStart)) return;
     const info = this.getWeekYearAndNumber(weekStart);
-    // update model
     this.sessionModel.update((m) => ({
       ...m,
       weeklySession: {

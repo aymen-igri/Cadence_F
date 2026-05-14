@@ -1,5 +1,9 @@
 <hlm-dialog [state]="state()" (stateChanged)="onStateChange($event)">
-  <hlm-dialog-content *hlmDialogPortal="let ctx" style="width: 500px; max-width: 500px">
+  <hlm-dialog-content
+    *hlmDialogPortal="let ctx"
+    class="flex flex-col max-h-[90vh]"
+    style="width: 500px; max-width: 500px"
+  >
     <hlm-dialog-header>
       <h2 hlmSheetTitle class="text-lg">{{ session() ? 'Update session' : 'Create session' }}</h2>
       <p hlmSheetDescription class="text-sm">
@@ -8,8 +12,8 @@
         }}
       </p>
     </hlm-dialog-header>
-    <form [formRoot]="sessionForm">
-      <div class="py-4 space-y-6">
+    <form [formRoot]="sessionForm" class="flex flex-col flex-1 min-h-0">
+      <div class="flex-1 overflow-y-auto py-4 space-y-6 px-1">
         <div class="space-y-2">
           <label hlmLabel>Title</label>
           <input
@@ -37,8 +41,6 @@
             <div class="text-xs text-muted-foreground">(click a week below)</div>
           </div>
 
-          <!-- no hidden fields needed, signal model triggers validation -->
-
           @if (
             sessionForm.weeklySession.weekNumber().touched() &&
             sessionForm.weeklySession.weekNumber().invalid()
@@ -50,7 +52,7 @@
             </div>
           }
 
-          <div class="mt-2 border rounded-md p-2">
+          <div class="mt-2 border border-border bg-background text-foreground rounded-md p-2">
             <div class="flex items-center justify-between px-2 mb-2">
               <button type="button" hlmBtn size="sm" variant="ghost" (click)="prevMonth()">
                 ◀
@@ -64,11 +66,14 @@
             </div>
 
             <div class="space-y-1">
-              @for (weekStart of weeksForMonth(currentMonth()); track weekStart) {
+              @for (weekStart of monthWeeks(); track weekStart.getTime()) {
                 <div
-                  class="flex items-center justify-between rounded-md p-2 cursor-pointer hover:bg-muted/10"
+                  class="flex items-center justify-between rounded-md p-2 cursor-pointer transition-colors text-foreground hover:bg-accent hover:text-accent-foreground"
                   [class.opacity-50]="isPastWeek(weekStart)"
-                  [class.bg-muted/20]="
+                  [class.bg-primary]="
+                    selectedWeekStart()?.toDateString() === weekStart.toDateString()
+                  "
+                  [class.text-primary-foreground]="
                     selectedWeekStart()?.toDateString() === weekStart.toDateString()
                   "
                   (click)="selectWeek(weekStart)"
@@ -189,7 +194,7 @@
           </button>
         </div>
       </div>
-      <hlm-dialog-footer>
+      <hlm-dialog-footer class="mt-4 pt-4 border-t">
         <button hlmBtn variant="outline" (click)="closeDialog(ctx)">Cancel</button>
         <button
           hlmBtn
