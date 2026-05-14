@@ -67,6 +67,22 @@ export class SessionsListComponent {
     this.router.navigate(['/user/sessions/calendar', sessionId]);
   }
 
+  isReflectable(status: string): boolean {
+    return status === 'CLOSED' || status === 'INCOMPLETED';
+  }
+
+  onCardClick(event: Event, session: any) {
+    // Prevent triggering if clicked on inner interactive elements like dropdowns or buttons
+    const target = event.target as HTMLElement;
+    if (target.closest('button') || target.closest('hlm-accordion')) {
+      return;
+    }
+
+    if (this.isReflectable(session.sessionStatus)) {
+      this.router.navigate(['/user/sessions', session.id, 'reflect']);
+    }
+  }
+
   readonly deleteSession = createMutation({
     mutationFn: (sessionId: string) => this.sessionSerivce.deleteSession(sessionId),
     onSuccess: () => {

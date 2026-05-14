@@ -132,6 +132,13 @@ export const routes: Routes = [
           import('./pages/user/session-calendar/session-calendar').then(
             (m) => m.SessionCalendarComponent,
           ),
+      },
+      {
+        path: 'sessions/:id/reflect',
+        loadComponent: () =>
+          import('./components/user/sessions/week-reflection/week-reflection').then(
+            (m) => m.WeekReflectionComponent,
+          ),
       }
     ],
   },
