@@ -31,11 +31,11 @@
                     {{ sessionRes.weeklySession.title }}
                   </h4>
                   <span
-                    hlmBadge
-                    [variant]="getBadgeVariant(sessionRes.weeklySession.sessionStatus)"
-                    class="text-[10px] px-2 py-0 h-5"
+                    class="text-[10px] px-2 py-0.5 rounded-full border font-medium uppercase tracking-wider {{
+                      getStatusClasses(sessionRes.weeklySession.sessionStatus)
+                    }}"
                   >
-                    {{ sessionRes.weeklySession.sessionStatus }}
+                    {{ getStatusDisplay(sessionRes.weeklySession.sessionStatus) }}
                   </span>
                 </div>
                 <div
@@ -43,10 +43,12 @@
                 >
                   <div class="flex items-center gap-1.5">
                     <lucide-angular [img]="Clock" class="h-3.5 w-3.5"></lucide-angular>
-                    <span
-                      >Week {{ sessionRes.weeklySession.weekNumber }},
-                      {{ sessionRes.weeklySession.weekYear }}</span
-                    >
+                    <span>{{
+                      getWeekLabel(
+                        sessionRes.weeklySession.weekYear,
+                        sessionRes.weeklySession.weekNumber
+                      )
+                    }}</span>
                   </div>
                 </div>
               </div>

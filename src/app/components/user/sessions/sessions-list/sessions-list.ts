@@ -105,6 +105,48 @@ export class SessionsListComponent {
     },
   });
 
+  getWeekLabel(weekYear: number, weekNumber: number): string {
+    const jan4 = new Date(weekYear, 0, 4);
+    const day = jan4.getDay();
+    const diffToMonday = jan4.getDate() - day + (day === 0 ? -6 : 1);
+    const startOfFirstWeek = new Date(weekYear, 0, diffToMonday);
+
+    const weekStart = new Date(startOfFirstWeek);
+    weekStart.setDate(weekStart.getDate() + (weekNumber - 1) * 7);
+
+    return `Week of ${weekStart.toLocaleString(undefined, { month: 'long' })} ${weekStart.getDate()}, ${weekStart.getFullYear()}`;
+  }
+
+  getStatusDisplay(status: string): string {
+    switch (status) {
+      case 'PENDING':
+        return 'UPCOMING';
+      case 'IN_PROGRESS':
+        return 'ACTIVE';
+      default:
+        return status;
+    }
+  }
+
+  getStatusClasses(status: string): string {
+    switch (status) {
+      case 'PENDING':
+      case 'UPCOMING':
+        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-800';
+      case 'ACTIVE':
+      case 'IN_PROGRESS':
+        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-800 hover:bg-blue-200 dark:hover:bg-blue-900/60';
+      case 'COMPLETED':
+        return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800 hover:bg-green-200 dark:hover:bg-green-900/60';
+      case 'INCOMPLETED':
+        return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800 hover:bg-red-200 dark:hover:bg-red-900/60';
+      case 'CLOSED':
+        return 'bg-muted text-muted-foreground border-border opacity-80 hover:bg-muted/80';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  }
+
   getBadgeVariant(status: string): any {
     switch (status) {
       case 'COMPLETED':
