@@ -1,4 +1,4 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
@@ -9,7 +9,7 @@ import { HlmInputOtpImports } from '@spartan-ng/helm/input-otp';
 import { BrnInputOtpImports } from '@spartan-ng/brain/input-otp';
 import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmLabelImports } from '@spartan-ng/helm/label';
-import { LucideAngularModule, Lock, Mail, Smartphone } from 'lucide-angular';
+import { LucideAngularModule, Lock, Mail, Smartphone, Check, X } from 'lucide-angular';
 import { MfaService } from '@app/core/services/mfa.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { finalize } from 'rxjs';
@@ -41,6 +41,8 @@ export class SettingsChangePasswordComponent {
   readonly Lock = Lock;
   readonly Mail = Mail;
   readonly Smartphone = Smartphone;
+  readonly Check = Check;
+  readonly X = X;
 
   state = signal<'closed' | 'open'>('closed');
   dialogStateChange = output<'closed' | 'open'>();
@@ -59,6 +61,25 @@ export class SettingsChangePasswordComponent {
   isLoading = signal(false);
   isSendingOtp = signal(false);
   isVerifyingOtp = signal(false);
+
+  // Real-time password validation
+  passwordsMatch = computed(() => {
+    const newPwd = this.newPassword();
+    const confirmPwd = this.confirmPassword();
+    return newPwd.length > 0 && confirmPwd.length > 0 && newPwd === confirmPwd;
+  });
+
+  passwordMismatch = computed(() => {
+    const newPwd = this.newPassword();
+    const confirmPwd = this.confirmPassword();
+    return confirmPwd.length > 0 && newPwd !== confirmPwd;
+  });
+
+  allPasswordsValid = computed(() => {
+    return this.oldPassword().length > 0 && 
+           this.newPassword().length > 0 && 
+           this.passwordsMatch();
+  });
 
   openChangePasswordDialog() {
     if (this.user().isTotpEnabled) {
