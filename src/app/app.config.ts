@@ -1,5 +1,5 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHlmSidebarConfig } from '@spartan-ng/helm/sidebar';
@@ -42,7 +42,7 @@ import {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(routes, withPreloading(PreloadAllModules)),
     provideHlmSidebarConfig({
       sidebarWidth: '16rem',
       sidebarWidthMobile: '18rem',
@@ -53,7 +53,14 @@ export const appConfig: ApplicationConfig = {
       mobileBreakpoint: '768px',
     }),
     provideHttpClient(
-      withInterceptors([cancelInterceptor, cacheInterceptor, retryInterceptor, authInterceptor, loadingInterceptor, errorInterceptor]),
+      withInterceptors([
+        cancelInterceptor,
+        cacheInterceptor,
+        retryInterceptor,
+        authInterceptor,
+        loadingInterceptor,
+        errorInterceptor,
+      ]),
     ),
     provideIcons({
       serverCrash: lucideServerCrash,
