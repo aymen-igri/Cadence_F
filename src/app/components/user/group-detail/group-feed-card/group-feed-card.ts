@@ -70,7 +70,11 @@ export class GroupFeedCardComponent {
   });
 
   onForkSession() {
-    this.forkSessionMutation.mutate({});
+    this.alertService.show({
+      description: 'Are you sure you want to add this session to your plan? It will be added',
+      actionLabel: 'Yes, Add to My Plan',
+      action: () => this.forkSessionMutation.mutate({}),
+    });
   }
 
   unshareSessionMutation = createMutation({

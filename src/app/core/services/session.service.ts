@@ -150,6 +150,10 @@ export class SessionService {
     return this.http.post<CreateSessionResponse>(
       `${this.url}/shared-sessions/${sharedSessionId}/fork`,
       {},
+    ).pipe(
+      tap((newSession) => {
+        this.allSessions.mutate((sessions) => [...sessions, newSession]);
+      }),
     );
   }
 
