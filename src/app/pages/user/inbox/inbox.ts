@@ -6,6 +6,7 @@ import { InboxFilters } from '@app/components/user/inbox/inbox-filters/inbox-fil
 import { NotificationsList } from '@app/components/user/inbox/notifications-list/notifications-list';
 import { LucideAngularModule, Loader2, AlertCircle } from 'lucide-angular';
 import { toast } from 'ngx-sonner';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-inbox',
@@ -15,6 +16,7 @@ import { toast } from 'ngx-sonner';
 })
 export class Inbox implements OnInit, OnDestroy {
   private notificationService = inject(NotificationService);
+  private destroyRef = takeUntilDestroyed();
 
   readonly Loader2 = Loader2;
   readonly AlertCircle = AlertCircle;
@@ -36,26 +38,30 @@ export class Inbox implements OnInit, OnDestroy {
   }
 
   onMarkAsRead(id: string) {
-    this.notificationService.markAsRead(id).subscribe({
-      next: () => {
-      toast.success('Notification marked as read');
-      },
-      error: (err) => {
-        console.error('Failed to mark notification as read', err);
-        toast.error('Failed to mark notification as read');
-      },
-    });
+    this.notificationService.markAsRead(id)
+      .pipe(this.destroyRef)
+      .subscribe({
+        next: () => {
+          toast.success('Notification marked as read');
+        },
+        error: (err) => {
+          console.error('Failed to mark notification as read', err);
+          toast.error('Failed to mark notification as read');
+        },
+      });
   }
 
   onMarkAllAsRead() {
-    this.notificationService.markAllAsRead().subscribe({
-      next: () => {
-        toast.success('All notifications marked as read');
-      },
-      error: (err) => {
-        console.error('Failed to mark all notifications as read', err);
-        toast.error('Failed to mark all notifications as read');
-      },
-    });
+    this.notificationService.markAllAsRead()
+      .pipe(this.destroyRef)
+      .subscribe({
+        next: () => {
+          toast.success('All notifications marked as read');
+        },
+        error: (err) => {
+          console.error('Failed to mark all notifications as read', err);
+          toast.error('Failed to mark all notifications as read');
+        },
+      });
   }
 }

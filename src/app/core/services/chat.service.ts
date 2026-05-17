@@ -1,12 +1,11 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { AuthService } from './auth.service';
-import { RxStomp } from '@stomp/rx-stomp';
 import { GroupMessageResponse, SendGroupMessageRequest } from '../models/chat.model';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { WebSocketService } from './websocket.service';
 
 export interface ChatMessage {
   groupId: string;
@@ -19,9 +18,8 @@ export interface ChatMessage {
   providedIn: 'root',
 })
 export class ChatService implements OnDestroy {
-  private authService = inject(AuthService);
   private http = inject(HttpClient);
-  private rxStomp: RxStomp = new RxStomp();
+  private wsService = inject(WebSocketService);
   private destroy$ = new Subject<void>();
   private readonly apiUrl = `${environment.apiUrl}/groups`;
 
@@ -55,46 +53,17 @@ export class ChatService implements OnDestroy {
   }
 
   connectAndSubscribe(groupId: string): void {
-    const token = this.authService.getAccessToken();
-    if (!token) return;
+    // Ensure WebSocket connection is established
+    this.wsService.connect();
 
-    const wsUrl = environment.apiUrl.replace(/^http/, 'ws') + '/ws';
-
-    // Configure the RxStomp client
-    this.rxStomp.configure({
-      brokerURL: wsUrl,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-      debug: (str: string) => {
-        console.log(str);
-      },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
-
-    // Activate connection
-    this.rxStomp.activate();
-
-    // Handle connection success and subscribe to group chat
-    this.rxStomp.connected$
-      .pipe(
-        tap(() => {
-          console.log('STOMP Connected');
-          this.subscribeToGroupChat(groupId);
-        }),
-        takeUntil(this.destroy$),
-      )
-      .subscribe({
-        error: (err) => console.error('Connection error:', err),
-      });
+    // Subscribe to group chat
+    this.subscribeToGroupChat(groupId);
   }
 
   private subscribeToGroupChat(groupId: string): void {
     const topicPath = `/topic/groups/${groupId}`;
 
-    this.rxStomp
+    this.wsService
       .watch(topicPath)
       .pipe(
         tap((message) => {
@@ -106,7 +75,7 @@ export class ChatService implements OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe({
-        error: (err) => console.error('Subscription error:', err),
+        error: (err) => console.error('[ChatService] Subscription error:', err),
       });
   }
   private handleIncomingMessage(message: GroupMessageResponse): void {
@@ -125,11 +94,10 @@ export class ChatService implements OnDestroy {
   disconnect(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    if (this.rxStomp.active) {
-      this.rxStomp.deactivate();
-    }
     // Clear the chat state
     this.messagesSubject.next([]);
+    // Note: We don't disconnect the WebSocket here as it's shared
+    // The WebSocketService manages the connection lifecycle
   }
 
   ngOnDestroy(): void {

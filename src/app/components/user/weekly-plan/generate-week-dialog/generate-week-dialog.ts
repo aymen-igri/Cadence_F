@@ -1,4 +1,13 @@
-import { Component, effect, output, input, inject, signal, computed } from '@angular/core';
+import {
+  Component,
+  effect,
+  output,
+  input,
+  inject,
+  signal,
+  computed,
+  DestroyRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { applyEach, form, FormField, FormRoot, minLength, required } from '@angular/forms/signals';
@@ -19,6 +28,7 @@ import { AvailabilityPlanService } from '@app/core/services/availability-plan.se
 import { createMutation } from '@app/core/utils/mutation.helper';
 import { SessionService } from '@app/core/services/session.service';
 import { toast } from 'ngx-sonner';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-generate-week-dialog',
@@ -41,6 +51,7 @@ export class GenerateWeekDialogComponent {
   private subjectService = inject(SubjectService);
   private goalService = inject(GoalService);
   private availabilityService = inject(AvailabilityPlanService);
+  private destroyRef = inject(DestroyRef);
 
   subjects = this.subjectService.allSubjects.data;
   availabilityPlans = this.availabilityService.allAvailabilityPlans.data;
@@ -101,9 +112,12 @@ export class GenerateWeekDialogComponent {
   );
 
   ngOnInit() {
-    this.subjectService.loadAllSubjects().subscribe();
-    this.availabilityService.loadAllAvailabilityPlans().subscribe();
-    this.sessionService.loadAllSessions().subscribe();
+    this.subjectService.loadAllSubjects().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
+    this.availabilityService
+      .loadAllAvailabilityPlans()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+    this.sessionService.loadAllSessions().pipe(takeUntilDestroyed(this.destroyRef)).subscribe();
   }
 
   constructor() {
@@ -119,13 +133,16 @@ export class GenerateWeekDialogComponent {
   }
 
   loadGoalsForSubject(subjectId: string) {
-    this.goalService.loadAllGoals(subjectId).subscribe((goals) => {
-      this.goalsBySubject.update((map) => {
-        const newMap = new Map(map);
-        newMap.set(subjectId, goals);
-        return newMap;
+    this.goalService
+      .loadAllGoals(subjectId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((goals) => {
+        this.goalsBySubject.update((map) => {
+          const newMap = new Map(map);
+          newMap.set(subjectId, goals);
+          return newMap;
+        });
       });
-    });
   }
 
   addSubjectGoalPair() {

@@ -15,7 +15,7 @@ import { toast } from 'ngx-sonner';
 import { extractErrorMessage } from '@app/core/utils/error.util';
 import { AlertService } from '@app/components/shared/alert/alert.service';
 import { SessionService } from '@app/core/services/session.service';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-group-detail-page',
@@ -53,14 +53,14 @@ export class GroupDetailComponent {
   readonly isSharedSessionsLoading = this.sessionService.sharedSessions.isLoading;
 
   constructor() {
-    this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
       const id = params.get('id');
       if (!id) return;
 
       this.groupId.set(id);
-      this.groupService.getGroupDataById(id).subscribe();
-      this.groupService.loadGroupMembers(id).subscribe();
-      this.sessionService.loadSharedSessions(id).subscribe();
+      this.groupService.getGroupDataById(id).pipe(takeUntilDestroyed()).subscribe();
+      this.groupService.loadGroupMembers(id).pipe(takeUntilDestroyed()).subscribe();
+      this.sessionService.loadSharedSessions(id).pipe(takeUntilDestroyed()).subscribe();
     });
   }
 

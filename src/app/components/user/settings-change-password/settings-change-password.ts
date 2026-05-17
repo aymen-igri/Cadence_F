@@ -15,6 +15,7 @@ import { AuthService } from '@app/core/services/auth.service';
 import { finalize } from 'rxjs';
 import { toast } from 'ngx-sonner';
 import { User } from '@app/core/models/user.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-settings-change-password',
@@ -36,6 +37,8 @@ import { User } from '@app/core/models/user.model';
 export class SettingsChangePasswordComponent {
   private mfaService = inject(MfaService);
   private authService = inject(AuthService);
+  private destroyRef = takeUntilDestroyed();
+
   user = input.required<User>();
 
   readonly Lock = Lock;
@@ -108,7 +111,10 @@ export class SettingsChangePasswordComponent {
     this.isSendingOtp.set(true);
     this.mfaService
       .triggerEmailCodeForPasswordChange()
-      .pipe(finalize(() => this.isSendingOtp.set(false)))
+      .pipe(
+        finalize(() => this.isSendingOtp.set(false)),
+        this.destroyRef
+      )
       .subscribe({
         next: () => {
           toast.success('OTP sent to email', {
@@ -175,7 +181,10 @@ export class SettingsChangePasswordComponent {
 
     this.authService
       .updatePassword(payload)
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(
+        finalize(() => this.isLoading.set(false)),
+        this.destroyRef
+      )
       .subscribe({
         next: () => {
           toast.success('Password changed successfully', {

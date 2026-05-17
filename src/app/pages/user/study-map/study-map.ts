@@ -6,6 +6,7 @@ import { SubjectCardComponent } from '@app/components/user/study-map/subject-car
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { SubjectService } from '@app/core/services/subject.service';
 import { SubjectFormDialogComponent } from '@app/components/user/study-map/subject-form-dialog/subject-form-dialog';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface SubjTask {
   id: string;
@@ -30,11 +31,16 @@ export interface SubjTask {
 })
 export class StudyMapComponent {
   private subjectService = inject(SubjectService);
+  private destroyRef = takeUntilDestroyed();
+
   readonly subjects = this.subjectService.allSubjects.data;
   readonly isSubjectsLoading = this.subjectService.allSubjects.isLoading;
   createSubjectDialogState = signal<'closed' | 'open'>('closed');
+
   ngOnInit() {
-    this.subjectService.loadAllSubjects().subscribe();
+    this.subjectService.loadAllSubjects()
+      .pipe(this.destroyRef)
+      .subscribe();
   }
   expandedSubjectId: string | null = null;
 

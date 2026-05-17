@@ -72,7 +72,24 @@ export class AuthService {
     const refreshToken = this.getRefreshToken();
     return this.http
       .post<AuthTokens>(`${this.url}/auth/refreshToken`, { refreshToken })
-      .pipe(tap((tokens) => this.setTokens(tokens)));
+      .pipe(
+        tap((tokens) => {
+          this.setTokens(tokens);
+          // Emit token refresh event for WebSocket reconnection
+          this.onTokenRefresh();
+        })
+      );
+  }
+
+  /**
+   * Called after token refresh to notify other services.
+   * WebSocketService will listen for this to reconnect with new token.
+   */
+  private onTokenRefresh(): void {
+    // Dispatch custom event that WebSocketService can listen to
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('auth:token-refreshed'));
+    }
   }
 
   logout() {

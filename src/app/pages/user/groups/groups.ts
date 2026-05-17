@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { toast } from 'ngx-sonner';
 import { extractErrorMessage } from '@app/core/utils/error.util';
 import { GroupDataTable } from "@app/components/user/groups/group-table/group-table";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-groups-page',
@@ -26,6 +27,7 @@ import { GroupDataTable } from "@app/components/user/groups/group-table/group-ta
 export class GroupsComponent {
   groupService = inject(GroupService);
   router = inject(Router);
+  private destroyRef = takeUntilDestroyed();
 
   activeTab = signal<'my-groups' | 'discover'>('my-groups');
   createGroupState = signal<'closed' | 'open'>('closed');
@@ -34,7 +36,9 @@ export class GroupsComponent {
   readonly isGroupsLoading = this.groupService.allGroups.isLoading;
 
   ngOnInit() {
-    this.groupService.loadAllGroups().subscribe();
+    this.groupService.loadAllGroups()
+      .pipe(this.destroyRef)
+      .subscribe();
   }
 
   setActiveTab(tab: any) {
@@ -46,33 +50,37 @@ export class GroupsComponent {
   }
 
   joinGroup(groupId: string) {
-    this.groupService.joinPublicGroup(groupId).subscribe({
-      next: () => {
-        this.router.navigate(['/user/groups', groupId]);
-        toast.success('Group joined successfully!', {
-          description: 'You have successfully joined the group.',
-        });
-      },
-      error: (err) => {
-        const errorMessage = extractErrorMessage(err);
-        console.error('Failed to join group:', err);
-        toast.error('Failed to join the group.', { description: errorMessage });
-      },
-    });
+    this.groupService.joinPublicGroup(groupId)
+      .pipe(this.destroyRef)
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/user/groups', groupId]);
+          toast.success('Group joined successfully!', {
+            description: 'You have successfully joined the group.',
+          });
+        },
+        error: (err) => {
+          const errorMessage = extractErrorMessage(err);
+          console.error('Failed to join group:', err);
+          toast.error('Failed to join the group.', { description: errorMessage });
+        },
+      });
   }
 
   requestToJoin(groupId: string) {
-    this.groupService.requestJoin(groupId).subscribe({
-      next: () => {
-        toast.success('Request sent successfully!', {
-          description: 'You have successfully requested to join the group.',
-        });
-      },
-      error: (err) => {
-        const errorMessage = extractErrorMessage(err);
-        console.error('Failed to send group request:', err);
-        toast.error('Failed to send the group request.', { description: errorMessage });
-      },
-    });
+    this.groupService.requestJoin(groupId)
+      .pipe(this.destroyRef)
+      .subscribe({
+        next: () => {
+          toast.success('Request sent successfully!', {
+            description: 'You have successfully requested to join the group.',
+          });
+        },
+        error: (err) => {
+          const errorMessage = extractErrorMessage(err);
+          console.error('Failed to send group request:', err);
+          toast.error('Failed to send the group request.', { description: errorMessage });
+        },
+      });
   }
 }

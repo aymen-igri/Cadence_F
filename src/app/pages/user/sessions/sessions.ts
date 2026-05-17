@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SessionsHeaderComponent } from '@app/components/user/sessions/sessions-header/sessions-header';
 import { SessionsListComponent } from '@app/components/user/sessions/sessions-list/sessions-list';
 import { SessionService } from '@app/core/services/session.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-sessions',
@@ -16,12 +17,15 @@ import { SessionService } from '@app/core/services/session.service';
 })
 export class SessionsComponent implements OnInit {
   sessionService = inject(SessionService);
+  private destroyRef = takeUntilDestroyed();
 
   sessions = this.sessionService.allSessions.data;
   isLoadingSesions = this.sessionService.allSessions.isLoading;
 
   ngOnInit() {
-    this.sessionService.loadAllSessions().subscribe();
+    this.sessionService.loadAllSessions()
+      .pipe(this.destroyRef)
+      .subscribe();
   }
 
   onSessionClick(id: string) {

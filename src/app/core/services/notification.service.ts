@@ -1,20 +1,18 @@
 import { Injectable, inject, linkedSignal, OnDestroy } from '@angular/core';
 import { HttpClient, httpResource } from '@angular/common/http';
 import { tap, takeUntil } from 'rxjs';
-import { RxStomp } from '@stomp/rx-stomp';
 import { environment } from '../../environments/environment';
-import { AuthService } from './auth.service';
 import { Notification } from '../models/notification.model';
 import { Subject } from 'rxjs';
+import { WebSocketService } from './websocket.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService implements OnDestroy {
   private http = inject(HttpClient);
-  private authService = inject(AuthService);
+  private wsService = inject(WebSocketService);
 
   private readonly apiUrl = `${environment.apiUrl}/notifications`;
 
-  private rxStomp: RxStomp = new RxStomp();
   private destroy$ = new Subject<void>();
 
   readonly notificationsResource = httpResource<Notification[]>(() => {
@@ -48,40 +46,15 @@ export class NotificationService implements OnDestroy {
   }
 
   connect(): void {
-    const token = this.authService.getAccessToken();
-    if (!token) return;
+    // Ensure WebSocket connection is established
+    this.wsService.connect();
 
-    const wsUrl = environment.apiUrl.replace(/^http/, 'ws') + '/ws';
-
-    // Configure the RxStomp client
-    this.rxStomp.configure({
-      brokerURL: wsUrl,
-      connectHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-      reconnectDelay: 5000,
-      heartbeatIncoming: 4000,
-      heartbeatOutgoing: 4000,
-    });
-
-    // Activate connection
-    this.rxStomp.activate();
-
-    // Handle connection success and subscribe to notifications
-    this.rxStomp.connected$
-      .pipe(
-        tap(() => {
-          this.subscribeToNotifications();
-        }),
-        takeUntil(this.destroy$),
-      )
-      .subscribe({
-        error: (err) => console.error('Connection error:', err),
-      });
+    // Subscribe to notifications
+    this.subscribeToNotifications();
   }
 
   private subscribeToNotifications(): void {
-    this.rxStomp
+    this.wsService
       .watch('/user/queue/notifications')
       .pipe(
         tap((message) => {
@@ -93,17 +66,15 @@ export class NotificationService implements OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe({
-        error: (err) => console.error('Subscription error:', err),
+        error: (err) => console.error('[NotificationService] Subscription error:', err),
       });
   }
 
   disconnect(): void {
     this.destroy$.next();
     this.destroy$.complete();
-
-    if (this.rxStomp.active) {
-      this.rxStomp.deactivate();
-    }
+    // Note: We don't disconnect the WebSocket here as it's shared
+    // The WebSocketService manages the connection lifecycle
   }
 
   ngOnDestroy(): void {

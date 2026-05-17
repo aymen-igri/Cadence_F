@@ -7,6 +7,7 @@ import { GenerateWeekDialogComponent } from '@app/components/user/weekly-plan/ge
 import { SessionService } from '@app/core/services/session.service';
 import { GeneratedSessionsListComponent } from "@app/components/user/weekly-plan/session-list/generated-session-list";
 import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-weekly-plan',
@@ -24,11 +25,15 @@ import { RouterLink } from '@angular/router';
 })
 export class WeeklyPlanComponent {
   private sessionService = inject(SessionService);
+  private destroyRef = takeUntilDestroyed();
+
   readonly allGeneratedSession = this.sessionService.allGeneratedSessions.data;
   readonly isLoadingSesions = this.sessionService.allGeneratedSessions.isLoading;
   dialogState = signal<'open' | 'closed'>('closed');
 
   ngOnInit() {
-    this.sessionService.loadAllGeneratedSessions().subscribe();
+    this.sessionService.loadAllGeneratedSessions()
+      .pipe(this.destroyRef)
+      .subscribe();
   }
 }
