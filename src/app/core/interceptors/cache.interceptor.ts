@@ -12,7 +12,8 @@ export const cacheInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req).pipe(
       tap((event) => {
         if (event instanceof HttpResponse) {
-          cacheService.invalidate(new URL(req.url).pathname);
+          const urlWithoutParams = req.url.split('?')[0];
+          cacheService.invalidate(urlWithoutParams);
         }
       }),
     );

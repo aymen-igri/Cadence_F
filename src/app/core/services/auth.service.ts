@@ -19,8 +19,9 @@ export class AuthService {
   isReady = signal<boolean>(false);
 
   constructor() {
+    const accessToken = this.getAccessToken();
     const refreshToken = this.getRefreshToken();
-    if (!refreshToken || this.isTokenExpired(refreshToken)) {
+    if (!accessToken || (this.isTokenExpired(accessToken) && (!refreshToken || this.isTokenExpired(refreshToken)))) {
       this.clearTokens();
       this.isReady.set(true);
     } else {
@@ -122,15 +123,20 @@ export class AuthService {
   // ─── Helpers ──────────────────────────────────────────────
 
   isLoggedIn(): boolean {
-    const token = this.getRefreshToken();
-    if (!token) return false;
+    const accessToken = this.getAccessToken();
+    const refreshToken = this.getRefreshToken();
+    if (!accessToken && !refreshToken) return false;
 
-    if (this.isTokenExpired(token)) {
-      this.clearTokens();
-      return false;
+    if (accessToken && !this.isTokenExpired(accessToken)) {
+      return true;
     }
 
-    return true;
+    if (refreshToken && !this.isTokenExpired(refreshToken)) {
+      return true;
+    }
+
+    this.clearTokens();
+    return false;
   }
 
   private isTokenExpired(token: string): boolean {

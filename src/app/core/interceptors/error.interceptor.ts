@@ -10,17 +10,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: HttpErrorResponse) => {
       switch (error.status) {
         case 0:
-          router.navigate(['/server-error']);
+          // Consider using a toast notification here instead of full page navigation
+          // router.navigate(['/server-error']);
           break;
         case 403:
           router.navigate(['/forbidden']);
           break;
-        case 404:
-          router.navigate(['/not-found']);
-          break;
-        case 500:
-          router.navigate(['/server-error']);
-          break;
+        // Removed 404 and 500 global navigation so secondary requests don't break the UI
       }
       return throwError(() => error);
     }),

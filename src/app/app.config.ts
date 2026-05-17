@@ -51,7 +51,7 @@ export const appConfig: ApplicationConfig = {
       mobileBreakpoint: '768px',
     }),
     provideHttpClient(
-      withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor, cacheInterceptor]),
+      withInterceptors([cacheInterceptor, authInterceptor, loadingInterceptor, errorInterceptor]),
     ),
     provideIcons({
       serverCrash: lucideServerCrash,
