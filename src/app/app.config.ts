@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { PreloadAllModules, provideRouter, withPreloading, withViewTransitions } from '@angular/router';
 
 import { routes } from './app.routes';
@@ -41,7 +41,7 @@ import {
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideBrowserGlobalErrorListeners(),
+    provideZonelessChangeDetection(),
     provideRouter(routes, withPreloading(PreloadAllModules), withViewTransitions()),
     provideHlmSidebarConfig({
       sidebarWidth: '16rem',
@@ -91,3 +91,7 @@ export const appConfig: ApplicationConfig = {
     }),
   ],
 };
+function provideExperimentalZonelessChangeDetection(): import("@angular/core").Provider | import("@angular/core").EnvironmentProviders {
+  throw new Error('Function not implemented.');
+}
+

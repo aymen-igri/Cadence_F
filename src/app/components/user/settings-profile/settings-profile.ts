@@ -1,4 +1,4 @@
-import { Component, input, inject, signal, effect , ChangeDetectionStrategy } from '@angular/core';
+import { Component, input, inject, signal, effect, ChangeDetectionStrategy, computed } from '@angular/core';
 import { form, FormField, required, FormRoot } from '@angular/forms/signals';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmInputImports } from '@spartan-ng/helm/input';
@@ -148,4 +148,11 @@ export class SettingsProfileComponent {
     };
     reader.readAsDataURL(file);
   }
+
+  optimizeAvatarUrl(url: string): string {
+    if (!url || !url.includes('cloudinary.com')) return url;
+    return url.replace('/upload/', '/upload/w_160,h_160,c_fill,f_auto,q_auto/');
+  }
+
+  optimizedAvatar = computed(() => this.optimizeAvatarUrl(this.profilePicture()));
 }

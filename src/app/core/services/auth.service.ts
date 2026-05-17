@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { AuthTokens, AuthResponse, LoginRequest, RegisterRequest } from '../models/auth.model';
 import { User } from '../models/user.model';
+import { HttpCacheService } from './cache.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
   private readonly USER_KEY = 'current_user';
   private http = inject(HttpClient);
   private router = inject(Router);
+  private cacheService = inject(HttpCacheService);
 
   currentUser = signal<User | null>(null);
   isReady = signal<boolean>(false);
@@ -97,6 +99,7 @@ export class AuthService {
     this.clearTokens();
     localStorage.removeItem(this.USER_KEY);
     this.currentUser.set(null);
+    this.cacheService.clear(); 
     this.router.navigate(['/sign-in']);
   }
 
