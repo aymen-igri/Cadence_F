@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "analyze": "ng build --stats-json && npx esbuild-visualizer --metadata dist/study-platform-frontend/stats.json --open",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

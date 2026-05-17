@@ -44,3 +44,6 @@ __screenshots__/
 Thumbs.db
 # Added by code-review-graph
 .code-review-graph/
+
+stats.html
+bundle-size-issues.md

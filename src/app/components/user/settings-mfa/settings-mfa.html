@@ -41,11 +41,13 @@
       </hlm-dialog-header>
 
       @if (selectedMethodId()) {
-        <app-mfa-setup-modal
-          [methodId]="selectedMethodId()!"
-          (closed)="closeModal()"
-          (confirmed)="onModalConfirmed()"
-        ></app-mfa-setup-modal>
+        @defer {
+          <app-mfa-setup-modal
+            [methodId]="selectedMethodId()!"
+            (closed)="closeModal()"
+            (confirmed)="onModalConfirmed()"
+          ></app-mfa-setup-modal>
+        }
       }
 
       <hlm-dialog-footer class="gap-3 mt-6">
