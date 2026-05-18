@@ -35,7 +35,7 @@ import { injectHlmSidebarConfig } from './hlm-sidebar.token';
           data-slot="sidebar"
           data-sidebar="sidebar"
           data-mobile="true"
-          class="bg-sidebar text-sidebar-foreground h-svh w-[var(--sidebar-width)] p-0 [&>button]:hidden"
+          class="bg-background text-foreground h-svh w-[var(--sidebar-width)] p-0 [&>button]:hidden"
           [style.--sidebar-width]="sidebarWidthMobile()"
         >
           <div class="flex h-full w-full flex-col">
@@ -50,7 +50,7 @@ import { injectHlmSidebarConfig } from './hlm-sidebar.token';
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          class="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow"
+          class="bg-background group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow"
         >
           <ng-container *ngTemplateOutlet="contentContainer" />
         </div>

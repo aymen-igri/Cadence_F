@@ -1,4 +1,4 @@
-import { Component , ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
 import {
   lucideBookOpen,
