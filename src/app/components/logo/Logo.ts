@@ -7,7 +7,7 @@ import { NgOptimizedImage } from '@angular/common';
   imports: [NgOptimizedImage],
   template: `
     <img
-      ngSrc="LogoDark.png"
+      ngSrc="LogoDark.webp"
       alt="Cadence"
       [class]="'w-auto ' + sizeClass"
       [width]="width"
