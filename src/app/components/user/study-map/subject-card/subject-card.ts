@@ -1,4 +1,15 @@
-import { Component, inject, input, output, signal , ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  output,
+  signal,
+  ChangeDetectionStrategy,
+  effect,
+  untracked,
+  DestroyRef,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { LucideAngularModule, ChevronDown, ChevronRight, MoreVertical, Plus } from 'lucide-angular';
@@ -12,8 +23,8 @@ import { AlertService } from '@app/components/shared/alert/alert.service';
 import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
 import { SubjectService } from '@app/core/services/subject.service';
-import { GoalFormDialogComponent } from "../goal-form-dialog/goal-form-dialog";
-import { SubjectFormDialogComponent } from "../subject-form-dialog/subject-form-dialog";
+import { GoalFormDialogComponent } from '../goal-form-dialog/goal-form-dialog';
+import { SubjectFormDialogComponent } from '../subject-form-dialog/subject-form-dialog';
 import { LoadingSpinnerComponent } from '@app/components/shared/loading-spinner/loading-spinner.component';
 
 @Component({
@@ -69,8 +80,19 @@ export class SubjectCardComponent {
     },
   });
 
-  ngOnInit() {
-    this.goalService.loadAllGoals(this.subject().id).subscribe();
+  private destroyRef = inject(DestroyRef);
+
+  constructor() {
+    effect(() => {
+      if (this.isExpanded()) {
+        untracked(() => {
+          this.goalService
+            .loadAllGoals(this.subject().id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
+        });
+      }
+    });
   }
 
   toggleGoal(goalId: string) {

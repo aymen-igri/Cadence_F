@@ -8,14 +8,6 @@ import { SubjectService } from '@app/core/services/subject.service';
 import { SubjectFormDialogComponent } from '@app/components/user/study-map/subject-form-dialog/subject-form-dialog';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-export interface SubjTask {
-  id: string;
-  title: string;
-  description: string;
-  durationMinutes: number;
-  completed: boolean;
-}
-
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-study-map',
