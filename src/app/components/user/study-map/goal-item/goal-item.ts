@@ -3,7 +3,10 @@ import {
   input,
   output,
   signal,
-  inject, ChangeDetectionStrategy } from '@angular/core';
+  inject, ChangeDetectionStrategy, 
+  effect,
+  untracked,
+  DestroyRef} from '@angular/core';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import {
   LucideAngularModule,
@@ -26,6 +29,7 @@ import { createMutation } from '@app/core/utils/mutation.helper';
 import { toast } from 'ngx-sonner';
 import { GoalFormDialogComponent } from "../goal-form-dialog/goal-form-dialog";
 import { TaskFormDialogComponent } from "../task-form-dialog/task-form-dialog";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,8 +44,8 @@ import { TaskFormDialogComponent } from "../task-form-dialog/task-form-dialog";
     HlmDropdownMenuImports,
     HlmProgressImports,
     GoalFormDialogComponent,
-    TaskFormDialogComponent
-],
+    TaskFormDialogComponent,
+  ],
   templateUrl: './goal-item.html',
 })
 export class GoalItemComponent {
@@ -55,9 +59,19 @@ export class GoalItemComponent {
   updateGoalDialogState = signal<'closed' | 'open'>('closed');
   SubjectName = input<string>('');
   createTaskDialogState = signal<'closed' | 'open'>('closed');
-
-  ngOnInit() {
-    this.goalService.loadAllTasks(this.goal().id).subscribe();
+  private destroyRef = inject(DestroyRef);
+  
+  constructor() {
+    effect(() => {
+      if (this.isExpanded()) {
+        untracked(() => {
+          this.goalService
+            .loadAllTasks(this.goal().id)
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe();
+        });
+      }
+    });
   }
 
   protected ChevronDown = ChevronDown;
