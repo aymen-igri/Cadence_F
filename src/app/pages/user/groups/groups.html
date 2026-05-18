@@ -21,7 +21,7 @@
 
       <!-- My Groups Section -->
       <div hlmTabsContent="my-groups">
-        <app-group-data-table [groups]="myGroups()" [isClickable]="true" />
+        <app-group-data-table [groups]="myGroups()" />
       </div>
 
       <!-- Discover Section -->
@@ -30,7 +30,6 @@
           [groups]="discoverGroups()"
           (joinClick)="joinGroup($event)"
           (requestJoinClick)="requestToJoin($event)"
-          [isClickable]="false"
         />
       </div>
     </hlm-tabs>

@@ -34,7 +34,6 @@
       "@spartan-ng/helm/skeleton": ["./src/components/ui/skeleton/src/index.ts"],
       "@spartan-ng/helm/tooltip": ["./src/components/ui/tooltip/src/index.ts"],
       "@spartan-ng/helm/switch": ["./src/components/ui/switch/src/index.ts"],
-      "@spartan-ng/helm/table": ["./src/components/ui/table/src/index.ts"],
       "@spartan-ng/helm/accordion": ["./src/components/ui/accordion/src/index.ts"],
       "@spartan-ng/helm/progress": ["./src/components/ui/progress/src/index.ts"],
       "@spartan-ng/helm/checkbox": ["./src/components/ui/checkbox/src/index.ts"],

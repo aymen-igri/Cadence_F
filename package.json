@@ -24,7 +24,6 @@
     "@ng-icons/lucide": ">=32.0.0 <34.0.0",
     "@spartan-ng/brain": "^0.0.1-alpha.646",
     "@stomp/rx-stomp": "^2.4.0",
-    "@tanstack/angular-table": "^8.21.3",
     "angularx-qrcode": "^21.0.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

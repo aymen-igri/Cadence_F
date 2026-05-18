@@ -30,25 +30,12 @@ export interface GroupMembership {
   joinedAt: Date;
 }
 
-export interface Comment {
-  id: string;
-  sharedSessionId: string;
-  userId: string;
-  content: string;
-  createdAt: Date;
-}
-
 // Added for UI view model integration
 export interface GroupJoinRequest {
   id: string;
   groupId: string;
   userId: string;
   requestedAt: Date;
-}
-
-export interface FeedComment extends Comment {
-  userInitials: string;
-  userName: string;
 }
 
 export interface MemberItem {

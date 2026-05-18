@@ -1,188 +1,158 @@
-<div class="flex flex-col items-center justify-between gap-4 py-4 sm:flex-row">
+<!-- Filter -->
+<div class="mb-1 flex items-center py-3">
   <input
     hlmInput
-    class="w-full transition-colors focus-visible:ring-1 focus-visible:ring-primary/50 sm:max-w-xs"
+    class="w-full max-w-xs transition-colors focus-visible:ring-1 focus-visible:ring-primary/50"
     placeholder="Filter groups..."
-    (input)="_filterChanged($event)"
+    [ngModel]="filterText()"
+    (ngModelChange)="filterText.set($event)"
   />
-
-  <button
-    hlmBtn
-    variant="outline"
-    size="sm"
-    align="end"
-    [hlmDropdownMenuTrigger]="menu"
-    class="ml-auto hidden sm:flex"
-  >
-    Columns
-    <ng-icon hlm name="lucideChevronDown" class="ml-2 h-2 w-2" />
-  </button>
-  <ng-template #menu>
-    <hlm-dropdown-menu class="w-32">
-      @for (column of _hidableColumns; track column.id) {
-        <button
-          hlmDropdownMenuCheckbox
-          class="capitalize"
-          [checked]="column.getIsVisible()"
-          (triggered)="column.toggleVisibility()"
-        >
-          <hlm-dropdown-menu-checkbox-indicator />
-          {{ column.columnDef.id }}
-        </button>
-      }
-    </hlm-dropdown-menu>
-  </ng-template>
-  <ng-template #actionsCell let-cell="cell">
-    <div class="flex justify-end pr-2">
-      @if (isClickable()) {
-        <button
-          hlmBtn
-          variant="ghost"
-          size="icon"
-          class="h-8 w-8 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          [routerLink]="['/user/groups', cell.row.original?.id]"
-        >
-          <lucide-angular [img]="SquareArrowOutUpRight" size="16" />
-        </button>
-      } @else {
-        <button
-          hlmBtn
-          variant="ghost"
-          size="icon"
-          class="h-8 w-8 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          [hlmDropdownMenuTrigger]="actionsMenu"
-        >
-          <lucide-angular size="16" [img]="Ellipsis" />
-        </button>
-        <ng-template #actionsMenu>
-          <hlm-dropdown-menu>
-            @if (!cell.row.original?.userRole && cell.row.original?.privacyLevel === 'PUBLIC') {
-              <button hlmDropdownMenuItem (click)="onJoinClick($event, cell.row.original?.id)">
-                Join group
-              </button>
-            }
-            @if (!cell.row.original?.userRole && cell.row.original?.privacyLevel === 'PRIVATE') {
-              <button
-                hlmDropdownMenuItem
-                (click)="onRequestJoinClick($event, cell.row.original?.id)"
-              >
-                Request to join
-              </button>
-            }
-          </hlm-dropdown-menu>
-        </ng-template>
-      }
-    </div>
-  </ng-template>
 </div>
-<div class="overflow-hidden rounded-md border">
-  <!-- we defer the loading of the table, because tanstack manipulates the DOM with flexRender which can cause errors during SSR -->
-  @defer {
-    <div hlmTableContainer>
-      <table hlmTable>
-        <thead hlmTHead>
-          @for (headerGroup of _table.getHeaderGroups(); track headerGroup.id) {
-            <tr hlmTr class="border-b transition-none hover:bg-transparent">
-              @for (header of headerGroup.headers; track header.id) {
-                <th
-                  class="whitespace-nowrap text-xs font-semibold uppercase tracking-wider text-muted-foreground/80"
-                  hlmTh
-                  [attr.colSpan]="header.colSpan"
-                >
-                  @if (!header.isPlaceholder) {
-                    <ng-container
-                      *flexRender="
-                        header.column.columnDef.header;
-                        props: header.getContext();
-                        let headerText
-                      "
-                    >
-                      <div [innerHTML]="headerText"></div>
-                    </ng-container>
-                  }
-                </th>
-              }
-            </tr>
+
+<!-- List -->
+<div class="divide-y divide-border/50 rounded-md">
+  @for (group of filteredGroups(); track group.id) {
+    <!-- Row wrapper — single click area -->
+    <div
+      class="group cursor-pointer px-4 py-3 transition-colors duration-150 hover:bg-muted/40"
+      (click)="toggleRow(group.id)"
+      [attr.aria-expanded]="isExpanded(group.id)"
+    >
+
+      <!-- ── Collapsed: always visible ── -->
+      <div class="flex items-start gap-3">
+
+        <!-- Left: name + badges + description -->
+        <div class="min-w-0 flex-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- Name -->
+            <span class="text-sm font-semibold text-foreground">{{ group.name }}</span>
+
+            <!-- Privacy badge -->
+            @if (group.privacyLevel === 'PUBLIC') {
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium
+                           bg-green-500/10 text-green-600 dark:text-green-400 ring-1 ring-inset ring-green-500/20">
+                Public
+              </span>
+            } @else {
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium
+                           bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-1 ring-inset ring-amber-500/20">
+                Private
+              </span>
+            }
+
+            <!-- Members count -->
+            <span class="text-xs text-muted-foreground/70">
+              {{ group.membersCount }} {{ group.membersCount === 1 ? 'member' : 'members' }}
+            </span>
+          </div>
+
+          <!-- Short description (truncated) -->
+          @if (group.description) {
+            <p class="mt-1 truncate text-xs text-muted-foreground/80">
+              {{ group.description }}
+            </p>
           }
-        </thead>
-        <tbody hlmTBody>
-          @for (row of _table().getRowModel().rows; track row.id) {
-            <tr
-              hlmTr
-              class="border-b transition-colors hover:bg-muted/30 data-[state=selected]:bg-muted"
-              [attr.key]="row.id"
-              [attr.data-state]="row.getIsSelected() && 'selected'"
+        </div>
+
+        <!-- Right: action button + chevron -->
+        <div class="flex shrink-0 items-center gap-2">
+
+          <!-- Action button -->
+          @if (group.userRole !== null && group.userRole !== undefined) {
+            <!-- My Groups → Go to group -->
+            <a
+              hlmBtn
+              variant="ghost"
+              size="sm"
+              class="h-7 gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+              [routerLink]="['/user/groups', group.id]"
+              (click)="$event.stopPropagation()"
             >
-              @for (cell of row.getVisibleCells(); track $index) {
-                <td hlmTd class="align-middle">
-                  @if (cell.column.id === 'actions') {
-                    <ng-container *ngTemplateOutlet="actionsCell; context: { cell: cell }" />
-                  } @else if (cell.column.id === 'privacyLevel') {
-                    <div
-                      hlmBadge
-                      variant="outline"
-                      [class]="
-                        cell.getValue() === 'Public'
-                          ? 'border-transparent bg-green-500/10 text-green-700 hover:bg-green-500/20 dark:text-green-400 font-medium transition-colors'
-                          : 'border-transparent bg-red-500/10 text-red-700 hover:bg-red-500/20 dark:text-red-400 font-medium transition-colors'
-                      "
-                    >
-                      {{ cell.getValue() }}
-                    </div>
-                  } @else if (cell.column.id === 'name') {
-                    <div class="text-sm font-medium text-foreground">
-                      {{ cell.getValue() }}
-                    </div>
-                  } @else {
-                    <div class="text-sm font-normal text-muted-foreground/80">
-                      {{ cell.getValue() }}
-                    </div>
-                  }
-                </td>
-              }
-            </tr>
-          } @empty {
-            <tr hlmTr>
-              <td hlmTd class="h-32 text-center" [attr.colspan]="_columns().length">
-                <div class="flex flex-col items-center justify-center gap-1 text-muted-foreground">
-                  <span class="text-sm">No groups found.</span>
-                  <span class="text-xs text-muted-foreground/60">Try adjusting your filters</span>
-                </div>
-              </td>
-            </tr>
+              Go&nbsp;→
+            </a>
+          } @else if (group.privacyLevel === 'PUBLIC') {
+            <!-- Discover PUBLIC → Join -->
+            <button
+              hlmBtn
+              variant="ghost"
+              size="sm"
+              class="h-7 text-xs text-muted-foreground hover:text-foreground"
+              (click)="onJoinClick($event, group.id)"
+            >
+              Join
+            </button>
+          } @else {
+            <!-- Discover PRIVATE → Request to Join -->
+            <button
+              hlmBtn
+              variant="ghost"
+              size="sm"
+              class="h-7 text-xs text-muted-foreground hover:text-foreground"
+              (click)="onRequestJoinClick($event, group.id)"
+            >
+              Request&nbsp;to&nbsp;Join
+            </button>
           }
-        </tbody>
-      </table>
-    </div>
-  }
-</div>
 
-<div class="flex flex-col items-center justify-between py-4 sm:flex-row">
-  <div class="flex-1 text-sm text-muted-foreground/80">
-    @if (_table().getRowCount() > 0) {
-      Showing {{ _table().getRowModel().rows.length }} of {{ _table().getRowCount() }} groups.
-    }
-  </div>
-  @if (_table().getRowCount() > 0) {
-    <div class="mt-2 flex space-x-2 sm:mt-0">
-      <button
-        size="sm"
-        variant="outline"
-        hlmBtn
-        [disabled]="!_table.getCanPreviousPage()"
-        (click)="_table.previousPage()"
+          <!-- Chevron indicator -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-3.5 w-3.5 shrink-0 text-muted-foreground/50 transition-transform duration-200"
+            [class.rotate-180]="isExpanded(group.id)"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- ── Expanded panel ── -->
+      <div
+        class="grid transition-all duration-200 ease-in-out"
+        [class.grid-rows-[0fr]]="!isExpanded(group.id)"
+        [class.grid-rows-[1fr]]="isExpanded(group.id)"
       >
-        Previous
-      </button>
-      <button
-        size="sm"
-        variant="outline"
-        hlmBtn
-        [disabled]="!_table.getCanNextPage()"
-        (click)="_table.nextPage()"
-      >
-        Next
-      </button>
+        <div class="overflow-hidden">
+          <div class="mt-3 space-y-3 border-t border-border/40 pt-3">
+
+            <!-- Full description -->
+            @if (group.description) {
+              <p class="text-xs leading-relaxed text-muted-foreground">
+                {{ group.description }}
+              </p>
+            }
+
+            <!-- Meta row -->
+            <div class="flex flex-wrap gap-x-5 gap-y-1">
+              <span class="text-xs text-muted-foreground/70">
+                <span class="font-medium text-muted-foreground">Members</span>&nbsp;·&nbsp;{{ group.membersCount }}
+              </span>
+              <span class="text-xs text-muted-foreground/70">
+                <span class="font-medium text-muted-foreground">Created</span>&nbsp;·&nbsp;{{ formatDate(group.createdAt) }}
+              </span>
+              @if (group.userRole) {
+                <span class="text-xs text-muted-foreground/70">
+                  <span class="font-medium text-muted-foreground">Your role</span>&nbsp;·&nbsp;{{ group.userRole | titlecase }}
+                </span>
+              }
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  } @empty {
+    <div class="flex flex-col items-center justify-center gap-1 py-12 text-muted-foreground">
+      <span class="text-sm">No groups found.</span>
+      <span class="text-xs text-muted-foreground/60">Try adjusting your filters</span>
     </div>
   }
 </div>
