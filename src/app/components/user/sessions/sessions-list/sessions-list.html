@@ -100,12 +100,14 @@
               </hlm-dropdown-menu>
             </ng-template>
 
-            <app-session-dialog
-              [state]="updateSubjectDialogState()"
-              (dialogStateChange)="updateSubjectDialogState.set($event)"
-              [session]="sessionRes"
-            >
-            </app-session-dialog>
+            @defer (when updateSubjectDialogState() === 'open') {
+              <app-session-dialog
+                [state]="updateSubjectDialogState()"
+                (dialogStateChange)="updateSubjectDialogState.set($event)"
+                [session]="sessionRes"
+              >
+              </app-session-dialog>
+            } @placeholder {}
           </div>
 
           <!-- Accordion for Sub-sessions -->

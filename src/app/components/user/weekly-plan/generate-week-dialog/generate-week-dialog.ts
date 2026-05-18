@@ -28,6 +28,7 @@ import { createMutation } from '@app/core/utils/mutation.helper';
 import { SessionService } from '@app/core/services/session.service';
 import { toast } from 'ngx-sonner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoadingSpinnerComponent } from "@app/components/shared/loading-spinner/loading-spinner.component";
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +44,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     HlmCheckboxImports,
     FormField,
     FormRoot,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './generate-week-dialog.html',
 })
@@ -55,6 +57,8 @@ export class GenerateWeekDialogComponent {
 
   subjects = this.subjectService.allSubjects.data;
   availabilityPlans = this.availabilityService.allAvailabilityPlans.data;
+  isLoadingSubjects = this.subjectService.allSubjects.isLoading;
+  isLoadingAvailabiltyPlans = this.availabilityService.allAvailabilityPlans.isLoading;
   goalsBySubject = signal<Map<string, Goal[]>>(new Map());
 
   state = input<'open' | 'closed'>('closed');

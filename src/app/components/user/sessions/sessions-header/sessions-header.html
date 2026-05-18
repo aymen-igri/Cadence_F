@@ -12,8 +12,10 @@
     </button>
   </div>
 </div>
-<app-session-dialog
-  [state]="createSessionDialogState()"
-  (dialogStateChange)="createSessionDialogState.set($event)"
->
-</app-session-dialog>
+@defer (when createSessionDialogState() === 'open') {
+  <app-session-dialog
+    [state]="createSessionDialogState()"
+    (dialogStateChange)="createSessionDialogState.set($event)"
+  >
+  </app-session-dialog>
+} @placeholder {}

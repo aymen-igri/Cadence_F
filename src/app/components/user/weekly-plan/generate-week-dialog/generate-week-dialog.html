@@ -34,10 +34,7 @@
             <div class="text-xs text-muted-foreground">(click a week below)</div>
           </div>
 
-          @if (
-            sessionForm.weekNumber().touched() &&
-            sessionForm.weekNumber().invalid()
-          ) {
+          @if (sessionForm.weekNumber().touched() && sessionForm.weekNumber().invalid()) {
             <div class="text-xs text-destructive">
               @for (error of sessionForm.weekNumber().errors(); track error) {
                 <p>{{ error.message }}</p>
@@ -95,84 +92,91 @@
             <h4 class="text-sm font-medium">Include Goals</h4>
           </div>
 
-          <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
-            @for (pair of sessionForm.subjectGoalPairs; track $index) {
-              <div class="relative rounded-lg border p-4 space-y-4 bg-muted/20">
-                <!-- Subject Select -->
-                <div class="space-y-2">
-                  <label hlmLabel class="text-sm">Subject</label>
-                  <select
-                    class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
-                    [formField]="pair.subjectId"
-                  >
-                    <option value="">Select a subject...</option>
-                    @for (subject of getAvailableSubjectsForPair($index); track subject.id) {
-                      <option [value]="subject.id">{{ subject.name }}</option>
-                    }
-                  </select>
-                  @if (pair.subjectId().touched() && pair.subjectId().invalid()) {
-                    <div class="text-xs text-destructive">
-                      @for (error of pair.subjectId().errors(); track error) {
-                        <p>{{ error.message }}</p>
-                      }
-                    </div>
-                  }
-                </div>
-
-                <!-- Goals Multi-Select -->
-                @if (getSubjectIdFromPair($index) !== '') {
+          @if (isLoadingSubjects()) {
+            <app-loading-spinner [isLoading]="true"></app-loading-spinner>
+          } @else {
+            <div class="space-y-4 max-h-80 overflow-y-auto pr-2">
+              @for (pair of sessionForm.subjectGoalPairs; track $index) {
+                <div class="relative rounded-lg border p-4 space-y-4 bg-muted/20">
+                  <!-- Subject Select -->
                   <div class="space-y-2">
-                    <label hlmLabel class="text-sm">Goals</label>
-                    <div class="space-y-2 p-3 border border-border rounded-md bg-background">
-                      @if (getGoalsForSubject(getSubjectIdFromPair($index)).length === 0) {
-                        <p class="text-xs text-muted-foreground italic">
-                          No goals found for this subject.
-                        </p>
+                    <label hlmLabel class="text-sm">Subject</label>
+                    <select
+                      class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+                      [formField]="pair.subjectId"
+                    >
+                      <option value="">Select a subject...</option>
+                      @for (subject of getAvailableSubjectsForPair($index); track subject.id) {
+                        <option [value]="subject.id">{{ subject.name }}</option>
                       }
-                      @for (
-                        goal of getGoalsForSubject(getSubjectIdFromPair($index));
-                        track goal.id
-                      ) {
-                        <label hlmLabel class="flex items-center gap-2 font-normal cursor-pointer">
-                          <input
-                            type="checkbox"
-                            [checked]="isGoalSelected($index, goal.id)"
-                            (change)="toggleGoal($index, goal.id)"
-                            class="rounded"
-                          />
-                          {{ goal.title }}
-                          <span class="text-muted-foreground text-xs"
-                            >({{ goal.targetHoursPerWeek }}h/week)</span
-                          >
-                        </label>
-                      }
-                    </div>
-                    @if (pair.selectedGoalIds().touched() && pair.selectedGoalIds().invalid()) {
+                    </select>
+                    @if (pair.subjectId().touched() && pair.subjectId().invalid()) {
                       <div class="text-xs text-destructive">
-                        @for (error of pair.selectedGoalIds().errors(); track error) {
+                        @for (error of pair.subjectId().errors(); track error) {
                           <p>{{ error.message }}</p>
                         }
                       </div>
                     }
                   </div>
-                }
 
-                <!-- Remove Button -->
-                @if (sessionForm.subjectGoalPairs.length > 1) {
-                  <button
-                    type="button"
-                    hlmBtn
-                    size="sm"
-                    variant="ghost"
-                    class="h-8 px-2 text-destructive hover:bg-destructive/10"
-                    (click)="removeSubjectGoalPair($index)"
-                  >
-                    Remove Subject
-                  </button>
-                }
-              </div>
-            }
-          </div>
+                  <!-- Goals Multi-Select -->
+                  @if (getSubjectIdFromPair($index) !== '') {
+                    <div class="space-y-2">
+                      <label hlmLabel class="text-sm">Goals</label>
+                      <div class="space-y-2 p-3 border border-border rounded-md bg-background">
+                        @if (getGoalsForSubject(getSubjectIdFromPair($index)).length === 0) {
+                          <p class="text-xs text-muted-foreground italic">
+                            No goals found for this subject.
+                          </p>
+                        }
+                        @for (
+                          goal of getGoalsForSubject(getSubjectIdFromPair($index));
+                          track goal.id
+                        ) {
+                          <label
+                            hlmLabel
+                            class="flex items-center gap-2 font-normal cursor-pointer"
+                          >
+                            <input
+                              type="checkbox"
+                              [checked]="isGoalSelected($index, goal.id)"
+                              (change)="toggleGoal($index, goal.id)"
+                              class="rounded"
+                            />
+                            {{ goal.title }}
+                            <span class="text-muted-foreground text-xs"
+                              >({{ goal.targetHoursPerWeek }}h/week)</span
+                            >
+                          </label>
+                        }
+                      </div>
+                      @if (pair.selectedGoalIds().touched() && pair.selectedGoalIds().invalid()) {
+                        <div class="text-xs text-destructive">
+                          @for (error of pair.selectedGoalIds().errors(); track error) {
+                            <p>{{ error.message }}</p>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  <!-- Remove Button -->
+                  @if (sessionForm.subjectGoalPairs.length > 1) {
+                    <button
+                      type="button"
+                      hlmBtn
+                      size="sm"
+                      variant="ghost"
+                      class="h-8 px-2 text-destructive hover:bg-destructive/10"
+                      (click)="removeSubjectGoalPair($index)"
+                    >
+                      Remove Subject
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
 
           <!-- Add More Subjects Button -->
           <button
@@ -199,15 +203,19 @@
         <!-- Availability Plan Select -->
         <div class="space-y-2">
           <label hlmLabel class="font-medium text-sm">Availability Plan</label>
-          <select
-            class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
-            [formField]="sessionForm.availabilityPlanID"
-          >
-            <option value="">Select an availability plan...</option>
-            @for (plan of availabilityPlans(); track plan.id) {
-              <option [value]="plan.id">{{ plan.title }}</option>
-            }
-          </select>
+          @if (isLoadingAvailabiltyPlans()) {
+            <app-loading-spinner [isLoading]="true"></app-loading-spinner>
+          } @else {
+            <select
+              class="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
+              [formField]="sessionForm.availabilityPlanID"
+            >
+              <option value="">Select an availability plan...</option>
+              @for (plan of availabilityPlans(); track plan.id) {
+                <option [value]="plan.id">{{ plan.title }}</option>
+              }
+            </select>
+          }
           @if (
             sessionForm.availabilityPlanID().touched() && sessionForm.availabilityPlanID().invalid()
           ) {

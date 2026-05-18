@@ -17,6 +17,7 @@ import { HlmLabelImports } from '@spartan-ng/helm/label';
 import { toast } from 'ngx-sonner';
 import { CarryOverDialogComponent } from '../carry-over-dialog/carry-over-dialog';
 import { mapMissedToCarryOverItems } from '../carry-over-dialog/carry-over.utils';
+import { LoadingSpinnerComponent } from '@app/components/shared/loading-spinner/loading-spinner.component';
 import {
   getLoadBalanceWarnings,
   formatWarningMessage,
@@ -35,6 +36,7 @@ import {
     HlmLabelImports,
     HlmInputImports,
     CarryOverDialogComponent,
+    LoadingSpinnerComponent,
   ],
 })
 export class SessionDialogComponent {
@@ -90,7 +92,7 @@ export class SessionDialogComponent {
   state = input.required<'closed' | 'open'>();
   dialogStateChange = output<'closed' | 'open'>();
   subjects = this.subjectService.allSubjects.data;
-
+  isLoadingSubjects = this.subjectService.allSubjects.isLoading;
   loadBalanceWarnings = computed<LoadBalanceWarning[]>(() => {
     const currentSubs = this.sessionModel().subSessions;
     const previousSessions = this.sessionService.allSessions.data() || [];
