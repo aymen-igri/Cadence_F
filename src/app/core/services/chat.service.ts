@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { GroupMessageResponse, SendGroupMessageRequest } from '../models/chat.model';
+import { GroupMessageResponse, SendGroupMessageRequest, PagedMessageResponse } from '../models/chat.model';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -27,6 +27,12 @@ export class ChatService implements OnDestroy {
   public messages$ = this.messagesSubject.asObservable();
   readonly messages = toSignal(this.messages$, { initialValue: [] });
 
+  private currentPageSubject = new BehaviorSubject<number>(0);
+  readonly currentPage = toSignal(this.currentPageSubject, { initialValue: 0 });
+
+  private hasMoreSubject = new BehaviorSubject<boolean>(false);
+  readonly hasMore = toSignal(this.hasMoreSubject, { initialValue: false });
+
   sendMessage(groupId: string, content: string): Observable<GroupMessageResponse> {
     const url = `${this.apiUrl}/${groupId}/messages`;
     const payload: SendGroupMessageRequest = { content };
@@ -37,15 +43,22 @@ export class ChatService implements OnDestroy {
     return this.http.post<GroupMessageResponse>(url, payload);
   }
 
-  loadChatHistory(groupId: string): Observable<GroupMessageResponse[]> {
-    const url = `${this.apiUrl}/${groupId}/messages`;
-    return this.http.get<GroupMessageResponse[]>(url).pipe(
+  loadPagedChatHistory(groupId: string, page: number, size: number = 20): Observable<PagedMessageResponse> {
+    const url = `${this.apiUrl}/${groupId}/messages/paginated?page=${page}&size=${size}`;
+    return this.http.get<PagedMessageResponse>(url).pipe(
       tap({
-        next: (history) => {
-          // Replace current state with fetched history
-          this.messagesSubject.next(history);
+        next: (response) => {
+          this.currentPageSubject.next(response.currentPage);
+          this.hasMoreSubject.next(response.hasMore);
+          
+          if (page === 0) {
+            this.messagesSubject.next(response.messages);
+          } else {
+            const currentMessages = this.messagesSubject.getValue();
+            this.messagesSubject.next([...response.messages, ...currentMessages]);
+          }
         },
-        error: (err) => console.error('Failed to load history', err),
+        error: (err) => console.error('Failed to load paginated history', err),
       })
     );
   }
@@ -94,6 +107,8 @@ export class ChatService implements OnDestroy {
     this.destroy$.complete();
     // Clear the chat state
     this.messagesSubject.next([]);
+    this.currentPageSubject.next(0);
+    this.hasMoreSubject.next(false);
     // Note: We don't disconnect the WebSocket here as it's shared
     // The WebSocketService manages the connection lifecycle
   }

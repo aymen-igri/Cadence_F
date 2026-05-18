@@ -11,3 +11,11 @@ export interface GroupMessageResponse {
 export interface SendGroupMessageRequest {
   content: string;
 }
+
+export interface PagedMessageResponse {
+  messages: GroupMessageResponse[];
+  currentPage: number;
+  totalElements: number;
+  totalPages: number;
+  hasMore: boolean;
+}

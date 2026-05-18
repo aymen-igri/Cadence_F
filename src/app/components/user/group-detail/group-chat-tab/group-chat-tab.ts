@@ -14,13 +14,15 @@ import { HlmInputImports } from '@spartan-ng/helm/input';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { lucideSend, lucideAlertCircle } from '@ng-icons/lucide';
 import { provideIcons } from '@ng-icons/core';
-import { ChatService } from '@app/core/services/chat.service'; // adjust path if needed
+import { ChatService } from '@app/core/services/chat.service';
+import { LoadingSpinnerComponent } from '@app/components/shared/loading-spinner/loading-spinner.component';
+import { effect } from '@angular/core';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-group-chat-tab',
   standalone: true,
-  imports: [CommonModule, FormsModule, HlmButtonImports, HlmInputImports, HlmIconImports, DatePipe],
+  imports: [CommonModule, FormsModule, HlmButtonImports, HlmInputImports, HlmIconImports, DatePipe, LoadingSpinnerComponent],
   providers: [provideIcons({ lucideSend, lucideAlertCircle })],
   templateUrl: './group-chat-tab.html',
 })
@@ -38,8 +40,20 @@ export class GroupChatTabComponent implements OnInit, OnDestroy {
   // 2. Local UI State signals
   newMessage = signal('');
   isLoading = signal(true);
+  isLoadingOlder = signal(false);
   isSending = signal(false);
   error = signal<string | null>(null);
+
+  constructor() {
+    effect(() => {
+      // Whenever messages change, if we're not explicitly loading older ones,
+      // scroll to the bottom to show the newest messages.
+      this.messages();
+      if (!this.isLoadingOlder() && !this.isLoading()) {
+        setTimeout(() => this.scrollToBottom(), 0);
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.initChat();
@@ -50,7 +64,7 @@ export class GroupChatTabComponent implements OnInit, OnDestroy {
     this.error.set(null);
 
     // Load history first via REST
-    this.chatService.loadChatHistory(this.groupId()).subscribe({
+    this.chatService.loadPagedChatHistory(this.groupId(), 0, 20).subscribe({
       next: () => {
         this.isLoading.set(false);
         // Once history is loaded, connect WebSocket to listen for new messages
@@ -91,8 +105,31 @@ export class GroupChatTabComponent implements OnInit, OnDestroy {
     this.chatService.disconnect();
   }
 
-  ngAfterViewChecked(): void {
-    this.scrollToBottom();
+  onScroll(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (target.scrollTop === 0 && this.chatService.hasMore() && !this.isLoadingOlder()) {
+      this.loadOlderMessages();
+    }
+  }
+
+  private loadOlderMessages(): void {
+    this.isLoadingOlder.set(true);
+    const oldScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+    
+    this.chatService.loadPagedChatHistory(this.groupId(), this.chatService.currentPage() + 1, 20).subscribe({
+      next: () => {
+        // Restore scroll position so user doesn't jump to the top
+        setTimeout(() => {
+          const newScrollHeight = this.scrollContainer.nativeElement.scrollHeight;
+          this.scrollContainer.nativeElement.scrollTop = newScrollHeight - oldScrollHeight;
+          this.isLoadingOlder.set(false);
+        }, 0);
+      },
+      error: (err) => {
+        console.error('Failed to load older messages', err);
+        this.isLoadingOlder.set(false);
+      }
+    });
   }
 
   private scrollToBottom(): void {
