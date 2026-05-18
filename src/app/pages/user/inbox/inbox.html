@@ -1,6 +1,5 @@
 <div class="flex flex-col gap-6">
   <app-inbox-header [unreadCount]="unreadCount()" (markAllAsRead)="onMarkAllAsRead()" />
-  <app-inbox-filters />
 
   @if (isLoading()) {
     <app-loading-spinner [isLoading]="true"></app-loading-spinner>

@@ -1,5 +1,9 @@
-<div class="flex flex-col gap-3">
+<div class="divide-y divide-border/50 rounded-md">
   @for (notification of notifications(); track notification.id) {
     <app-notification-item [item]="notification" (markAsRead)="onMarkAsRead(notification.id)" />
+  } @empty {
+    <div class="flex flex-col items-center justify-center gap-1 py-12 text-muted-foreground">
+      <span class="text-sm">No notifications found.</span>
+    </div>
   }
 </div>

@@ -2,7 +2,6 @@ import { Component, OnInit, OnDestroy, computed, inject , ChangeDetectionStrateg
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '@app/core/services/notification.service';
 import { InboxHeader } from '@app/components/user/inbox/inbox-header/inbox-header';
-import { InboxFilters } from '@app/components/user/inbox/inbox-filters/inbox-filters';
 import { NotificationsList } from '@app/components/user/inbox/notifications-list/notifications-list';
 import { LucideAngularModule, Loader2, AlertCircle } from 'lucide-angular';
 import { toast } from 'ngx-sonner';
@@ -12,7 +11,7 @@ import { LoadingSpinnerComponent } from '@app/components/shared/loading-spinner/
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-inbox',
-  imports: [CommonModule, InboxHeader, InboxFilters, NotificationsList, LucideAngularModule, LoadingSpinnerComponent],
+  imports: [CommonModule, InboxHeader, NotificationsList, LucideAngularModule, LoadingSpinnerComponent],
   templateUrl: './inbox.html',
   providers: [NotificationService],
 })

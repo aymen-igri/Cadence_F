@@ -1,58 +1,37 @@
 <div
-  hlmCard
+  class="group px-4 py-3 transition-colors duration-150 hover:bg-muted/40"
   [class.opacity-50]="item().isRead"
-  class="group relative overflow-hidden rounded-xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:shadow-md hover:border-border"
 >
-  <!-- Unread accent line -->
-  @if (!item().isRead) {
-    <div class="absolute left-0 top-0 h-full w-0.75 bg-primary rounded-l-xl"></div>
-  }
-
-  <div hlmCardContent class="p-4 pl-5">
-    <div class="flex items-start gap-3">
-      <!-- Icon -->
-      <div
-        class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border/70 bg-muted/40 transition-colors group-hover:bg-muted/70"
-      >
-        <ng-icon [name]="icon" class="h-4 w-4 text-muted-foreground" />
+  <div class="flex items-start gap-3">
+    <!-- Left: title + status + time + description -->
+    <div class="min-w-0 flex-1">
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-sm font-semibold text-foreground">{{ item().title }}</span>
+        @if (!item().isRead) {
+          <span class="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary"></span>
+        }
+        <span class="text-xs text-muted-foreground/70">
+          {{ item().createdAt | date: 'shortTime' }}
+        </span>
       </div>
+      <p class="mt-1 truncate text-xs text-muted-foreground/80">
+        {{ item().message }}
+      </p>
+    </div>
 
-      <!-- Content -->
-      <div class="flex-1 min-w-0 flex items-start justify-between gap-3">
-        <div class="min-w-0">
-          <div class="flex items-center gap-2">
-            <p class="text-sm font-semibold text-foreground leading-snug truncate">
-              {{ item().title }}
-            </p>
-            @if (!item().isRead) {
-              <span class="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-primary"></span>
-            }
-          </div>
-          <p class="text-sm text-muted-foreground mt-1 leading-relaxed line-clamp-2">
-            {{ item().message }}
-          </p>
-        </div>
-
-        <!-- Timestamp + Action -->
-        <div class="flex flex-col items-end gap-2.5 shrink-0">
-          <span
-            class="text-[11px] font-medium text-muted-foreground/70 whitespace-nowrap tabular-nums"
-          >
-            {{ item().createdAt | date: 'shortTime' }}
-          </span>
-          @if (!item().isRead) {
-            <button
-              hlmBtn
-              variant="outline"
-              size="sm"
-              class="h-7 text-xs px-2.5 rounded-lg border-border/60 text-muted-foreground hover:text-foreground hover:border-border transition-colors"
-              (click)="onMarkAsRead()"
-            >
-              Mark as read
-            </button>
-          }
-        </div>
-      </div>
+    <!-- Right: action button -->
+    <div class="flex shrink-0 items-center gap-2">
+      @if (!item().isRead) {
+        <button
+          hlmBtn
+          variant="ghost"
+          size="sm"
+          class="h-7 text-xs text-muted-foreground hover:text-foreground"
+          (click)="onMarkAsRead()"
+        >
+          Mark as read
+        </button>
+      }
     </div>
   </div>
 </div>
