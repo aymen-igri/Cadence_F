@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
 import { mfaGuard } from './core/guards/mfa.guard';
+import { roleGuard } from './core/guards/role.guard';
 
 export const routes: Routes = [
   {
@@ -46,11 +47,13 @@ export const routes: Routes = [
   },
   {
     path: 'reset-password',
-    loadComponent: () => import('./pages/auth/reset-password/reset-password').then((m) => m.ResetPassword),
+    loadComponent: () =>
+      import('./pages/auth/reset-password/reset-password').then((m) => m.ResetPassword),
   },
   {
     path: 'change-password',
-    loadComponent: () => import('./pages/auth/change-password/change-password').then((m) => m.ChangePassword),
+    loadComponent: () =>
+      import('./pages/auth/change-password/change-password').then((m) => m.ChangePassword),
   },
   {
     path: 'forbidden',
@@ -67,6 +70,8 @@ export const routes: Routes = [
   {
     path: 'user',
     canMatch: [authGuard],
+    canActivate: [roleGuard],
+    data: { roles: ['ROLE_GENERAL_USER', 'ROLE_ADMIN'] },
     loadComponent: () =>
       import('./layouts/side-bar-layout/side-bar-layout').then((m) => m.SideBarLayout),
     children: [
@@ -147,11 +152,14 @@ export const routes: Routes = [
           import('./components/user/sessions/week-reflection/week-reflection').then(
             (m) => m.WeekReflectionComponent,
           ),
-      }
+      },
     ],
   },
   {
     path: 'admin',
+    canMatch: [authGuard],
+    canActivate: [roleGuard],
+    data: { roles: ['ROLE_ADMIN'] },
     loadComponent: () =>
       import('./layouts/side-bar-layout/side-bar-layout').then((m) => m.SideBarLayout),
     children: [
@@ -165,8 +173,12 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/admin/users/users').then((m) => m.AdminUsers),
       },
       {
+        path: 'logout',
+        loadComponent: () => import('./pages/user/logout/logout').then((m) => m.LogoutComponent),
+      },
+      {
         path: 'settings',
-        loadComponent: () => import('./pages/admin/settings/settings').then((m) => m.AdminSettings),
+        loadComponent: () => import('./pages/user/settings/settings').then((m) => m.SettingsComponent),
       },
     ],
   },

@@ -1,4 +1,5 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
+import { AuthService } from '../../core/services/auth.service';
 import { HlmSidebarImports } from '@spartan-ng/helm/sidebar';
 import {
   lucideBookOpen,
@@ -36,7 +37,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
           <div hlmSidebarGroup>
             <div hlmSidebarGroupContent>
               <ul hlmSidebarMenu>
-                @for (item of _navItems; track item.title) {
+                @for (item of _navItems(); track item.title) {
                   <li hlmSidebarMenuItem>
                     <a
                       hlmSidebarMenuButton
@@ -94,7 +95,9 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   ],
 })
 export class AppSidebar {
-  readonly role = localStorage.getItem('role');
+  private readonly _authService = inject(AuthService);
+
+  readonly role = computed(() => this._authService.currentUser()?.role);
 
   protected readonly _adminNavItems = [
     {
@@ -160,5 +163,7 @@ export class AppSidebar {
     },
   ];
 
-  readonly _navItems = this.role === 'admin' ? this._adminNavItems : this._userNavItems;
+  readonly _navItems = computed(() =>
+    this.role() === 'ROLE_ADMIN' ? this._adminNavItems : this._userNavItems,
+  );
 }

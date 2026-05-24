@@ -60,6 +60,8 @@ export class SignIn {
             if (response.mfaTokens && response.user?.role === 'ROLE_PRE_AUTH') {
               this.mfaService.temporaryMfaToken.set(response.mfaTokens);
               this.router.navigate(['/auth/mfa/type']); // redirection spot for mfa verification
+            } else if (response.user?.role === 'ROLE_ADMIN') {
+              this.router.navigate(['/admin/dashboard']);
             } else {
               this.router.navigate(['/user/dashboard']);
             }
