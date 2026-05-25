@@ -1,0 +1,73 @@
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+  <!-- Total Registered Users -->
+  @if (isLoading()) {
+    <div hlmCard class="border border-border rounded-lg">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <hlm-skeleton class="h-4 w-1/2 mb-3" />
+        <hlm-skeleton class="h-8 w-2/3" />
+      </div>
+    </div>
+  } @else {
+    <div hlmCard class="border border-border rounded-lg hover:shadow-md transition-shadow">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <p class="text-sm font-medium text-muted-foreground">Total Registered Users</p>
+        <p class="text-3xl font-bold text-foreground mt-2">{{ cardsData()?.registredUsersCount ?? 0 }}</p>
+        <p class="text-xs text-muted-foreground mt-2">Active user accounts</p>
+      </div>
+    </div>
+  }
+
+  <!-- Total Weekly Plans -->
+  @if (isLoading()) {
+    <div hlmCard class="border border-border rounded-lg">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <hlm-skeleton class="h-4 w-1/2 mb-3" />
+        <hlm-skeleton class="h-8 w-2/3" />
+      </div>
+    </div>
+  } @else {
+    <div hlmCard class="border border-border rounded-lg hover:shadow-md transition-shadow">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <p class="text-sm font-medium text-muted-foreground">Total Weekly Plans</p>
+        <p class="text-3xl font-bold text-foreground mt-2">{{ cardsData()?.weeklyPlanCount ?? 0 }}</p>
+        <p class="text-xs text-muted-foreground mt-2">Created or generated</p>
+      </div>
+    </div>
+  }
+
+  <!-- Total Groups -->
+  @if (isLoading()) {
+    <div hlmCard class="border border-border rounded-lg">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <hlm-skeleton class="h-4 w-1/2 mb-3" />
+        <hlm-skeleton class="h-8 w-2/3" />
+      </div>
+    </div>
+  } @else {
+    <div hlmCard class="border border-border rounded-lg hover:shadow-md transition-shadow">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <p class="text-sm font-medium text-muted-foreground">Total Groups</p>
+        <p class="text-3xl font-bold text-foreground mt-2">{{ cardsData()?.groupsCount ?? 0 }}</p>
+        <p class="text-xs text-muted-foreground mt-2">Study groups created</p>
+      </div>
+    </div>
+  }
+
+  <!-- Total Unique Subjects -->
+  @if (isLoading()) {
+    <div hlmCard class="border border-border rounded-lg">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <hlm-skeleton class="h-4 w-1/2 mb-3" />
+        <hlm-skeleton class="h-8 w-2/3" />
+      </div>
+    </div>
+  } @else {
+    <div hlmCard class="border border-border rounded-lg hover:shadow-md transition-shadow">
+      <div hlmCardContent class="pt-6 pb-3 px-4">
+        <p class="text-sm font-medium text-muted-foreground">Total Unique Subjects</p>
+        <p class="text-3xl font-bold text-foreground mt-2">{{ cardsData()?.subjectsCount ?? 0 }}</p>
+        <p class="text-xs text-muted-foreground mt-2">Distinct subjects</p>
+      </div>
+    </div>
+  }
+</div>

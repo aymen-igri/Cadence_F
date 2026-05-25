@@ -11,6 +11,8 @@ import { cacheInterceptor } from '@app/core/interceptors/cache.interceptor';
 import { retryInterceptor } from '@app/core/interceptors/retry.interceptor';
 import { cancelInterceptor } from '@app/core/interceptors/cancel.interceptor';
 import { provideIcons } from '@ng-icons/core';
+import { provideEchartsCore } from 'ngx-echarts';
+import * as echarts from 'echarts';
 import {
   lucideServerCrash,
   lucideEye,
@@ -62,6 +64,7 @@ export const appConfig: ApplicationConfig = {
         errorInterceptor,
       ]),
     ),
+    provideEchartsCore({ echarts }),
     provideIcons({
       serverCrash: lucideServerCrash,
       eye: lucideEye,
