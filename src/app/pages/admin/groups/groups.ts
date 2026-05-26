@@ -1,6 +1,8 @@
 import { Component, ChangeDetectionStrategy, inject, signal, effect } from '@angular/core';
+import { Dialog } from '@angular/cdk/dialog';
 import { GroupsFilterBarComponent } from '@app/components/admin/groups-filter-bar/groups-filter-bar';
 import { GroupsListComponent } from '@app/components/admin/groups-list/groups-list';
+import { GroupsDetailModalComponent } from '@app/components/admin/groups-detail-modal/groups-detail-modal';
 import {
   GroupsManagementService,
   GroupFilterRequest,
@@ -13,28 +15,11 @@ import { toast } from 'ngx-sonner';
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-admin-groups',
   imports: [GroupsFilterBarComponent, GroupsListComponent],
-  template: `
-    <div class="min-h-screen bg-background p-6 md:p-8">
-      <!-- Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-foreground">Groups Management</h1>
-        <p class="text-muted-foreground mt-2">Search and manage platform groups</p>
-      </div>
-
-      <!-- Filter Bar -->
-      <app-groups-filter-bar (filterSubmitted)="onFilterSubmitted($event)" />
-
-      <!-- Groups List -->
-      <app-groups-list
-        [groupsList]="groupsList()"
-        [isLoading]="isLoading()"
-        (groupSelected)="onGroupSelected($event)"
-      />
-    </div>
-  `,
+  templateUrl: './groups.html',
 })
 export class AdminGroups {
   private readonly groupsManagementService = inject(GroupsManagementService);
+  private readonly dialog = inject(Dialog);
 
   groupsList = signal<GroupData[] | null>(null);
   isLoading = signal<boolean>(false);
@@ -58,7 +43,7 @@ export class AdminGroups {
 
     const payload: GroupsFilterPayload = {
       groupData: this.currentFilter(),
-      page: 1,
+      page: 0,
       size: this.PAGE_SIZE,
     };
 
@@ -77,7 +62,8 @@ export class AdminGroups {
   }
 
   onGroupSelected(groupId: string) {
-    // TODO: Open group details modal
-    toast.info(`Group selected: ${groupId}`);
+    this.dialog.open(GroupsDetailModalComponent, {
+      data: { groupId },
+    });
   }
 }

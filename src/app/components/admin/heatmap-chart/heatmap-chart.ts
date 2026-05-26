@@ -117,7 +117,7 @@ export class HeatmapChartComponent {
         orient: 'vertical',
         right: '5%',
         inRange: {
-          color: ['#f3f4f6', '#fef3c7', '#fcd34d', '#f59e0b', '#d97706'],
+          color: ['#1D1D1D', '#2d2d2d', '#686767', '#aaaaaa', 'rgb(255, 255, 255)'],
         },
       },
       series: [
