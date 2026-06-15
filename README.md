@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <div align="center">
+=======
+# StudyPlatformFrontend- Cadence Frontend
+>>>>>>> upstream/master
 
   <a href="#">
     <img src="public/LogoDark.webp" alt="Cadence Logo" width="400" height="120">
