@@ -1,4 +1,7 @@
- <a href="#">
+
+<div align="center">
+
+  <a href="#">
     <img src="public/LogoDark.webp" alt="Cadence Logo" width="400" height="120">
   </a>
 
